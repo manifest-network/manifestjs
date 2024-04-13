@@ -1,6 +1,6 @@
 {
   "name": "@chalabi/manifestjs",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Javascript library for interacting with Manifest",
   "author": "Joseph Chalabi <chalabi@chandrastation.com>",
   "homepage": "https://github.com/chalabi2/manifestjs#readme",
@@ -65,6 +65,7 @@
     "@cosmjs/amino": "0.29.4",
     "@cosmjs/proto-signing": "0.29.4",
     "@cosmjs/stargate": "0.29.4",
-    "@cosmjs/tendermint-rpc": "^0.29.4"
+    "@cosmjs/tendermint-rpc": "^0.29.4",
+    "@cosmology/lcd": "^0.13.3"
   }
 }
