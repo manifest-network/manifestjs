@@ -1,6 +1,6 @@
 {
   "name": "@chalabi/manifestjs",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Javascript library for interacting with Manifest",
   "author": "Joseph Chalabi <chalabi@chandrastation.com>",
   "homepage": "https://github.com/chalabi2/manifestjs#readme",
@@ -25,7 +25,7 @@
     "build": "npm run clean && npm run build:cjs && npm run build:mjs && npm run build:rename",
     "codegen": "node scripts/codegen.js",
     "prepare": "npm run build",
-    "lint": "eslint src --fix",
+    "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}' --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand"
