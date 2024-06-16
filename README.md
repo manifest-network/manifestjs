@@ -1,14 +1,14 @@
-# manifest
+# manifestjs
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/545047/188804067-28e67e5e-0214-4449-ab04-2e0c564a6885.svg" width="80"><br />
-    Javascript library for interacting with Manifest
+  <img src="https://avatars.githubusercontent.com/u/90303796?s=200&v=4" width="80"><br />
+    Javascript library for interacting with the Manifest Network
 </p>
 
 ## install
 
 ```sh
-npm install manifest
+npm install @chalabi/manifest
 ```
 
 ## Table of contents
@@ -36,7 +36,7 @@ npm install manifest
 ### RPC Clients
 
 ```js
-import { manifest } from "manifestjs";
+import { manifest } from "@chalabi/manifest";
 
 const { createRPCQueryClient } = manifest.ClientFactory;
 const client = await createRPCQueryClient({ rpcEndpoint: RPC_ENDPOINT });
@@ -55,31 +55,23 @@ const balances = await client.manifest.exchange.v1beta1.exchangeBalances();
 Import the `manifest` object from `manifestjs`.
 
 ```js
-import { manifest } from "manifestjs";
+import { manifest } from "@chalabi/manifest";
 
-const { createSpotLimitOrder, createSpotMarketOrder, deposit } =
-  manifest.exchange.v1beta1.MessageComposer.withTypeUrl;
+const { payout } = manifest.module.v1.MessageComposer.withTypeUrl;
 ```
 
-#### CosmWasm Messages
+#### TokenFactory Messages
 
 ```js
-import { cosmwasm } from "manifestjs";
+import { osmosis } from "@chalabi/manifest";
 
-const {
-  clearAdmin,
-  executeContract,
-  instantiateContract,
-  migrateContract,
-  storeCode,
-  updateAdmin,
-} = cosmwasm.wasm.v1.MessageComposer.withTypeUrl;
+const { createDenom } = osmosis.tokenfactory.v1.MessageComposer.withTypeUrl;
 ```
 
 #### IBC Messages
 
 ```js
-import { ibc } from "manifestjs";
+import { ibc } from "@chalabi/manifest";
 
 const { transfer } = ibc.applications.transfer.v1.MessageComposer.withTypeUrl;
 ```
@@ -87,7 +79,7 @@ const { transfer } = ibc.applications.transfer.v1.MessageComposer.withTypeUrl;
 #### Cosmos Messages
 
 ```js
-import { cosmos } from "manifestjs";
+import { cosmos } from "@chalabi/manifest";
 
 const {
   fundCommunityPool,
@@ -108,6 +100,9 @@ const {
 
 const { deposit, submitProposal, vote, voteWeighted } =
   cosmos.gov.v1beta1.MessageComposer.fromPartial;
+
+const { createGroupWithPolicy } =
+  cosmos.group.v1beta1.MessageComposer.fromPartial;
 ```
 
 ## Connecting with Wallets and Signing Messages
@@ -121,9 +116,9 @@ Here are the docs on [creating signers](https://github.com/cosmology-tech/cosmos
 Use `getSigningmanifestClient` to get your `SigningStargateClient`, with the proto/amino messages full-loaded. No need to manually add amino types, just require and initialize the client:
 
 ```js
-import { getSigningmanifestClient } from "manifestjs";
+import { getSigningStargateClient } from "@chalabi/manifest";
 
-const stargateClient = await getSigningmanifestClient({
+const stargateClient = await getSigningStargateClient({
   rpcEndpoint,
   signer, // OfflineSigner
 });
@@ -206,8 +201,8 @@ import { AminoTypes, SigningStargateClient } from "@cosmjs/stargate";
 import {
     cosmosAminoConverters,
     cosmosProtoRegistry,
-    cosmwasmAminoConverters,
-    cosmwasmProtoRegistry,
+    osmosisAminoConverters,
+    osmosisProtoRegistry,
     ibcProtoRegistry,
     ibcAminoConverters,
     manifestAminoConverters,
@@ -219,14 +214,14 @@ const rpcEndpint = 'https://rpc.cosmos.directory/manifest'; // or another URL
 
 const protoRegistry: ReadonlyArray<[string, GeneratedType]> = [
     ...cosmosProtoRegistry,
-    ...cosmwasmProtoRegistry,
+    ...osmosisProtoRegistry,
     ...ibcProtoRegistry,
     ...manifestProtoRegistry
 ];
 
 const aminoConverters = {
     ...cosmosAminoConverters,
-    ...cosmwasmAminoConverters,
+    ...osmosisAminoConverters,
     ...ibcAminoConverters,
     ...manifestAminoConverters
 };
@@ -280,7 +275,7 @@ Checkout these related projects:
 
 ## Credits
 
-🛠 Built by Cosmology — if you like our tools, please consider delegating to [our validator ⚛️](https://cosmology.zone/validator)
+🛠 Built with Telescope by Cosmology — if you like their tools, please consider delegating to [their validator ⚛️](https://cosmology.zone/validator)
 
 ## Disclaimer
 
