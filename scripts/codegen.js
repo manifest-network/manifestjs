@@ -77,7 +77,8 @@ telescope({
         useDeepPartial: true,
         duration: 'duration',
         timestamp: 'date',
-        useExact: false
+        useExact: false,
+        autoFixUndefinedEnumDefault: true
       }
     },
     interfaces: {
