@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { MsgConnectionOpenInit, MsgConnectionOpenTry, MsgConnectionOpenAck, MsgConnectionOpenConfirm } from "./tx";
 export const AminoConverter = {
   "/ibc.core.connection.v1.MsgConnectionOpenInit": {

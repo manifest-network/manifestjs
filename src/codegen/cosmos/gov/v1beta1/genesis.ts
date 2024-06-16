@@ -1,5 +1,6 @@
 import { Deposit, DepositAmino, DepositSDKType, Vote, VoteAmino, VoteSDKType, Proposal, ProposalAmino, ProposalSDKType, DepositParams, DepositParamsAmino, DepositParamsSDKType, VotingParams, VotingParamsAmino, VotingParamsSDKType, TallyParams, TallyParamsAmino, TallyParamsSDKType } from "./gov";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** GenesisState defines the gov module's genesis state. */
 export interface GenesisState {
   /** starting_proposal_id is the ID of the starting proposal. */
@@ -10,11 +11,11 @@ export interface GenesisState {
   votes: Vote[];
   /** proposals defines all the proposals present at genesis. */
   proposals: Proposal[];
-  /** params defines all the paramaters of related to deposit. */
+  /** deposit_params defines all the parameters related to deposit. */
   depositParams: DepositParams;
-  /** params defines all the paramaters of related to voting. */
+  /** voting_params defines all the parameters related to voting. */
   votingParams: VotingParams;
-  /** params defines all the paramaters of related to tally. */
+  /** tally_params defines all the parameters related to tally. */
   tallyParams: TallyParams;
 }
 export interface GenesisStateProtoMsg {
@@ -26,17 +27,17 @@ export interface GenesisStateAmino {
   /** starting_proposal_id is the ID of the starting proposal. */
   starting_proposal_id?: string;
   /** deposits defines all the deposits present at genesis. */
-  deposits?: DepositAmino[];
+  deposits: DepositAmino[];
   /** votes defines all the votes present at genesis. */
-  votes?: VoteAmino[];
+  votes: VoteAmino[];
   /** proposals defines all the proposals present at genesis. */
-  proposals?: ProposalAmino[];
-  /** params defines all the paramaters of related to deposit. */
-  deposit_params?: DepositParamsAmino;
-  /** params defines all the paramaters of related to voting. */
-  voting_params?: VotingParamsAmino;
-  /** params defines all the paramaters of related to tally. */
-  tally_params?: TallyParamsAmino;
+  proposals: ProposalAmino[];
+  /** deposit_params defines all the parameters related to deposit. */
+  deposit_params: DepositParamsAmino;
+  /** voting_params defines all the parameters related to voting. */
+  voting_params: VotingParamsAmino;
+  /** tally_params defines all the parameters related to tally. */
+  tally_params: TallyParamsAmino;
 }
 export interface GenesisStateAminoMsg {
   type: "cosmos-sdk/GenesisState";
@@ -65,6 +66,7 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/cosmos.gov.v1beta1.GenesisState",
+  aminoType: "cosmos-sdk/GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.startingProposalId !== BigInt(0)) {
       writer.uint32(8).uint64(message.startingProposalId);
@@ -124,7 +126,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: Partial<GenesisState>): GenesisState {
+  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
     const message = createBaseGenesisState();
     message.startingProposalId = object.startingProposalId !== undefined && object.startingProposalId !== null ? BigInt(object.startingProposalId.toString()) : BigInt(0);
     message.deposits = object.deposits?.map(e => Deposit.fromPartial(e)) || [];
@@ -172,9 +174,9 @@ export const GenesisState = {
     } else {
       obj.proposals = message.proposals;
     }
-    obj.deposit_params = message.depositParams ? DepositParams.toAmino(message.depositParams) : undefined;
-    obj.voting_params = message.votingParams ? VotingParams.toAmino(message.votingParams) : undefined;
-    obj.tally_params = message.tallyParams ? TallyParams.toAmino(message.tallyParams) : undefined;
+    obj.deposit_params = message.depositParams ? DepositParams.toAmino(message.depositParams) : DepositParams.toAmino(DepositParams.fromPartial({}));
+    obj.voting_params = message.votingParams ? VotingParams.toAmino(message.votingParams) : VotingParams.toAmino(VotingParams.fromPartial({}));
+    obj.tally_params = message.tallyParams ? TallyParams.toAmino(message.tallyParams) : TallyParams.toAmino(TallyParams.fromPartial({}));
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {

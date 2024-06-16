@@ -1,4 +1,6 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
+import { Decimal } from "@cosmjs/math";
 /**
  * Coin defines a token with a denomination and an amount.
  * 
@@ -21,7 +23,7 @@ export interface CoinProtoMsg {
  */
 export interface CoinAmino {
   denom?: string;
-  amount?: string;
+  amount: string;
 }
 export interface CoinAminoMsg {
   type: "cosmos-sdk/Coin";
@@ -75,7 +77,10 @@ export interface DecCoinSDKType {
   denom: string;
   amount: string;
 }
-/** IntProto defines a Protobuf wrapper around an Int object. */
+/**
+ * IntProto defines a Protobuf wrapper around an Int object.
+ * Deprecated: Prefer to use math.Int directly. It supports binary Marshal and Unmarshal.
+ */
 export interface IntProto {
   int: string;
 }
@@ -83,7 +88,10 @@ export interface IntProtoProtoMsg {
   typeUrl: "/cosmos.base.v1beta1.IntProto";
   value: Uint8Array;
 }
-/** IntProto defines a Protobuf wrapper around an Int object. */
+/**
+ * IntProto defines a Protobuf wrapper around an Int object.
+ * Deprecated: Prefer to use math.Int directly. It supports binary Marshal and Unmarshal.
+ */
 export interface IntProtoAmino {
   int?: string;
 }
@@ -91,11 +99,17 @@ export interface IntProtoAminoMsg {
   type: "cosmos-sdk/IntProto";
   value: IntProtoAmino;
 }
-/** IntProto defines a Protobuf wrapper around an Int object. */
+/**
+ * IntProto defines a Protobuf wrapper around an Int object.
+ * Deprecated: Prefer to use math.Int directly. It supports binary Marshal and Unmarshal.
+ */
 export interface IntProtoSDKType {
   int: string;
 }
-/** DecProto defines a Protobuf wrapper around a Dec object. */
+/**
+ * DecProto defines a Protobuf wrapper around a Dec object.
+ * Deprecated: Prefer to use math.LegacyDec directly. It supports binary Marshal and Unmarshal.
+ */
 export interface DecProto {
   dec: string;
 }
@@ -103,7 +117,10 @@ export interface DecProtoProtoMsg {
   typeUrl: "/cosmos.base.v1beta1.DecProto";
   value: Uint8Array;
 }
-/** DecProto defines a Protobuf wrapper around a Dec object. */
+/**
+ * DecProto defines a Protobuf wrapper around a Dec object.
+ * Deprecated: Prefer to use math.LegacyDec directly. It supports binary Marshal and Unmarshal.
+ */
 export interface DecProtoAmino {
   dec?: string;
 }
@@ -111,7 +128,10 @@ export interface DecProtoAminoMsg {
   type: "cosmos-sdk/DecProto";
   value: DecProtoAmino;
 }
-/** DecProto defines a Protobuf wrapper around a Dec object. */
+/**
+ * DecProto defines a Protobuf wrapper around a Dec object.
+ * Deprecated: Prefer to use math.LegacyDec directly. It supports binary Marshal and Unmarshal.
+ */
 export interface DecProtoSDKType {
   dec: string;
 }
@@ -123,6 +143,7 @@ function createBaseCoin(): Coin {
 }
 export const Coin = {
   typeUrl: "/cosmos.base.v1beta1.Coin",
+  aminoType: "cosmos-sdk/Coin",
   encode(message: Coin, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.denom !== "") {
       writer.uint32(10).string(message.denom);
@@ -152,7 +173,7 @@ export const Coin = {
     }
     return message;
   },
-  fromPartial(object: Partial<Coin>): Coin {
+  fromPartial(object: DeepPartial<Coin>): Coin {
     const message = createBaseCoin();
     message.denom = object.denom ?? "";
     message.amount = object.amount ?? "";
@@ -171,7 +192,7 @@ export const Coin = {
   toAmino(message: Coin): CoinAmino {
     const obj: any = {};
     obj.denom = message.denom === "" ? undefined : message.denom;
-    obj.amount = message.amount === "" ? undefined : message.amount;
+    obj.amount = message.amount ?? "";
     return obj;
   },
   fromAminoMsg(object: CoinAminoMsg): Coin {
@@ -204,12 +225,13 @@ function createBaseDecCoin(): DecCoin {
 }
 export const DecCoin = {
   typeUrl: "/cosmos.base.v1beta1.DecCoin",
+  aminoType: "cosmos-sdk/DecCoin",
   encode(message: DecCoin, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.denom !== "") {
       writer.uint32(10).string(message.denom);
     }
     if (message.amount !== "") {
-      writer.uint32(18).string(message.amount);
+      writer.uint32(18).string(Decimal.fromUserInput(message.amount, 18).atomics);
     }
     return writer;
   },
@@ -224,7 +246,7 @@ export const DecCoin = {
           message.denom = reader.string();
           break;
         case 2:
-          message.amount = reader.string();
+          message.amount = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
         default:
           reader.skipType(tag & 7);
@@ -233,7 +255,7 @@ export const DecCoin = {
     }
     return message;
   },
-  fromPartial(object: Partial<DecCoin>): DecCoin {
+  fromPartial(object: DeepPartial<DecCoin>): DecCoin {
     const message = createBaseDecCoin();
     message.denom = object.denom ?? "";
     message.amount = object.amount ?? "";
@@ -284,6 +306,7 @@ function createBaseIntProto(): IntProto {
 }
 export const IntProto = {
   typeUrl: "/cosmos.base.v1beta1.IntProto",
+  aminoType: "cosmos-sdk/IntProto",
   encode(message: IntProto, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.int !== "") {
       writer.uint32(10).string(message.int);
@@ -307,7 +330,7 @@ export const IntProto = {
     }
     return message;
   },
-  fromPartial(object: Partial<IntProto>): IntProto {
+  fromPartial(object: DeepPartial<IntProto>): IntProto {
     const message = createBaseIntProto();
     message.int = object.int ?? "";
     return message;
@@ -353,9 +376,10 @@ function createBaseDecProto(): DecProto {
 }
 export const DecProto = {
   typeUrl: "/cosmos.base.v1beta1.DecProto",
+  aminoType: "cosmos-sdk/DecProto",
   encode(message: DecProto, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.dec !== "") {
-      writer.uint32(10).string(message.dec);
+      writer.uint32(10).string(Decimal.fromUserInput(message.dec, 18).atomics);
     }
     return writer;
   },
@@ -367,7 +391,7 @@ export const DecProto = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.dec = reader.string();
+          message.dec = Decimal.fromAtomics(reader.string(), 18).toString();
           break;
         default:
           reader.skipType(tag & 7);
@@ -376,7 +400,7 @@ export const DecProto = {
     }
     return message;
   },
-  fromPartial(object: Partial<DecProto>): DecProto {
+  fromPartial(object: DeepPartial<DecProto>): DecProto {
     const message = createBaseDecProto();
     message.dec = object.dec ?? "";
     return message;

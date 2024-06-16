@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { GeneratedType, Registry } from "@cosmjs/proto-signing";
-import { MsgUpdateParams, MsgPayoutStakeholders } from "./tx";
-export const registry: ReadonlyArray<[string, GeneratedType]> = [["/manifest.v1.MsgUpdateParams", MsgUpdateParams], ["/manifest.v1.MsgPayoutStakeholders", MsgPayoutStakeholders]];
+import { MsgUpdateParams, MsgPayout, MsgBurnHeldBalance } from "./tx";
+export const registry: ReadonlyArray<[string, GeneratedType]> = [["/manifest.v1.MsgUpdateParams", MsgUpdateParams], ["/manifest.v1.MsgPayout", MsgPayout], ["/manifest.v1.MsgBurnHeldBalance", MsgBurnHeldBalance]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -15,10 +15,16 @@ export const MessageComposer = {
         value: MsgUpdateParams.encode(value).finish()
       };
     },
-    payoutStakeholders(value: MsgPayoutStakeholders) {
+    payout(value: MsgPayout) {
       return {
-        typeUrl: "/manifest.v1.MsgPayoutStakeholders",
-        value: MsgPayoutStakeholders.encode(value).finish()
+        typeUrl: "/manifest.v1.MsgPayout",
+        value: MsgPayout.encode(value).finish()
+      };
+    },
+    burnHeldBalance(value: MsgBurnHeldBalance) {
+      return {
+        typeUrl: "/manifest.v1.MsgBurnHeldBalance",
+        value: MsgBurnHeldBalance.encode(value).finish()
       };
     }
   },
@@ -29,9 +35,15 @@ export const MessageComposer = {
         value
       };
     },
-    payoutStakeholders(value: MsgPayoutStakeholders) {
+    payout(value: MsgPayout) {
       return {
-        typeUrl: "/manifest.v1.MsgPayoutStakeholders",
+        typeUrl: "/manifest.v1.MsgPayout",
+        value
+      };
+    },
+    burnHeldBalance(value: MsgBurnHeldBalance) {
+      return {
+        typeUrl: "/manifest.v1.MsgBurnHeldBalance",
         value
       };
     }
@@ -43,10 +55,16 @@ export const MessageComposer = {
         value: MsgUpdateParams.fromPartial(value)
       };
     },
-    payoutStakeholders(value: MsgPayoutStakeholders) {
+    payout(value: MsgPayout) {
       return {
-        typeUrl: "/manifest.v1.MsgPayoutStakeholders",
-        value: MsgPayoutStakeholders.fromPartial(value)
+        typeUrl: "/manifest.v1.MsgPayout",
+        value: MsgPayout.fromPartial(value)
+      };
+    },
+    burnHeldBalance(value: MsgBurnHeldBalance) {
+      return {
+        typeUrl: "/manifest.v1.MsgBurnHeldBalance",
+        value: MsgBurnHeldBalance.fromPartial(value)
       };
     }
   }

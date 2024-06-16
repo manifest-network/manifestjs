@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
  * PubKey is an ed25519 public key for handling Tendermint keys in SDK.
  * It's needed for Any serialization and SDK compatibility.
@@ -25,7 +25,7 @@ export interface PubKeyAmino {
   key?: string;
 }
 export interface PubKeyAminoMsg {
-  type: "cosmos-sdk/PubKey";
+  type: "tendermint/PubKeyEd25519";
   value: PubKeyAmino;
 }
 /**
@@ -39,7 +39,7 @@ export interface PubKeySDKType {
   key: Uint8Array;
 }
 /**
- * Deprecated: PrivKey defines a ed25519 private key.
+ * PrivKey defines a ed25519 private key.
  * NOTE: ed25519 keys must not be used in SDK apps except in a tendermint validator context.
  */
 export interface PrivKey {
@@ -50,18 +50,18 @@ export interface PrivKeyProtoMsg {
   value: Uint8Array;
 }
 /**
- * Deprecated: PrivKey defines a ed25519 private key.
+ * PrivKey defines a ed25519 private key.
  * NOTE: ed25519 keys must not be used in SDK apps except in a tendermint validator context.
  */
 export interface PrivKeyAmino {
   key?: string;
 }
 export interface PrivKeyAminoMsg {
-  type: "cosmos-sdk/PrivKey";
+  type: "tendermint/PrivKeyEd25519";
   value: PrivKeyAmino;
 }
 /**
- * Deprecated: PrivKey defines a ed25519 private key.
+ * PrivKey defines a ed25519 private key.
  * NOTE: ed25519 keys must not be used in SDK apps except in a tendermint validator context.
  */
 export interface PrivKeySDKType {
@@ -74,6 +74,7 @@ function createBasePubKey(): PubKey {
 }
 export const PubKey = {
   typeUrl: "/cosmos.crypto.ed25519.PubKey",
+  aminoType: "tendermint/PubKeyEd25519",
   encode(message: PubKey, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
@@ -97,7 +98,7 @@ export const PubKey = {
     }
     return message;
   },
-  fromPartial(object: Partial<PubKey>): PubKey {
+  fromPartial(object: DeepPartial<PubKey>): PubKey {
     const message = createBasePubKey();
     message.key = object.key ?? new Uint8Array();
     return message;
@@ -119,7 +120,7 @@ export const PubKey = {
   },
   toAminoMsg(message: PubKey): PubKeyAminoMsg {
     return {
-      type: "cosmos-sdk/PubKey",
+      type: "tendermint/PubKeyEd25519",
       value: PubKey.toAmino(message)
     };
   },
@@ -143,6 +144,7 @@ function createBasePrivKey(): PrivKey {
 }
 export const PrivKey = {
   typeUrl: "/cosmos.crypto.ed25519.PrivKey",
+  aminoType: "tendermint/PrivKeyEd25519",
   encode(message: PrivKey, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
@@ -166,7 +168,7 @@ export const PrivKey = {
     }
     return message;
   },
-  fromPartial(object: Partial<PrivKey>): PrivKey {
+  fromPartial(object: DeepPartial<PrivKey>): PrivKey {
     const message = createBasePrivKey();
     message.key = object.key ?? new Uint8Array();
     return message;
@@ -188,7 +190,7 @@ export const PrivKey = {
   },
   toAminoMsg(message: PrivKey): PrivKeyAminoMsg {
     return {
-      type: "cosmos-sdk/PrivKey",
+      type: "tendermint/PrivKeyEd25519",
       value: PrivKey.toAmino(message)
     };
   },

@@ -1,4 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { DeepPartial } from "../../../../helpers";
 /** BIP44Params is used as path field in ledger item in Record. */
 export interface BIP44Params {
   /** purpose is a constant set to 44' (or 0x8000002C) following the BIP43 recommendation */
@@ -36,7 +37,7 @@ export interface BIP44ParamsAmino {
   address_index?: number;
 }
 export interface BIP44ParamsAminoMsg {
-  type: "cosmos-sdk/BIP44Params";
+  type: "crypto/keys/hd/BIP44Params";
   value: BIP44ParamsAmino;
 }
 /** BIP44Params is used as path field in ledger item in Record. */
@@ -58,6 +59,7 @@ function createBaseBIP44Params(): BIP44Params {
 }
 export const BIP44Params = {
   typeUrl: "/cosmos.crypto.hd.v1.BIP44Params",
+  aminoType: "crypto/keys/hd/BIP44Params",
   encode(message: BIP44Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.purpose !== 0) {
       writer.uint32(8).uint32(message.purpose);
@@ -105,7 +107,7 @@ export const BIP44Params = {
     }
     return message;
   },
-  fromPartial(object: Partial<BIP44Params>): BIP44Params {
+  fromPartial(object: DeepPartial<BIP44Params>): BIP44Params {
     const message = createBaseBIP44Params();
     message.purpose = object.purpose ?? 0;
     message.coinType = object.coinType ?? 0;
@@ -147,7 +149,7 @@ export const BIP44Params = {
   },
   toAminoMsg(message: BIP44Params): BIP44ParamsAminoMsg {
     return {
-      type: "cosmos-sdk/BIP44Params",
+      type: "crypto/keys/hd/BIP44Params",
       value: BIP44Params.toAmino(message)
     };
   },

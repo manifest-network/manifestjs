@@ -1,5 +1,6 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { Decimal } from "@cosmjs/math";
+import { DeepPartial } from "../../../helpers";
 /** Minter represents the minting state. */
 export interface Minter {
   /** current annual inflation rate */
@@ -27,7 +28,7 @@ export interface MinterSDKType {
   inflation: string;
   annual_provisions: string;
 }
-/** Params holds parameters for the mint module. */
+/** Params defines the parameters for the x/mint module. */
 export interface Params {
   /** type of coin to mint */
   mintDenom: string;
@@ -46,26 +47,26 @@ export interface ParamsProtoMsg {
   typeUrl: "/cosmos.mint.v1beta1.Params";
   value: Uint8Array;
 }
-/** Params holds parameters for the mint module. */
+/** Params defines the parameters for the x/mint module. */
 export interface ParamsAmino {
   /** type of coin to mint */
   mint_denom?: string;
   /** maximum annual change in inflation rate */
-  inflation_rate_change?: string;
+  inflation_rate_change: string;
   /** maximum inflation rate */
-  inflation_max?: string;
+  inflation_max: string;
   /** minimum inflation rate */
-  inflation_min?: string;
+  inflation_min: string;
   /** goal of percent bonded atoms */
-  goal_bonded?: string;
+  goal_bonded: string;
   /** expected blocks per year */
   blocks_per_year?: string;
 }
 export interface ParamsAminoMsg {
-  type: "cosmos-sdk/Params";
+  type: "cosmos-sdk/x/mint/Params";
   value: ParamsAmino;
 }
-/** Params holds parameters for the mint module. */
+/** Params defines the parameters for the x/mint module. */
 export interface ParamsSDKType {
   mint_denom: string;
   inflation_rate_change: string;
@@ -82,6 +83,7 @@ function createBaseMinter(): Minter {
 }
 export const Minter = {
   typeUrl: "/cosmos.mint.v1beta1.Minter",
+  aminoType: "cosmos-sdk/Minter",
   encode(message: Minter, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.inflation !== "") {
       writer.uint32(10).string(Decimal.fromUserInput(message.inflation, 18).atomics);
@@ -111,7 +113,7 @@ export const Minter = {
     }
     return message;
   },
-  fromPartial(object: Partial<Minter>): Minter {
+  fromPartial(object: DeepPartial<Minter>): Minter {
     const message = createBaseMinter();
     message.inflation = object.inflation ?? "";
     message.annualProvisions = object.annualProvisions ?? "";
@@ -167,6 +169,7 @@ function createBaseParams(): Params {
 }
 export const Params = {
   typeUrl: "/cosmos.mint.v1beta1.Params",
+  aminoType: "cosmos-sdk/x/mint/Params",
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.mintDenom !== "") {
       writer.uint32(10).string(message.mintDenom);
@@ -220,7 +223,7 @@ export const Params = {
     }
     return message;
   },
-  fromPartial(object: Partial<Params>): Params {
+  fromPartial(object: DeepPartial<Params>): Params {
     const message = createBaseParams();
     message.mintDenom = object.mintDenom ?? "";
     message.inflationRateChange = object.inflationRateChange ?? "";
@@ -255,10 +258,10 @@ export const Params = {
   toAmino(message: Params): ParamsAmino {
     const obj: any = {};
     obj.mint_denom = message.mintDenom === "" ? undefined : message.mintDenom;
-    obj.inflation_rate_change = message.inflationRateChange === "" ? undefined : message.inflationRateChange;
-    obj.inflation_max = message.inflationMax === "" ? undefined : message.inflationMax;
-    obj.inflation_min = message.inflationMin === "" ? undefined : message.inflationMin;
-    obj.goal_bonded = message.goalBonded === "" ? undefined : message.goalBonded;
+    obj.inflation_rate_change = message.inflationRateChange ?? "";
+    obj.inflation_max = message.inflationMax ?? "";
+    obj.inflation_min = message.inflationMin ?? "";
+    obj.goal_bonded = message.goalBonded ?? "";
     obj.blocks_per_year = message.blocksPerYear !== BigInt(0) ? message.blocksPerYear.toString() : undefined;
     return obj;
   },
@@ -267,7 +270,7 @@ export const Params = {
   },
   toAminoMsg(message: Params): ParamsAminoMsg {
     return {
-      type: "cosmos-sdk/Params",
+      type: "cosmos-sdk/x/mint/Params",
       value: Params.toAmino(message)
     };
   },

@@ -1,12 +1,11 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** ModuleDescriptor describes an app module. */
 export interface ModuleDescriptor {
   /**
    * go_import names the package that should be imported by an app to load the
-   * module in the runtime module registry. Either go_import must be defined here
-   * or the go_package option must be defined at the file level to indicate
-   * to users where to location the module implementation. go_import takes
-   * precedence over go_package when both are defined.
+   * module in the runtime module registry. It is required to make debugging
+   * of configuration errors easier for users.
    */
   goImport: string;
   /**
@@ -35,10 +34,8 @@ export interface ModuleDescriptorProtoMsg {
 export interface ModuleDescriptorAmino {
   /**
    * go_import names the package that should be imported by an app to load the
-   * module in the runtime module registry. Either go_import must be defined here
-   * or the go_package option must be defined at the file level to indicate
-   * to users where to location the module implementation. go_import takes
-   * precedence over go_package when both are defined.
+   * module in the runtime module registry. It is required to make debugging
+   * of configuration errors easier for users.
    */
   go_import?: string;
   /**
@@ -82,13 +79,13 @@ export interface PackageReference {
    * present in a previous version.
    * 
    * A package should indicate its revision with a source code comment
-   * above the package declaration in one of its fields containing the
-   * test "Revision N" where N is an integer revision. All packages start
+   * above the package declaration in one of its files containing the
+   * text "Revision N" where N is an integer revision. All packages start
    * at revision 0 the first time they are released in a module.
    * 
    * When a new version of a module is released and items are added to existing
    * .proto files, these definitions should contain comments of the form
-   * "Since Revision N" where N is an integer revision.
+   * "Since: Revision N" where N is an integer revision.
    * 
    * When the module runtime starts up, it will check the pinned proto
    * image and panic if there are runtime protobuf definitions that are not
@@ -129,13 +126,13 @@ export interface PackageReferenceAmino {
    * present in a previous version.
    * 
    * A package should indicate its revision with a source code comment
-   * above the package declaration in one of its fields containing the
-   * test "Revision N" where N is an integer revision. All packages start
+   * above the package declaration in one of its files containing the
+   * text "Revision N" where N is an integer revision. All packages start
    * at revision 0 the first time they are released in a module.
    * 
    * When a new version of a module is released and items are added to existing
    * .proto files, these definitions should contain comments of the form
-   * "Since Revision N" where N is an integer revision.
+   * "Since: Revision N" where N is an integer revision.
    * 
    * When the module runtime starts up, it will check the pinned proto
    * image and panic if there are runtime protobuf definitions that are not
@@ -214,6 +211,7 @@ function createBaseModuleDescriptor(): ModuleDescriptor {
 }
 export const ModuleDescriptor = {
   typeUrl: "/cosmos.app.v1alpha1.ModuleDescriptor",
+  aminoType: "cosmos-sdk/ModuleDescriptor",
   encode(message: ModuleDescriptor, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.goImport !== "") {
       writer.uint32(10).string(message.goImport);
@@ -249,7 +247,7 @@ export const ModuleDescriptor = {
     }
     return message;
   },
-  fromPartial(object: Partial<ModuleDescriptor>): ModuleDescriptor {
+  fromPartial(object: DeepPartial<ModuleDescriptor>): ModuleDescriptor {
     const message = createBaseModuleDescriptor();
     message.goImport = object.goImport ?? "";
     message.usePackage = object.usePackage?.map(e => PackageReference.fromPartial(e)) || [];
@@ -310,6 +308,7 @@ function createBasePackageReference(): PackageReference {
 }
 export const PackageReference = {
   typeUrl: "/cosmos.app.v1alpha1.PackageReference",
+  aminoType: "cosmos-sdk/PackageReference",
   encode(message: PackageReference, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -339,7 +338,7 @@ export const PackageReference = {
     }
     return message;
   },
-  fromPartial(object: Partial<PackageReference>): PackageReference {
+  fromPartial(object: DeepPartial<PackageReference>): PackageReference {
     const message = createBasePackageReference();
     message.name = object.name ?? "";
     message.revision = object.revision ?? 0;
@@ -390,6 +389,7 @@ function createBaseMigrateFromInfo(): MigrateFromInfo {
 }
 export const MigrateFromInfo = {
   typeUrl: "/cosmos.app.v1alpha1.MigrateFromInfo",
+  aminoType: "cosmos-sdk/MigrateFromInfo",
   encode(message: MigrateFromInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -413,7 +413,7 @@ export const MigrateFromInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<MigrateFromInfo>): MigrateFromInfo {
+  fromPartial(object: DeepPartial<MigrateFromInfo>): MigrateFromInfo {
     const message = createBaseMigrateFromInfo();
     message.module = object.module ?? "";
     return message;

@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { MsgSoftwareUpgrade, MsgCancelUpgrade } from "./tx";
 export const AminoConverter = {
   "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade": {

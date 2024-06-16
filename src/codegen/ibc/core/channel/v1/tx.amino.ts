@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { MsgChannelOpenInit, MsgChannelOpenTry, MsgChannelOpenAck, MsgChannelOpenConfirm, MsgChannelCloseInit, MsgChannelCloseConfirm, MsgRecvPacket, MsgTimeout, MsgTimeoutOnClose, MsgAcknowledgement } from "./tx";
 export const AminoConverter = {
   "/ibc.core.channel.v1.MsgChannelOpenInit": {

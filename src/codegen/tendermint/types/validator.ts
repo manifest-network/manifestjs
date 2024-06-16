@@ -1,6 +1,54 @@
 import { PublicKey, PublicKeyAmino, PublicKeySDKType } from "../crypto/keys";
 import { BinaryReader, BinaryWriter } from "../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../helpers";
+/** BlockIdFlag indicates which BlockID the signature is for */
+export enum BlockIDFlag {
+  /** BLOCK_ID_FLAG_UNKNOWN - indicates an error condition */
+  BLOCK_ID_FLAG_UNKNOWN = 0,
+  /** BLOCK_ID_FLAG_ABSENT - the vote was not received */
+  BLOCK_ID_FLAG_ABSENT = 1,
+  BLOCK_ID_FLAG_COMMIT = 2,
+  /** BLOCK_ID_FLAG_NIL - voted for nil */
+  BLOCK_ID_FLAG_NIL = 3,
+  UNRECOGNIZED = -1,
+}
+export const BlockIDFlagSDKType = BlockIDFlag;
+export const BlockIDFlagAmino = BlockIDFlag;
+export function blockIDFlagFromJSON(object: any): BlockIDFlag {
+  switch (object) {
+    case 0:
+    case "BLOCK_ID_FLAG_UNKNOWN":
+      return BlockIDFlag.BLOCK_ID_FLAG_UNKNOWN;
+    case 1:
+    case "BLOCK_ID_FLAG_ABSENT":
+      return BlockIDFlag.BLOCK_ID_FLAG_ABSENT;
+    case 2:
+    case "BLOCK_ID_FLAG_COMMIT":
+      return BlockIDFlag.BLOCK_ID_FLAG_COMMIT;
+    case 3:
+    case "BLOCK_ID_FLAG_NIL":
+      return BlockIDFlag.BLOCK_ID_FLAG_NIL;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return BlockIDFlag.UNRECOGNIZED;
+  }
+}
+export function blockIDFlagToJSON(object: BlockIDFlag): string {
+  switch (object) {
+    case BlockIDFlag.BLOCK_ID_FLAG_UNKNOWN:
+      return "BLOCK_ID_FLAG_UNKNOWN";
+    case BlockIDFlag.BLOCK_ID_FLAG_ABSENT:
+      return "BLOCK_ID_FLAG_ABSENT";
+    case BlockIDFlag.BLOCK_ID_FLAG_COMMIT:
+      return "BLOCK_ID_FLAG_COMMIT";
+    case BlockIDFlag.BLOCK_ID_FLAG_NIL:
+      return "BLOCK_ID_FLAG_NIL";
+    case BlockIDFlag.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
 export interface ValidatorSet {
   validators: Validator[];
   proposer?: Validator;
@@ -114,7 +162,7 @@ export const ValidatorSet = {
     }
     return message;
   },
-  fromPartial(object: Partial<ValidatorSet>): ValidatorSet {
+  fromPartial(object: DeepPartial<ValidatorSet>): ValidatorSet {
     const message = createBaseValidatorSet();
     message.validators = object.validators?.map(e => Validator.fromPartial(e)) || [];
     message.proposer = object.proposer !== undefined && object.proposer !== null ? Validator.fromPartial(object.proposer) : undefined;
@@ -210,7 +258,7 @@ export const Validator = {
     }
     return message;
   },
-  fromPartial(object: Partial<Validator>): Validator {
+  fromPartial(object: DeepPartial<Validator>): Validator {
     const message = createBaseValidator();
     message.address = object.address ?? new Uint8Array();
     message.pubKey = object.pubKey !== undefined && object.pubKey !== null ? PublicKey.fromPartial(object.pubKey) : undefined;
@@ -295,7 +343,7 @@ export const SimpleValidator = {
     }
     return message;
   },
-  fromPartial(object: Partial<SimpleValidator>): SimpleValidator {
+  fromPartial(object: DeepPartial<SimpleValidator>): SimpleValidator {
     const message = createBaseSimpleValidator();
     message.pubKey = object.pubKey !== undefined && object.pubKey !== null ? PublicKey.fromPartial(object.pubKey) : undefined;
     message.votingPower = object.votingPower !== undefined && object.votingPower !== null ? BigInt(object.votingPower.toString()) : BigInt(0);

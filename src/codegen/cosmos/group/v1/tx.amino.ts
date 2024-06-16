@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { MsgCreateGroup, MsgUpdateGroupMembers, MsgUpdateGroupAdmin, MsgUpdateGroupMetadata, MsgCreateGroupPolicy, MsgCreateGroupWithPolicy, MsgUpdateGroupPolicyAdmin, MsgUpdateGroupPolicyDecisionPolicy, MsgUpdateGroupPolicyMetadata, MsgSubmitProposal, MsgWithdrawProposal, MsgVote, MsgExec, MsgLeaveGroup } from "./tx";
 export const AminoConverter = {
   "/cosmos.group.v1.MsgCreateGroup": {
@@ -37,7 +36,7 @@ export const AminoConverter = {
     fromAmino: MsgUpdateGroupPolicyAdmin.fromAmino
   },
   "/cosmos.group.v1.MsgUpdateGroupPolicyDecisionPolicy": {
-    aminoType: "cosmos-sdk/MsgUpdateGroupPolicyDecisionPolicy",
+    aminoType: "cosmos-sdk/MsgUpdateGroupDecisionPolicy",
     toAmino: MsgUpdateGroupPolicyDecisionPolicy.toAmino,
     fromAmino: MsgUpdateGroupPolicyDecisionPolicy.fromAmino
   },

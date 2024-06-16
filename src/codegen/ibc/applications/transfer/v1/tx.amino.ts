@@ -1,4 +1,3 @@
-//@ts-nocheck
 import { MsgTransfer } from "./tx";
 export const AminoConverter = {
   "/ibc.applications.transfer.v1.MsgTransfer": {

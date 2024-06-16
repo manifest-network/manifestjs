@@ -1,7 +1,7 @@
 import { Timestamp } from "../../../google/protobuf/timestamp";
 import { Any, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { toTimestamp, fromTimestamp } from "../../../helpers";
+import { toTimestamp, fromTimestamp, DeepPartial } from "../../../helpers";
 /** Plan specifies information about a planned upgrade and when it should occur. */
 export interface Plan {
   /**
@@ -21,10 +21,7 @@ export interface Plan {
    */
   /** @deprecated */
   time: Date;
-  /**
-   * The height at which the upgrade must be performed.
-   * Only used if Time is not set.
-   */
+  /** The height at which the upgrade must be performed. */
   height: bigint;
   /**
    * Any application specific upgrade info to be included on-chain
@@ -61,11 +58,8 @@ export interface PlanAmino {
    * If this field is not empty, an error will be thrown.
    */
   /** @deprecated */
-  time?: string;
-  /**
-   * The height at which the upgrade must be performed.
-   * Only used if Time is not set.
-   */
+  time: string;
+  /** The height at which the upgrade must be performed. */
   height?: string;
   /**
    * Any application specific upgrade info to be included on-chain
@@ -103,8 +97,11 @@ export interface PlanSDKType {
 /** @deprecated */
 export interface SoftwareUpgradeProposal {
   $typeUrl?: "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal";
+  /** title of the proposal */
   title: string;
+  /** description of the proposal */
   description: string;
+  /** plan of the proposal */
   plan: Plan;
 }
 export interface SoftwareUpgradeProposalProtoMsg {
@@ -119,9 +116,12 @@ export interface SoftwareUpgradeProposalProtoMsg {
  */
 /** @deprecated */
 export interface SoftwareUpgradeProposalAmino {
+  /** title of the proposal */
   title?: string;
+  /** description of the proposal */
   description?: string;
-  plan?: PlanAmino;
+  /** plan of the proposal */
+  plan: PlanAmino;
 }
 export interface SoftwareUpgradeProposalAminoMsg {
   type: "cosmos-sdk/SoftwareUpgradeProposal";
@@ -149,7 +149,9 @@ export interface SoftwareUpgradeProposalSDKType {
 /** @deprecated */
 export interface CancelSoftwareUpgradeProposal {
   $typeUrl?: "/cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal";
+  /** title of the proposal */
   title: string;
+  /** description of the proposal */
   description: string;
 }
 export interface CancelSoftwareUpgradeProposalProtoMsg {
@@ -164,7 +166,9 @@ export interface CancelSoftwareUpgradeProposalProtoMsg {
  */
 /** @deprecated */
 export interface CancelSoftwareUpgradeProposalAmino {
+  /** title of the proposal */
   title?: string;
+  /** description of the proposal */
   description?: string;
 }
 export interface CancelSoftwareUpgradeProposalAminoMsg {
@@ -233,6 +237,7 @@ function createBasePlan(): Plan {
 }
 export const Plan = {
   typeUrl: "/cosmos.upgrade.v1beta1.Plan",
+  aminoType: "cosmos-sdk/Plan",
   encode(message: Plan, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -280,7 +285,7 @@ export const Plan = {
     }
     return message;
   },
-  fromPartial(object: Partial<Plan>): Plan {
+  fromPartial(object: DeepPartial<Plan>): Plan {
     const message = createBasePlan();
     message.name = object.name ?? "";
     message.time = object.time ?? undefined;
@@ -311,7 +316,7 @@ export const Plan = {
   toAmino(message: Plan): PlanAmino {
     const obj: any = {};
     obj.name = message.name === "" ? undefined : message.name;
-    obj.time = message.time ? Timestamp.toAmino(toTimestamp(message.time)) : undefined;
+    obj.time = message.time ? Timestamp.toAmino(toTimestamp(message.time)) : new Date();
     obj.height = message.height !== BigInt(0) ? message.height.toString() : undefined;
     obj.info = message.info === "" ? undefined : message.info;
     obj.upgraded_client_state = message.upgradedClientState ? Any.toAmino(message.upgradedClientState) : undefined;
@@ -349,6 +354,7 @@ function createBaseSoftwareUpgradeProposal(): SoftwareUpgradeProposal {
 }
 export const SoftwareUpgradeProposal = {
   typeUrl: "/cosmos.upgrade.v1beta1.SoftwareUpgradeProposal",
+  aminoType: "cosmos-sdk/SoftwareUpgradeProposal",
   encode(message: SoftwareUpgradeProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.title !== "") {
       writer.uint32(10).string(message.title);
@@ -384,7 +390,7 @@ export const SoftwareUpgradeProposal = {
     }
     return message;
   },
-  fromPartial(object: Partial<SoftwareUpgradeProposal>): SoftwareUpgradeProposal {
+  fromPartial(object: DeepPartial<SoftwareUpgradeProposal>): SoftwareUpgradeProposal {
     const message = createBaseSoftwareUpgradeProposal();
     message.title = object.title ?? "";
     message.description = object.description ?? "";
@@ -408,7 +414,7 @@ export const SoftwareUpgradeProposal = {
     const obj: any = {};
     obj.title = message.title === "" ? undefined : message.title;
     obj.description = message.description === "" ? undefined : message.description;
-    obj.plan = message.plan ? Plan.toAmino(message.plan) : undefined;
+    obj.plan = message.plan ? Plan.toAmino(message.plan) : Plan.toAmino(Plan.fromPartial({}));
     return obj;
   },
   fromAminoMsg(object: SoftwareUpgradeProposalAminoMsg): SoftwareUpgradeProposal {
@@ -442,6 +448,7 @@ function createBaseCancelSoftwareUpgradeProposal(): CancelSoftwareUpgradeProposa
 }
 export const CancelSoftwareUpgradeProposal = {
   typeUrl: "/cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal",
+  aminoType: "cosmos-sdk/CancelSoftwareUpgradeProposal",
   encode(message: CancelSoftwareUpgradeProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.title !== "") {
       writer.uint32(10).string(message.title);
@@ -471,7 +478,7 @@ export const CancelSoftwareUpgradeProposal = {
     }
     return message;
   },
-  fromPartial(object: Partial<CancelSoftwareUpgradeProposal>): CancelSoftwareUpgradeProposal {
+  fromPartial(object: DeepPartial<CancelSoftwareUpgradeProposal>): CancelSoftwareUpgradeProposal {
     const message = createBaseCancelSoftwareUpgradeProposal();
     message.title = object.title ?? "";
     message.description = object.description ?? "";
@@ -523,6 +530,7 @@ function createBaseModuleVersion(): ModuleVersion {
 }
 export const ModuleVersion = {
   typeUrl: "/cosmos.upgrade.v1beta1.ModuleVersion",
+  aminoType: "cosmos-sdk/ModuleVersion",
   encode(message: ModuleVersion, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -552,7 +560,7 @@ export const ModuleVersion = {
     }
     return message;
   },
-  fromPartial(object: Partial<ModuleVersion>): ModuleVersion {
+  fromPartial(object: DeepPartial<ModuleVersion>): ModuleVersion {
     const message = createBaseModuleVersion();
     message.name = object.name ?? "";
     message.version = object.version !== undefined && object.version !== null ? BigInt(object.version.toString()) : BigInt(0);

@@ -1,35 +1,44 @@
-const { join } = require('path');
+const { join, resolve } = require('path');
 const telescope = require('@cosmology/telescope').default;
 const rimraf = require('rimraf').rimrafSync;
-const { AMINO_MAP } = require('./aminos');
 
 const protoDirs = [join(__dirname, '/../proto')];
-const outPath = join(__dirname, '../src/codegen');
+
+const outPath = join(__dirname, '/../src/codegen');
 rimraf(outPath);
 
 telescope({
   protoDirs,
   outPath,
   options: {
+    removeUnusedImports: true, // testing...
+    classesUseArrowFunctions: true,
+
     tsDisable: {
+      patterns: ['**/tx.registry.ts'],
       files: [
-        'cosmos/authz/v1beta1/tx.amino.ts',
-        'cosmos/staking/v1beta1/tx.amino.ts'
-      ],
-      patterns: ['**/*amino.ts', '**/*registry.ts']
+        'cosmos/auth/v1beta1/query.ts',
+        'cosmos/authz/v1beta1/authz.ts',
+        'cosmos/gov/v1/tx.ts',
+        'cosmos/gov/v1beta1/gov.ts',
+        'cosmos/gov/v1beta1/tx.ts'
+      ]
     },
+
     prototypes: {
-      includePackageVar: false,
-      removeUnusedImports: true,
-      experimentalGlobalProtoNamespace: true,
-      interfaces: {
-        enabled: true,
-        useUnionTypes: false
-      },
+      optionalQueryParams: true,
+      useOptionalNullable: true,
+      fieldDefaultIsOptional: true,
+
+      addTypeUrlToObjects: true,
+      addTypeUrlToDecoders: true,
+      addAminoTypeToObjects: true,
+
       excluded: {
         packages: [
           'ibc.applications.fee.v1', // issue with parsing protos (LCD routes with nested objects in params)
 
+          // 'cosmos.auth.v1beta1',
           'cosmos.app.v1alpha1',
           'cosmos.app.v1beta1',
           'cosmos.base.kv.v1beta1',
@@ -39,56 +48,65 @@ telescope({
           'cosmos.base.tendermint.v1beta1',
           'cosmos.crisis.v1beta1',
           'cosmos.evidence.v1beta1',
+          // "cosmos.feegrant.v1beta1",
           'cosmos.genutil.v1beta1',
+          // "cosmos.group.v1beta1",
+
+          // 'cosmos.mint.v1beta1',
 
           'cosmos.autocli.v1',
 
+          // "cosmos.group.v1",
           'cosmos.msg.v1',
           'cosmos.nft.v1beta1',
           'cosmos.capability.v1beta1',
           'cosmos.orm.v1alpha1',
           'cosmos.orm.v1',
           'cosmos.slashing.v1beta1',
+          // "cosmos.vesting.v1beta1",
           'google.api',
           'ibc.core.port.v1',
           'ibc.core.types.v1'
-        ]
-      },
-      methods: {
-        fromJSON: false,
-        toJSON: false,
-        encode: true,
-        decode: true,
-        fromPartial: true,
-        toAmino: true,
-        fromAmino: true,
-        fromProto: true,
-        toProto: true
+        ],
+        hardProtos: ['cosmos/accounts/v1/accounts.proto']
       },
       parser: {
         keepCase: false
+      },
+      typingsFormat: {
+        useDeepPartial: true,
+        duration: 'duration',
+        timestamp: 'date',
+        useExact: false
       }
     },
-    typingsFormat: {
-      duration: 'duration',
-      timestamp: 'date',
-      useExact: false,
-      useDeepPartial: false,
-      num64: 'bigint',
-      customTypes: {
-        useCosmosSDKDec: true
-      }
+    interfaces: {
+      enabled: true,
+      useUnionTypes: true
     },
     aminoEncoding: {
       enabled: true,
-      exceptions: AMINO_MAP
+      useLegacyInlineEncoding: false
     },
     lcdClients: {
-      enabled: false
+      enabled: true
     },
     rpcClients: {
+      type: 'tendermint',
       enabled: true,
-      camelCase: true
+      camelCase: true,
+      useConnectComet: true
+    },
+    packages: {
+      cosmos: {
+        authz: {
+          v1beta1: {
+            aminoEncoding: {
+              enabled: false
+            }
+          }
+        }
+      }
     }
   }
 })

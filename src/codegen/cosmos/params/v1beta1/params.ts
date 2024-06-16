@@ -1,4 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial } from "../../../helpers";
 /** ParameterChangeProposal defines a proposal to change one or more parameters. */
 export interface ParameterChangeProposal {
   $typeUrl?: "/cosmos.params.v1beta1.ParameterChangeProposal";
@@ -14,7 +15,7 @@ export interface ParameterChangeProposalProtoMsg {
 export interface ParameterChangeProposalAmino {
   title?: string;
   description?: string;
-  changes?: ParamChangeAmino[];
+  changes: ParamChangeAmino[];
 }
 export interface ParameterChangeProposalAminoMsg {
   type: "cosmos-sdk/ParameterChangeProposal";
@@ -72,6 +73,7 @@ function createBaseParameterChangeProposal(): ParameterChangeProposal {
 }
 export const ParameterChangeProposal = {
   typeUrl: "/cosmos.params.v1beta1.ParameterChangeProposal",
+  aminoType: "cosmos-sdk/ParameterChangeProposal",
   encode(message: ParameterChangeProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.title !== "") {
       writer.uint32(10).string(message.title);
@@ -107,7 +109,7 @@ export const ParameterChangeProposal = {
     }
     return message;
   },
-  fromPartial(object: Partial<ParameterChangeProposal>): ParameterChangeProposal {
+  fromPartial(object: DeepPartial<ParameterChangeProposal>): ParameterChangeProposal {
     const message = createBaseParameterChangeProposal();
     message.title = object.title ?? "";
     message.description = object.description ?? "";
@@ -167,6 +169,7 @@ function createBaseParamChange(): ParamChange {
 }
 export const ParamChange = {
   typeUrl: "/cosmos.params.v1beta1.ParamChange",
+  aminoType: "cosmos-sdk/ParamChange",
   encode(message: ParamChange, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.subspace !== "") {
       writer.uint32(10).string(message.subspace);
@@ -202,7 +205,7 @@ export const ParamChange = {
     }
     return message;
   },
-  fromPartial(object: Partial<ParamChange>): ParamChange {
+  fromPartial(object: DeepPartial<ParamChange>): ParamChange {
     const message = createBaseParamChange();
     message.subspace = object.subspace ?? "";
     message.key = object.key ?? "";

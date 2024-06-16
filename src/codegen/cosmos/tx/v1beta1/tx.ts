@@ -3,7 +3,7 @@ import { SignMode } from "../signing/v1beta1/signing";
 import { CompactBitArray, CompactBitArrayAmino, CompactBitArraySDKType } from "../../crypto/multisig/v1beta1/multisig";
 import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { bytesFromBase64, base64FromBytes } from "../../../helpers";
+import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /** Tx is the standard type used for broadcasting transactions. */
 export interface Tx {
   /** body is the processable content of the transaction */
@@ -201,10 +201,8 @@ export interface SignDocDirectAux {
   accountNumber: bigint;
   /** sequence is the sequence number of the signing account. */
   sequence: bigint;
-  /**
-   * Tip is the optional tip used for meta-transactions. It should be left
-   * empty if the signer is not the tipper for this transaction.
-   */
+  /** tips have been depreacted and should not be used */
+  /** @deprecated */
   tip?: Tip;
 }
 export interface SignDocDirectAuxProtoMsg {
@@ -235,10 +233,8 @@ export interface SignDocDirectAuxAmino {
   account_number?: string;
   /** sequence is the sequence number of the signing account. */
   sequence?: string;
-  /**
-   * Tip is the optional tip used for meta-transactions. It should be left
-   * empty if the signer is not the tipper for this transaction.
-   */
+  /** tips have been depreacted and should not be used */
+  /** @deprecated */
   tip?: TipAmino;
 }
 export interface SignDocDirectAuxAminoMsg {
@@ -257,6 +253,7 @@ export interface SignDocDirectAuxSDKType {
   chain_id: string;
   account_number: bigint;
   sequence: bigint;
+  /** @deprecated */
   tip?: TipSDKType;
 }
 /** TxBody is the body of a transaction that all signers sign over. */
@@ -367,10 +364,14 @@ export interface AuthInfo {
    */
   fee?: Fee;
   /**
-   * Tip is the optional tip used for meta-transactions.
+   * Tip is the optional tip used for transactions fees paid in another denom.
+   * 
+   * This field is ignored if the chain didn't enable tips, i.e. didn't add the
+   * `TipDecorator` in its posthandler.
    * 
    * Since: cosmos-sdk 0.46
    */
+  /** @deprecated */
   tip?: Tip;
 }
 export interface AuthInfoProtoMsg {
@@ -397,10 +398,14 @@ export interface AuthInfoAmino {
    */
   fee?: FeeAmino;
   /**
-   * Tip is the optional tip used for meta-transactions.
+   * Tip is the optional tip used for transactions fees paid in another denom.
+   * 
+   * This field is ignored if the chain didn't enable tips, i.e. didn't add the
+   * `TipDecorator` in its posthandler.
    * 
    * Since: cosmos-sdk 0.46
    */
+  /** @deprecated */
   tip?: TipAmino;
 }
 export interface AuthInfoAminoMsg {
@@ -414,6 +419,7 @@ export interface AuthInfoAminoMsg {
 export interface AuthInfoSDKType {
   signer_infos: SignerInfoSDKType[];
   fee?: FeeSDKType;
+  /** @deprecated */
   tip?: TipSDKType;
 }
 /**
@@ -610,7 +616,7 @@ export interface FeeProtoMsg {
  */
 export interface FeeAmino {
   /** amount is the amount of coins to be paid as a fee */
-  amount?: CoinAmino[];
+  amount: CoinAmino[];
   /**
    * gas_limit is the maximum gas that can be used in transaction processing
    * before an out of gas error occurs
@@ -649,6 +655,7 @@ export interface FeeSDKType {
  * 
  * Since: cosmos-sdk 0.46
  */
+/** @deprecated */
 export interface Tip {
   /** amount is the amount of the tip */
   amount: Coin[];
@@ -664,9 +671,10 @@ export interface TipProtoMsg {
  * 
  * Since: cosmos-sdk 0.46
  */
+/** @deprecated */
 export interface TipAmino {
   /** amount is the amount of the tip */
-  amount?: CoinAmino[];
+  amount: CoinAmino[];
   /** tipper is the address of the account paying for the tip */
   tipper?: string;
 }
@@ -679,6 +687,7 @@ export interface TipAminoMsg {
  * 
  * Since: cosmos-sdk 0.46
  */
+/** @deprecated */
 export interface TipSDKType {
   amount: CoinSDKType[];
   tipper: string;
@@ -699,12 +708,12 @@ export interface AuxSignerData {
    */
   address: string;
   /**
-   * sign_doc is the SIGN_MOD_DIRECT_AUX sign doc that the auxiliary signer
+   * sign_doc is the SIGN_MODE_DIRECT_AUX sign doc that the auxiliary signer
    * signs. Note: we use the same sign doc even if we're signing with
    * LEGACY_AMINO_JSON.
    */
   signDoc?: SignDocDirectAux;
-  /** mode is the signing mode of the single signer */
+  /** mode is the signing mode of the single signer. */
   mode: SignMode;
   /** sig is the signature of the sign doc. */
   sig: Uint8Array;
@@ -729,12 +738,12 @@ export interface AuxSignerDataAmino {
    */
   address?: string;
   /**
-   * sign_doc is the SIGN_MOD_DIRECT_AUX sign doc that the auxiliary signer
+   * sign_doc is the SIGN_MODE_DIRECT_AUX sign doc that the auxiliary signer
    * signs. Note: we use the same sign doc even if we're signing with
    * LEGACY_AMINO_JSON.
    */
   sign_doc?: SignDocDirectAuxAmino;
-  /** mode is the signing mode of the single signer */
+  /** mode is the signing mode of the single signer. */
   mode?: SignMode;
   /** sig is the signature of the sign doc. */
   sig?: string;
@@ -766,6 +775,7 @@ function createBaseTx(): Tx {
 }
 export const Tx = {
   typeUrl: "/cosmos.tx.v1beta1.Tx",
+  aminoType: "cosmos-sdk/Tx",
   encode(message: Tx, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.body !== undefined) {
       TxBody.encode(message.body, writer.uint32(10).fork()).ldelim();
@@ -801,7 +811,7 @@ export const Tx = {
     }
     return message;
   },
-  fromPartial(object: Partial<Tx>): Tx {
+  fromPartial(object: DeepPartial<Tx>): Tx {
     const message = createBaseTx();
     message.body = object.body !== undefined && object.body !== null ? TxBody.fromPartial(object.body) : undefined;
     message.authInfo = object.authInfo !== undefined && object.authInfo !== null ? AuthInfo.fromPartial(object.authInfo) : undefined;
@@ -861,6 +871,7 @@ function createBaseTxRaw(): TxRaw {
 }
 export const TxRaw = {
   typeUrl: "/cosmos.tx.v1beta1.TxRaw",
+  aminoType: "cosmos-sdk/TxRaw",
   encode(message: TxRaw, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.bodyBytes.length !== 0) {
       writer.uint32(10).bytes(message.bodyBytes);
@@ -896,7 +907,7 @@ export const TxRaw = {
     }
     return message;
   },
-  fromPartial(object: Partial<TxRaw>): TxRaw {
+  fromPartial(object: DeepPartial<TxRaw>): TxRaw {
     const message = createBaseTxRaw();
     message.bodyBytes = object.bodyBytes ?? new Uint8Array();
     message.authInfoBytes = object.authInfoBytes ?? new Uint8Array();
@@ -957,6 +968,7 @@ function createBaseSignDoc(): SignDoc {
 }
 export const SignDoc = {
   typeUrl: "/cosmos.tx.v1beta1.SignDoc",
+  aminoType: "cosmos-sdk/SignDoc",
   encode(message: SignDoc, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.bodyBytes.length !== 0) {
       writer.uint32(10).bytes(message.bodyBytes);
@@ -998,7 +1010,7 @@ export const SignDoc = {
     }
     return message;
   },
-  fromPartial(object: Partial<SignDoc>): SignDoc {
+  fromPartial(object: DeepPartial<SignDoc>): SignDoc {
     const message = createBaseSignDoc();
     message.bodyBytes = object.bodyBytes ?? new Uint8Array();
     message.authInfoBytes = object.authInfoBytes ?? new Uint8Array();
@@ -1064,6 +1076,7 @@ function createBaseSignDocDirectAux(): SignDocDirectAux {
 }
 export const SignDocDirectAux = {
   typeUrl: "/cosmos.tx.v1beta1.SignDocDirectAux",
+  aminoType: "cosmos-sdk/SignDocDirectAux",
   encode(message: SignDocDirectAux, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.bodyBytes.length !== 0) {
       writer.uint32(10).bytes(message.bodyBytes);
@@ -1117,7 +1130,7 @@ export const SignDocDirectAux = {
     }
     return message;
   },
-  fromPartial(object: Partial<SignDocDirectAux>): SignDocDirectAux {
+  fromPartial(object: DeepPartial<SignDocDirectAux>): SignDocDirectAux {
     const message = createBaseSignDocDirectAux();
     message.bodyBytes = object.bodyBytes ?? new Uint8Array();
     message.publicKey = object.publicKey !== undefined && object.publicKey !== null ? Any.fromPartial(object.publicKey) : undefined;
@@ -1192,6 +1205,7 @@ function createBaseTxBody(): TxBody {
 }
 export const TxBody = {
   typeUrl: "/cosmos.tx.v1beta1.TxBody",
+  aminoType: "cosmos-sdk/TxBody",
   encode(message: TxBody, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.messages) {
       Any.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1239,7 +1253,7 @@ export const TxBody = {
     }
     return message;
   },
-  fromPartial(object: Partial<TxBody>): TxBody {
+  fromPartial(object: DeepPartial<TxBody>): TxBody {
     const message = createBaseTxBody();
     message.messages = object.messages?.map(e => Any.fromPartial(e)) || [];
     message.memo = object.memo ?? "";
@@ -1313,6 +1327,7 @@ function createBaseAuthInfo(): AuthInfo {
 }
 export const AuthInfo = {
   typeUrl: "/cosmos.tx.v1beta1.AuthInfo",
+  aminoType: "cosmos-sdk/AuthInfo",
   encode(message: AuthInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.signerInfos) {
       SignerInfo.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1348,7 +1363,7 @@ export const AuthInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<AuthInfo>): AuthInfo {
+  fromPartial(object: DeepPartial<AuthInfo>): AuthInfo {
     const message = createBaseAuthInfo();
     message.signerInfos = object.signerInfos?.map(e => SignerInfo.fromPartial(e)) || [];
     message.fee = object.fee !== undefined && object.fee !== null ? Fee.fromPartial(object.fee) : undefined;
@@ -1408,6 +1423,7 @@ function createBaseSignerInfo(): SignerInfo {
 }
 export const SignerInfo = {
   typeUrl: "/cosmos.tx.v1beta1.SignerInfo",
+  aminoType: "cosmos-sdk/SignerInfo",
   encode(message: SignerInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.publicKey !== undefined) {
       Any.encode(message.publicKey, writer.uint32(10).fork()).ldelim();
@@ -1443,7 +1459,7 @@ export const SignerInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<SignerInfo>): SignerInfo {
+  fromPartial(object: DeepPartial<SignerInfo>): SignerInfo {
     const message = createBaseSignerInfo();
     message.publicKey = object.publicKey !== undefined && object.publicKey !== null ? Any.fromPartial(object.publicKey) : undefined;
     message.modeInfo = object.modeInfo !== undefined && object.modeInfo !== null ? ModeInfo.fromPartial(object.modeInfo) : undefined;
@@ -1500,6 +1516,7 @@ function createBaseModeInfo(): ModeInfo {
 }
 export const ModeInfo = {
   typeUrl: "/cosmos.tx.v1beta1.ModeInfo",
+  aminoType: "cosmos-sdk/ModeInfo",
   encode(message: ModeInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.single !== undefined) {
       ModeInfo_Single.encode(message.single, writer.uint32(10).fork()).ldelim();
@@ -1529,7 +1546,7 @@ export const ModeInfo = {
     }
     return message;
   },
-  fromPartial(object: Partial<ModeInfo>): ModeInfo {
+  fromPartial(object: DeepPartial<ModeInfo>): ModeInfo {
     const message = createBaseModeInfo();
     message.single = object.single !== undefined && object.single !== null ? ModeInfo_Single.fromPartial(object.single) : undefined;
     message.multi = object.multi !== undefined && object.multi !== null ? ModeInfo_Multi.fromPartial(object.multi) : undefined;
@@ -1580,6 +1597,7 @@ function createBaseModeInfo_Single(): ModeInfo_Single {
 }
 export const ModeInfo_Single = {
   typeUrl: "/cosmos.tx.v1beta1.Single",
+  aminoType: "cosmos-sdk/Single",
   encode(message: ModeInfo_Single, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.mode !== 0) {
       writer.uint32(8).int32(message.mode);
@@ -1603,7 +1621,7 @@ export const ModeInfo_Single = {
     }
     return message;
   },
-  fromPartial(object: Partial<ModeInfo_Single>): ModeInfo_Single {
+  fromPartial(object: DeepPartial<ModeInfo_Single>): ModeInfo_Single {
     const message = createBaseModeInfo_Single();
     message.mode = object.mode ?? 0;
     return message;
@@ -1650,6 +1668,7 @@ function createBaseModeInfo_Multi(): ModeInfo_Multi {
 }
 export const ModeInfo_Multi = {
   typeUrl: "/cosmos.tx.v1beta1.Multi",
+  aminoType: "cosmos-sdk/Multi",
   encode(message: ModeInfo_Multi, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.bitarray !== undefined) {
       CompactBitArray.encode(message.bitarray, writer.uint32(10).fork()).ldelim();
@@ -1679,7 +1698,7 @@ export const ModeInfo_Multi = {
     }
     return message;
   },
-  fromPartial(object: Partial<ModeInfo_Multi>): ModeInfo_Multi {
+  fromPartial(object: DeepPartial<ModeInfo_Multi>): ModeInfo_Multi {
     const message = createBaseModeInfo_Multi();
     message.bitarray = object.bitarray !== undefined && object.bitarray !== null ? CompactBitArray.fromPartial(object.bitarray) : undefined;
     message.modeInfos = object.modeInfos?.map(e => ModeInfo.fromPartial(e)) || [];
@@ -1735,6 +1754,7 @@ function createBaseFee(): Fee {
 }
 export const Fee = {
   typeUrl: "/cosmos.tx.v1beta1.Fee",
+  aminoType: "cosmos-sdk/Fee",
   encode(message: Fee, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.amount) {
       Coin.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1776,7 +1796,7 @@ export const Fee = {
     }
     return message;
   },
-  fromPartial(object: Partial<Fee>): Fee {
+  fromPartial(object: DeepPartial<Fee>): Fee {
     const message = createBaseFee();
     message.amount = object.amount?.map(e => Coin.fromPartial(e)) || [];
     message.gasLimit = object.gasLimit !== undefined && object.gasLimit !== null ? BigInt(object.gasLimit.toString()) : BigInt(0);
@@ -1840,6 +1860,7 @@ function createBaseTip(): Tip {
 }
 export const Tip = {
   typeUrl: "/cosmos.tx.v1beta1.Tip",
+  aminoType: "cosmos-sdk/Tip",
   encode(message: Tip, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.amount) {
       Coin.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -1869,7 +1890,7 @@ export const Tip = {
     }
     return message;
   },
-  fromPartial(object: Partial<Tip>): Tip {
+  fromPartial(object: DeepPartial<Tip>): Tip {
     const message = createBaseTip();
     message.amount = object.amount?.map(e => Coin.fromPartial(e)) || [];
     message.tipper = object.tipper ?? "";
@@ -1925,6 +1946,7 @@ function createBaseAuxSignerData(): AuxSignerData {
 }
 export const AuxSignerData = {
   typeUrl: "/cosmos.tx.v1beta1.AuxSignerData",
+  aminoType: "cosmos-sdk/AuxSignerData",
   encode(message: AuxSignerData, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -1966,7 +1988,7 @@ export const AuxSignerData = {
     }
     return message;
   },
-  fromPartial(object: Partial<AuxSignerData>): AuxSignerData {
+  fromPartial(object: DeepPartial<AuxSignerData>): AuxSignerData {
     const message = createBaseAuxSignerData();
     message.address = object.address ?? "";
     message.signDoc = object.signDoc !== undefined && object.signDoc !== null ? SignDocDirectAux.fromPartial(object.signDoc) : undefined;
