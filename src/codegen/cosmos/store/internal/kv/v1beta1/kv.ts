@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../../../binary";
-import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../../helpers";
+import { DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../../../helpers";
 /** Pairs defines a repeated slice of Pair objects. */
 export interface Pairs {
   pairs: Pair[];
@@ -74,7 +74,7 @@ export const Pairs = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Pairs>): Pairs {
+  fromPartial<I extends Exact<DeepPartial<Pairs>, I>>(object: I): Pairs {
     const message = createBasePairs();
     message.pairs = object.pairs?.map(e => Pair.fromPartial(e)) || [];
     return message;
@@ -153,7 +153,7 @@ export const Pair = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Pair>): Pair {
+  fromPartial<I extends Exact<DeepPartial<Pair>, I>>(object: I): Pair {
     const message = createBasePair();
     message.key = object.key ?? new Uint8Array();
     message.value = object.value ?? new Uint8Array();

@@ -1,6 +1,6 @@
 import { Duration, DurationAmino, DurationSDKType } from "../../../google/protobuf/duration";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 import { Decimal } from "@cosmjs/math";
 /** Params defines the parameters for the module. */
 export interface Params {
@@ -126,7 +126,7 @@ export const Params = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Params>): Params {
+  fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
     message.admins = object.admins?.map(e => e) || [];
     message.allowValidatorSelfExit = object.allowValidatorSelfExit ?? false;
@@ -238,7 +238,7 @@ export const StakingParams = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<StakingParams>): StakingParams {
+  fromPartial<I extends Exact<DeepPartial<StakingParams>, I>>(object: I): StakingParams {
     const message = createBaseStakingParams();
     message.unbondingTime = object.unbondingTime !== undefined && object.unbondingTime !== null ? Duration.fromPartial(object.unbondingTime) : undefined;
     message.maxValidators = object.maxValidators ?? 0;

@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 import { Decimal } from "@cosmjs/math";
 /**
  * Coin defines a token with a denomination and an amount.
@@ -173,7 +173,7 @@ export const Coin = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Coin>): Coin {
+  fromPartial<I extends Exact<DeepPartial<Coin>, I>>(object: I): Coin {
     const message = createBaseCoin();
     message.denom = object.denom ?? "";
     message.amount = object.amount ?? "";
@@ -255,7 +255,7 @@ export const DecCoin = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<DecCoin>): DecCoin {
+  fromPartial<I extends Exact<DeepPartial<DecCoin>, I>>(object: I): DecCoin {
     const message = createBaseDecCoin();
     message.denom = object.denom ?? "";
     message.amount = object.amount ?? "";
@@ -330,7 +330,7 @@ export const IntProto = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<IntProto>): IntProto {
+  fromPartial<I extends Exact<DeepPartial<IntProto>, I>>(object: I): IntProto {
     const message = createBaseIntProto();
     message.int = object.int ?? "";
     return message;
@@ -400,7 +400,7 @@ export const DecProto = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<DecProto>): DecProto {
+  fromPartial<I extends Exact<DeepPartial<DecProto>, I>>(object: I): DecProto {
     const message = createBaseDecProto();
     message.dec = object.dec ?? "";
     return message;

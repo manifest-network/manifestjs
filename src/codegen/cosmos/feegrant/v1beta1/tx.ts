@@ -1,7 +1,7 @@
 import { Any, AnyProtoMsg, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
 import { BasicAllowance, BasicAllowanceProtoMsg, BasicAllowanceSDKType, PeriodicAllowance, PeriodicAllowanceProtoMsg, PeriodicAllowanceSDKType, AllowedMsgAllowance, AllowedMsgAllowanceProtoMsg, AllowedMsgAllowanceSDKType } from "./feegrant";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 /**
  * MsgGrantAllowance adds permission for Grantee to spend up to Allowance
  * of fees from the account of Granter.
@@ -206,7 +206,7 @@ export const MsgGrantAllowance = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgGrantAllowance>): MsgGrantAllowance {
+  fromPartial<I extends Exact<DeepPartial<MsgGrantAllowance>, I>>(object: I): MsgGrantAllowance {
     const message = createBaseMsgGrantAllowance();
     message.granter = object.granter ?? "";
     message.grantee = object.grantee ?? "";
@@ -278,7 +278,7 @@ export const MsgGrantAllowanceResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgGrantAllowanceResponse>): MsgGrantAllowanceResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgGrantAllowanceResponse>, I>>(_: I): MsgGrantAllowanceResponse {
     const message = createBaseMsgGrantAllowanceResponse();
     return message;
   },
@@ -350,7 +350,7 @@ export const MsgRevokeAllowance = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgRevokeAllowance>): MsgRevokeAllowance {
+  fromPartial<I extends Exact<DeepPartial<MsgRevokeAllowance>, I>>(object: I): MsgRevokeAllowance {
     const message = createBaseMsgRevokeAllowance();
     message.granter = object.granter ?? "";
     message.grantee = object.grantee ?? "";
@@ -417,7 +417,7 @@ export const MsgRevokeAllowanceResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgRevokeAllowanceResponse>): MsgRevokeAllowanceResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgRevokeAllowanceResponse>, I>>(_: I): MsgRevokeAllowanceResponse {
     const message = createBaseMsgRevokeAllowanceResponse();
     return message;
   },
@@ -482,7 +482,7 @@ export const MsgPruneAllowances = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgPruneAllowances>): MsgPruneAllowances {
+  fromPartial<I extends Exact<DeepPartial<MsgPruneAllowances>, I>>(object: I): MsgPruneAllowances {
     const message = createBaseMsgPruneAllowances();
     message.pruner = object.pruner ?? "";
     return message;
@@ -544,7 +544,7 @@ export const MsgPruneAllowancesResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgPruneAllowancesResponse>): MsgPruneAllowancesResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgPruneAllowancesResponse>, I>>(_: I): MsgPruneAllowancesResponse {
     const message = createBaseMsgPruneAllowancesResponse();
     return message;
   },

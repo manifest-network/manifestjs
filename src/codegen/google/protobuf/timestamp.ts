@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../binary";
-import { DeepPartial, fromJsonTimestamp, fromTimestamp } from "../../helpers";
+import { DeepPartial, Exact, fromJsonTimestamp, fromTimestamp } from "../../helpers";
 /**
  * A Timestamp represents a point in time independent of any time zone or local
  * calendar, encoded as a count of seconds and fractions of seconds at
@@ -317,7 +317,7 @@ export const Timestamp = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Timestamp>): Timestamp {
+  fromPartial<I extends Exact<DeepPartial<Timestamp>, I>>(object: I): Timestamp {
     const message = createBaseTimestamp();
     message.seconds = object.seconds !== undefined && object.seconds !== null ? BigInt(object.seconds.toString()) : BigInt(0);
     message.nanos = object.nanos ?? 0;

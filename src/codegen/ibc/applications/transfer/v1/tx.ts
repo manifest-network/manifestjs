@@ -1,7 +1,7 @@
 import { Coin, CoinAmino, CoinSDKType } from "../../../../cosmos/base/v1beta1/coin";
 import { Height, HeightAmino, HeightSDKType } from "../../../core/client/v1/client";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial } from "../../../../helpers";
+import { DeepPartial, Exact } from "../../../../helpers";
 /**
  * MsgTransfer defines a msg to transfer fungible tokens (i.e Coins) between
  * ICS20 enabled chains. See ICS Spec here:
@@ -165,7 +165,7 @@ export const MsgTransfer = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgTransfer>): MsgTransfer {
+  fromPartial<I extends Exact<DeepPartial<MsgTransfer>, I>>(object: I): MsgTransfer {
     const message = createBaseMsgTransfer();
     message.sourcePort = object.sourcePort ?? "";
     message.sourceChannel = object.sourceChannel ?? "";
@@ -257,7 +257,7 @@ export const MsgTransferResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgTransferResponse>): MsgTransferResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgTransferResponse>, I>>(_: I): MsgTransferResponse {
     const message = createBaseMsgTransferResponse();
     return message;
   },

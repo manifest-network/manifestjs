@@ -1,6 +1,6 @@
 import { Height, HeightAmino, HeightSDKType } from "../../client/v1/client";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /**
  * State defines if a channel is in one of the following states:
  * CLOSED, INIT, TRYOPEN, OPEN or UNINITIALIZED.
@@ -488,7 +488,7 @@ export const Channel = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Channel>): Channel {
+  fromPartial<I extends Exact<DeepPartial<Channel>, I>>(object: I): Channel {
     const message = createBaseChannel();
     message.state = object.state ?? 0;
     message.ordering = object.ordering ?? 0;
@@ -622,7 +622,7 @@ export const IdentifiedChannel = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<IdentifiedChannel>): IdentifiedChannel {
+  fromPartial<I extends Exact<DeepPartial<IdentifiedChannel>, I>>(object: I): IdentifiedChannel {
     const message = createBaseIdentifiedChannel();
     message.state = object.state ?? 0;
     message.ordering = object.ordering ?? 0;
@@ -731,7 +731,7 @@ export const Counterparty = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Counterparty>): Counterparty {
+  fromPartial<I extends Exact<DeepPartial<Counterparty>, I>>(object: I): Counterparty {
     const message = createBaseCounterparty();
     message.portId = object.portId ?? "";
     message.channelId = object.channelId ?? "";
@@ -855,7 +855,7 @@ export const Packet = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Packet>): Packet {
+  fromPartial<I extends Exact<DeepPartial<Packet>, I>>(object: I): Packet {
     const message = createBasePacket();
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
     message.sourcePort = object.sourcePort ?? "";
@@ -981,7 +981,7 @@ export const PacketState = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<PacketState>): PacketState {
+  fromPartial<I extends Exact<DeepPartial<PacketState>, I>>(object: I): PacketState {
     const message = createBasePacketState();
     message.portId = object.portId ?? "";
     message.channelId = object.channelId ?? "";
@@ -1073,7 +1073,7 @@ export const Acknowledgement = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Acknowledgement>): Acknowledgement {
+  fromPartial<I extends Exact<DeepPartial<Acknowledgement>, I>>(object: I): Acknowledgement {
     const message = createBaseAcknowledgement();
     message.result = object.result ?? undefined;
     message.error = object.error ?? undefined;

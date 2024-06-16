@@ -1,6 +1,6 @@
 import { ProposalExecutorResult, ProposalStatus, TallyResult, TallyResultAmino, TallyResultSDKType } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 /** EventCreateGroup is an event emitted when a group is created. */
 export interface EventCreateGroup {
   /** group_id is the unique ID of the group. */
@@ -277,7 +277,7 @@ export const EventCreateGroup = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<EventCreateGroup>): EventCreateGroup {
+  fromPartial<I extends Exact<DeepPartial<EventCreateGroup>, I>>(object: I): EventCreateGroup {
     const message = createBaseEventCreateGroup();
     message.groupId = object.groupId !== undefined && object.groupId !== null ? BigInt(object.groupId.toString()) : BigInt(0);
     return message;
@@ -347,7 +347,7 @@ export const EventUpdateGroup = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<EventUpdateGroup>): EventUpdateGroup {
+  fromPartial<I extends Exact<DeepPartial<EventUpdateGroup>, I>>(object: I): EventUpdateGroup {
     const message = createBaseEventUpdateGroup();
     message.groupId = object.groupId !== undefined && object.groupId !== null ? BigInt(object.groupId.toString()) : BigInt(0);
     return message;
@@ -417,7 +417,7 @@ export const EventCreateGroupPolicy = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<EventCreateGroupPolicy>): EventCreateGroupPolicy {
+  fromPartial<I extends Exact<DeepPartial<EventCreateGroupPolicy>, I>>(object: I): EventCreateGroupPolicy {
     const message = createBaseEventCreateGroupPolicy();
     message.address = object.address ?? "";
     return message;
@@ -487,7 +487,7 @@ export const EventUpdateGroupPolicy = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<EventUpdateGroupPolicy>): EventUpdateGroupPolicy {
+  fromPartial<I extends Exact<DeepPartial<EventUpdateGroupPolicy>, I>>(object: I): EventUpdateGroupPolicy {
     const message = createBaseEventUpdateGroupPolicy();
     message.address = object.address ?? "";
     return message;
@@ -557,7 +557,7 @@ export const EventSubmitProposal = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<EventSubmitProposal>): EventSubmitProposal {
+  fromPartial<I extends Exact<DeepPartial<EventSubmitProposal>, I>>(object: I): EventSubmitProposal {
     const message = createBaseEventSubmitProposal();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     return message;
@@ -627,7 +627,7 @@ export const EventWithdrawProposal = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<EventWithdrawProposal>): EventWithdrawProposal {
+  fromPartial<I extends Exact<DeepPartial<EventWithdrawProposal>, I>>(object: I): EventWithdrawProposal {
     const message = createBaseEventWithdrawProposal();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     return message;
@@ -697,7 +697,7 @@ export const EventVote = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<EventVote>): EventVote {
+  fromPartial<I extends Exact<DeepPartial<EventVote>, I>>(object: I): EventVote {
     const message = createBaseEventVote();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     return message;
@@ -781,7 +781,7 @@ export const EventExec = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<EventExec>): EventExec {
+  fromPartial<I extends Exact<DeepPartial<EventExec>, I>>(object: I): EventExec {
     const message = createBaseEventExec();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     message.result = object.result ?? 0;
@@ -868,7 +868,7 @@ export const EventLeaveGroup = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<EventLeaveGroup>): EventLeaveGroup {
+  fromPartial<I extends Exact<DeepPartial<EventLeaveGroup>, I>>(object: I): EventLeaveGroup {
     const message = createBaseEventLeaveGroup();
     message.groupId = object.groupId !== undefined && object.groupId !== null ? BigInt(object.groupId.toString()) : BigInt(0);
     message.address = object.address ?? "";
@@ -957,7 +957,7 @@ export const EventProposalPruned = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<EventProposalPruned>): EventProposalPruned {
+  fromPartial<I extends Exact<DeepPartial<EventProposalPruned>, I>>(object: I): EventProposalPruned {
     const message = createBaseEventProposalPruned();
     message.proposalId = object.proposalId !== undefined && object.proposalId !== null ? BigInt(object.proposalId.toString()) : BigInt(0);
     message.status = object.status ?? 0;

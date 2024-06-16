@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 /** EventGrant is emitted on Msg/Grant */
 export interface EventGrant {
   /** Msg type URL for which an autorization is granted */
@@ -109,7 +109,7 @@ export const EventGrant = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<EventGrant>): EventGrant {
+  fromPartial<I extends Exact<DeepPartial<EventGrant>, I>>(object: I): EventGrant {
     const message = createBaseEventGrant();
     message.msgTypeUrl = object.msgTypeUrl ?? "";
     message.granter = object.granter ?? "";
@@ -203,7 +203,7 @@ export const EventRevoke = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<EventRevoke>): EventRevoke {
+  fromPartial<I extends Exact<DeepPartial<EventRevoke>, I>>(object: I): EventRevoke {
     const message = createBaseEventRevoke();
     message.msgTypeUrl = object.msgTypeUrl ?? "";
     message.granter = object.granter ?? "";

@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
+import { DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /**
  * PubKey is an ed25519 public key for handling Tendermint keys in SDK.
  * It's needed for Any serialization and SDK compatibility.
@@ -98,7 +98,7 @@ export const PubKey = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<PubKey>): PubKey {
+  fromPartial<I extends Exact<DeepPartial<PubKey>, I>>(object: I): PubKey {
     const message = createBasePubKey();
     message.key = object.key ?? new Uint8Array();
     return message;
@@ -168,7 +168,7 @@ export const PrivKey = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<PrivKey>): PrivKey {
+  fromPartial<I extends Exact<DeepPartial<PrivKey>, I>>(object: I): PrivKey {
     const message = createBasePrivKey();
     message.key = object.key ?? new Uint8Array();
     return message;

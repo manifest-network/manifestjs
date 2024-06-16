@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** Snapshot contains Tendermint state sync snapshot info. */
 export interface Snapshot {
   height: bigint;
@@ -298,7 +298,7 @@ export const Snapshot = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Snapshot>): Snapshot {
+  fromPartial<I extends Exact<DeepPartial<Snapshot>, I>>(object: I): Snapshot {
     const message = createBaseSnapshot();
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
     message.format = object.format ?? 0;
@@ -388,7 +388,7 @@ export const Metadata = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Metadata>): Metadata {
+  fromPartial<I extends Exact<DeepPartial<Metadata>, I>>(object: I): Metadata {
     const message = createBaseMetadata();
     message.chunkHashes = object.chunkHashes?.map(e => e) || [];
     return message;
@@ -481,7 +481,7 @@ export const SnapshotItem = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<SnapshotItem>): SnapshotItem {
+  fromPartial<I extends Exact<DeepPartial<SnapshotItem>, I>>(object: I): SnapshotItem {
     const message = createBaseSnapshotItem();
     message.store = object.store !== undefined && object.store !== null ? SnapshotStoreItem.fromPartial(object.store) : undefined;
     message.iavl = object.iavl !== undefined && object.iavl !== null ? SnapshotIAVLItem.fromPartial(object.iavl) : undefined;
@@ -566,7 +566,7 @@ export const SnapshotStoreItem = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<SnapshotStoreItem>): SnapshotStoreItem {
+  fromPartial<I extends Exact<DeepPartial<SnapshotStoreItem>, I>>(object: I): SnapshotStoreItem {
     const message = createBaseSnapshotStoreItem();
     message.name = object.name ?? "";
     return message;
@@ -657,7 +657,7 @@ export const SnapshotIAVLItem = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<SnapshotIAVLItem>): SnapshotIAVLItem {
+  fromPartial<I extends Exact<DeepPartial<SnapshotIAVLItem>, I>>(object: I): SnapshotIAVLItem {
     const message = createBaseSnapshotIAVLItem();
     message.key = object.key ?? new Uint8Array();
     message.value = object.value ?? new Uint8Array();
@@ -749,7 +749,7 @@ export const SnapshotExtensionMeta = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<SnapshotExtensionMeta>): SnapshotExtensionMeta {
+  fromPartial<I extends Exact<DeepPartial<SnapshotExtensionMeta>, I>>(object: I): SnapshotExtensionMeta {
     const message = createBaseSnapshotExtensionMeta();
     message.name = object.name ?? "";
     message.format = object.format ?? 0;
@@ -824,7 +824,7 @@ export const SnapshotExtensionPayload = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<SnapshotExtensionPayload>): SnapshotExtensionPayload {
+  fromPartial<I extends Exact<DeepPartial<SnapshotExtensionPayload>, I>>(object: I): SnapshotExtensionPayload {
     const message = createBaseSnapshotExtensionPayload();
     message.payload = object.payload ?? new Uint8Array();
     return message;

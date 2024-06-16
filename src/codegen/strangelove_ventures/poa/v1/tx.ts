@@ -2,7 +2,7 @@ import { Description, DescriptionAmino, DescriptionSDKType, CommissionRates, Com
 import { Any, AnyProtoMsg, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
 import { Params, ParamsAmino, ParamsSDKType, StakingParams, StakingParamsAmino, StakingParamsSDKType } from "./params";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 import { encodePubkey, decodePubkey } from "@cosmjs/proto-signing";
 import { Pubkey } from "@cosmjs/amino";
 /** SetPower sets the new power of the validator and accepts new validators into the set. */
@@ -360,7 +360,7 @@ export const MsgSetPower = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgSetPower>): MsgSetPower {
+  fromPartial<I extends Exact<DeepPartial<MsgSetPower>, I>>(object: I): MsgSetPower {
     const message = createBaseMsgSetPower();
     message.sender = object.sender ?? "";
     message.validatorAddress = object.validatorAddress ?? "";
@@ -436,7 +436,7 @@ export const MsgSetPowerResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgSetPowerResponse>): MsgSetPowerResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgSetPowerResponse>, I>>(_: I): MsgSetPowerResponse {
     const message = createBaseMsgSetPowerResponse();
     return message;
   },
@@ -502,7 +502,7 @@ export const MsgRemoveValidator = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgRemoveValidator>): MsgRemoveValidator {
+  fromPartial<I extends Exact<DeepPartial<MsgRemoveValidator>, I>>(object: I): MsgRemoveValidator {
     const message = createBaseMsgRemoveValidator();
     message.sender = object.sender ?? "";
     message.validatorAddress = object.validatorAddress ?? "";
@@ -568,7 +568,7 @@ export const MsgRemoveValidatorResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgRemoveValidatorResponse>): MsgRemoveValidatorResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgRemoveValidatorResponse>, I>>(_: I): MsgRemoveValidatorResponse {
     const message = createBaseMsgRemoveValidatorResponse();
     return message;
   },
@@ -634,7 +634,7 @@ export const MsgRemovePending = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgRemovePending>): MsgRemovePending {
+  fromPartial<I extends Exact<DeepPartial<MsgRemovePending>, I>>(object: I): MsgRemovePending {
     const message = createBaseMsgRemovePending();
     message.sender = object.sender ?? "";
     message.validatorAddress = object.validatorAddress ?? "";
@@ -700,7 +700,7 @@ export const MsgRemovePendingResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgRemovePendingResponse>): MsgRemovePendingResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgRemovePendingResponse>, I>>(_: I): MsgRemovePendingResponse {
     const message = createBaseMsgRemovePendingResponse();
     return message;
   },
@@ -766,7 +766,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(object: I): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.sender = object.sender ?? "";
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
@@ -832,7 +832,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(_: I): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },
@@ -898,7 +898,7 @@ export const MsgUpdateStakingParams = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgUpdateStakingParams>): MsgUpdateStakingParams {
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateStakingParams>, I>>(object: I): MsgUpdateStakingParams {
     const message = createBaseMsgUpdateStakingParams();
     message.sender = object.sender ?? "";
     message.params = object.params !== undefined && object.params !== null ? StakingParams.fromPartial(object.params) : undefined;
@@ -964,7 +964,7 @@ export const MsgUpdateStakingParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgUpdateStakingParamsResponse>): MsgUpdateStakingParamsResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateStakingParamsResponse>, I>>(_: I): MsgUpdateStakingParamsResponse {
     const message = createBaseMsgUpdateStakingParamsResponse();
     return message;
   },
@@ -1058,7 +1058,7 @@ export const MsgCreateValidator = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgCreateValidator>): MsgCreateValidator {
+  fromPartial<I extends Exact<DeepPartial<MsgCreateValidator>, I>>(object: I): MsgCreateValidator {
     const message = createBaseMsgCreateValidator();
     message.description = object.description !== undefined && object.description !== null ? Description.fromPartial(object.description) : undefined;
     message.commission = object.commission !== undefined && object.commission !== null ? CommissionRates.fromPartial(object.commission) : undefined;
@@ -1144,7 +1144,7 @@ export const MsgCreateValidatorResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgCreateValidatorResponse>): MsgCreateValidatorResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgCreateValidatorResponse>, I>>(_: I): MsgCreateValidatorResponse {
     const message = createBaseMsgCreateValidatorResponse();
     return message;
   },

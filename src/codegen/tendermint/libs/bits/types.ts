@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 export interface BitArray {
   bits: bigint;
   elems: bigint[];
@@ -66,7 +66,7 @@ export const BitArray = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<BitArray>): BitArray {
+  fromPartial<I extends Exact<DeepPartial<BitArray>, I>>(object: I): BitArray {
     const message = createBaseBitArray();
     message.bits = object.bits !== undefined && object.bits !== null ? BigInt(object.bits.toString()) : BigInt(0);
     message.elems = object.elems?.map(e => BigInt(e.toString())) || [];

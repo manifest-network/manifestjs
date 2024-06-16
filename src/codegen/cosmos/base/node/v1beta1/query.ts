@@ -1,6 +1,6 @@
 import { Timestamp } from "../../../../google/protobuf/timestamp";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial, toTimestamp, fromTimestamp, bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, Exact, toTimestamp, fromTimestamp, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** ConfigRequest defines the request structure for the Config gRPC query. */
 export interface ConfigRequest {}
 export interface ConfigRequestProtoMsg {
@@ -122,7 +122,7 @@ export const ConfigRequest = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<ConfigRequest>): ConfigRequest {
+  fromPartial<I extends Exact<DeepPartial<ConfigRequest>, I>>(_: I): ConfigRequest {
     const message = createBaseConfigRequest();
     return message;
   },
@@ -201,7 +201,7 @@ export const ConfigResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ConfigResponse>): ConfigResponse {
+  fromPartial<I extends Exact<DeepPartial<ConfigResponse>, I>>(object: I): ConfigResponse {
     const message = createBaseConfigResponse();
     message.minimumGasPrice = object.minimumGasPrice ?? "";
     message.pruningKeepRecent = object.pruningKeepRecent ?? "";
@@ -273,7 +273,7 @@ export const StatusRequest = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<StatusRequest>): StatusRequest {
+  fromPartial<I extends Exact<DeepPartial<StatusRequest>, I>>(_: I): StatusRequest {
     const message = createBaseStatusRequest();
     return message;
   },
@@ -366,7 +366,7 @@ export const StatusResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<StatusResponse>): StatusResponse {
+  fromPartial<I extends Exact<DeepPartial<StatusResponse>, I>>(object: I): StatusResponse {
     const message = createBaseStatusResponse();
     message.earliestStoreHeight = object.earliestStoreHeight !== undefined && object.earliestStoreHeight !== null ? BigInt(object.earliestStoreHeight.toString()) : BigInt(0);
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);

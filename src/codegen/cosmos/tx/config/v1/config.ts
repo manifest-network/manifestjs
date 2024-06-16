@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial } from "../../../../helpers";
+import { DeepPartial, Exact } from "../../../../helpers";
 /** Config is the config object of the x/auth/tx package. */
 export interface Config {
   /**
@@ -77,7 +77,7 @@ export const Config = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Config>): Config {
+  fromPartial<I extends Exact<DeepPartial<Config>, I>>(object: I): Config {
     const message = createBaseConfig();
     message.skipAnteHandler = object.skipAnteHandler ?? false;
     message.skipPostHandler = object.skipPostHandler ?? false;

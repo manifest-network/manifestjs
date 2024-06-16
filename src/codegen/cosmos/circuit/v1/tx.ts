@@ -1,6 +1,6 @@
 import { Permissions, PermissionsAmino, PermissionsSDKType } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 /** MsgAuthorizeCircuitBreaker defines the Msg/AuthorizeCircuitBreaker request type. */
 export interface MsgAuthorizeCircuitBreaker {
   /**
@@ -226,7 +226,7 @@ export const MsgAuthorizeCircuitBreaker = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgAuthorizeCircuitBreaker>): MsgAuthorizeCircuitBreaker {
+  fromPartial<I extends Exact<DeepPartial<MsgAuthorizeCircuitBreaker>, I>>(object: I): MsgAuthorizeCircuitBreaker {
     const message = createBaseMsgAuthorizeCircuitBreaker();
     message.granter = object.granter ?? "";
     message.grantee = object.grantee ?? "";
@@ -306,7 +306,7 @@ export const MsgAuthorizeCircuitBreakerResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgAuthorizeCircuitBreakerResponse>): MsgAuthorizeCircuitBreakerResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgAuthorizeCircuitBreakerResponse>, I>>(object: I): MsgAuthorizeCircuitBreakerResponse {
     const message = createBaseMsgAuthorizeCircuitBreakerResponse();
     message.success = object.success ?? false;
     return message;
@@ -383,7 +383,7 @@ export const MsgTripCircuitBreaker = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgTripCircuitBreaker>): MsgTripCircuitBreaker {
+  fromPartial<I extends Exact<DeepPartial<MsgTripCircuitBreaker>, I>>(object: I): MsgTripCircuitBreaker {
     const message = createBaseMsgTripCircuitBreaker();
     message.authority = object.authority ?? "";
     message.msgTypeUrls = object.msgTypeUrls?.map(e => e) || [];
@@ -460,7 +460,7 @@ export const MsgTripCircuitBreakerResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgTripCircuitBreakerResponse>): MsgTripCircuitBreakerResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgTripCircuitBreakerResponse>, I>>(object: I): MsgTripCircuitBreakerResponse {
     const message = createBaseMsgTripCircuitBreakerResponse();
     message.success = object.success ?? false;
     return message;
@@ -537,7 +537,7 @@ export const MsgResetCircuitBreaker = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgResetCircuitBreaker>): MsgResetCircuitBreaker {
+  fromPartial<I extends Exact<DeepPartial<MsgResetCircuitBreaker>, I>>(object: I): MsgResetCircuitBreaker {
     const message = createBaseMsgResetCircuitBreaker();
     message.authority = object.authority ?? "";
     message.msgTypeUrls = object.msgTypeUrls?.map(e => e) || [];
@@ -614,7 +614,7 @@ export const MsgResetCircuitBreakerResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgResetCircuitBreakerResponse>): MsgResetCircuitBreakerResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgResetCircuitBreakerResponse>, I>>(object: I): MsgResetCircuitBreakerResponse {
     const message = createBaseMsgResetCircuitBreakerResponse();
     message.success = object.success ?? false;
     return message;

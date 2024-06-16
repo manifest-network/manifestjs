@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial } from "../../../../helpers";
+import { DeepPartial, Exact } from "../../../../helpers";
 /** Module is the config object for the runtime module. */
 export interface Module {
   /** app_name is the name of the app. */
@@ -247,7 +247,7 @@ export const Module = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Module>): Module {
+  fromPartial<I extends Exact<DeepPartial<Module>, I>>(object: I): Module {
     const message = createBaseModule();
     message.appName = object.appName ?? "";
     message.beginBlockers = object.beginBlockers?.map(e => e) || [];
@@ -380,7 +380,7 @@ export const StoreKeyConfig = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<StoreKeyConfig>): StoreKeyConfig {
+  fromPartial<I extends Exact<DeepPartial<StoreKeyConfig>, I>>(object: I): StoreKeyConfig {
     const message = createBaseStoreKeyConfig();
     message.moduleName = object.moduleName ?? "";
     message.kvStoreKey = object.kvStoreKey ?? "";

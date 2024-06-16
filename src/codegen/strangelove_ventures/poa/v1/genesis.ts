@@ -1,6 +1,6 @@
 import { Params, ParamsAmino, ParamsSDKType } from "./params";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 /** GenesisState defines the poa module's genesis state. */
 export interface GenesisState {
   /** Params defines all the parameters of the module. */
@@ -73,7 +73,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
+  fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(object: I): GenesisState {
     const message = createBaseGenesisState();
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
     return message;
@@ -137,7 +137,7 @@ export const PowerCache = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<PowerCache>): PowerCache {
+  fromPartial<I extends Exact<DeepPartial<PowerCache>, I>>(object: I): PowerCache {
     const message = createBasePowerCache();
     message.power = object.power !== undefined && object.power !== null ? BigInt(object.power.toString()) : BigInt(0);
     return message;

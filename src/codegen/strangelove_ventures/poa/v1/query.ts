@@ -1,7 +1,7 @@
 import { Params, ParamsAmino, ParamsSDKType } from "./params";
 import { Validator, ValidatorAmino, ValidatorSDKType } from "./validator";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 /** QueryParamsRequest is the request type for the Query/Params RPC method. */
 export interface QueryParamsRequest {}
 export interface QueryParamsRequestProtoMsg {
@@ -77,7 +77,7 @@ export interface PendingValidatorsResponseSDKType {
 /** QueryConsensusPowerRequest is the request type for the Query/ConsensusPower RPC method. */
 export interface QueryConsensusPowerRequest {
   /** validator_address is the address of the validator */
-  validatorAddress?: string;
+  validatorAddress: string;
 }
 export interface QueryConsensusPowerRequestProtoMsg {
   typeUrl: "/strangelove_ventures.poa.v1.QueryConsensusPowerRequest";
@@ -94,7 +94,7 @@ export interface QueryConsensusPowerRequestAminoMsg {
 }
 /** QueryConsensusPowerRequest is the request type for the Query/ConsensusPower RPC method. */
 export interface QueryConsensusPowerRequestSDKType {
-  validator_address?: string;
+  validator_address: string;
 }
 /** QueryConsensusPowerResponse is the response type for the Query/ConsensusPowerRequest RPC method. */
 export interface QueryConsensusPowerResponse {
@@ -140,7 +140,7 @@ export const QueryParamsRequest = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<QueryParamsRequest>): QueryParamsRequest {
+  fromPartial<I extends Exact<DeepPartial<QueryParamsRequest>, I>>(_: I): QueryParamsRequest {
     const message = createBaseQueryParamsRequest();
     return message;
   },
@@ -198,7 +198,7 @@ export const ParamsResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ParamsResponse>): ParamsResponse {
+  fromPartial<I extends Exact<DeepPartial<ParamsResponse>, I>>(object: I): ParamsResponse {
     const message = createBaseParamsResponse();
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
     return message;
@@ -253,7 +253,7 @@ export const QueryPendingValidatorsRequest = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<QueryPendingValidatorsRequest>): QueryPendingValidatorsRequest {
+  fromPartial<I extends Exact<DeepPartial<QueryPendingValidatorsRequest>, I>>(_: I): QueryPendingValidatorsRequest {
     const message = createBaseQueryPendingValidatorsRequest();
     return message;
   },
@@ -311,7 +311,7 @@ export const PendingValidatorsResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<PendingValidatorsResponse>): PendingValidatorsResponse {
+  fromPartial<I extends Exact<DeepPartial<PendingValidatorsResponse>, I>>(object: I): PendingValidatorsResponse {
     const message = createBasePendingValidatorsResponse();
     message.pending = object.pending?.map(e => Validator.fromPartial(e)) || [];
     return message;
@@ -376,7 +376,7 @@ export const QueryConsensusPowerRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryConsensusPowerRequest>): QueryConsensusPowerRequest {
+  fromPartial<I extends Exact<DeepPartial<QueryConsensusPowerRequest>, I>>(object: I): QueryConsensusPowerRequest {
     const message = createBaseQueryConsensusPowerRequest();
     message.validatorAddress = object.validatorAddress ?? "";
     return message;
@@ -439,7 +439,7 @@ export const QueryConsensusPowerResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryConsensusPowerResponse>): QueryConsensusPowerResponse {
+  fromPartial<I extends Exact<DeepPartial<QueryConsensusPowerResponse>, I>>(object: I): QueryConsensusPowerResponse {
     const message = createBaseQueryConsensusPowerResponse();
     message.consensusPower = object.consensusPower !== undefined && object.consensusPower !== null ? BigInt(object.consensusPower.toString()) : BigInt(0);
     return message;

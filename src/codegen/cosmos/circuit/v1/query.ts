@@ -1,7 +1,7 @@
 import { PageRequest, PageRequestAmino, PageRequestSDKType, PageResponse, PageResponseAmino, PageResponseSDKType } from "../../base/query/v1beta1/pagination";
 import { Permissions, PermissionsAmino, PermissionsSDKType, GenesisAccountPermissions, GenesisAccountPermissionsAmino, GenesisAccountPermissionsSDKType } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 /** QueryAccountRequest is the request type for the Query/Account RPC method. */
 export interface QueryAccountRequest {
   address: string;
@@ -154,7 +154,7 @@ export const QueryAccountRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryAccountRequest>): QueryAccountRequest {
+  fromPartial<I extends Exact<DeepPartial<QueryAccountRequest>, I>>(object: I): QueryAccountRequest {
     const message = createBaseQueryAccountRequest();
     message.address = object.address ?? "";
     return message;
@@ -224,7 +224,7 @@ export const AccountResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<AccountResponse>): AccountResponse {
+  fromPartial<I extends Exact<DeepPartial<AccountResponse>, I>>(object: I): AccountResponse {
     const message = createBaseAccountResponse();
     message.permission = object.permission !== undefined && object.permission !== null ? Permissions.fromPartial(object.permission) : undefined;
     return message;
@@ -294,7 +294,7 @@ export const QueryAccountsRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryAccountsRequest>): QueryAccountsRequest {
+  fromPartial<I extends Exact<DeepPartial<QueryAccountsRequest>, I>>(object: I): QueryAccountsRequest {
     const message = createBaseQueryAccountsRequest();
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
     return message;
@@ -371,7 +371,7 @@ export const AccountsResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<AccountsResponse>): AccountsResponse {
+  fromPartial<I extends Exact<DeepPartial<AccountsResponse>, I>>(object: I): AccountsResponse {
     const message = createBaseAccountsResponse();
     message.accounts = object.accounts?.map(e => GenesisAccountPermissions.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
@@ -440,7 +440,7 @@ export const QueryDisabledListRequest = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<QueryDisabledListRequest>): QueryDisabledListRequest {
+  fromPartial<I extends Exact<DeepPartial<QueryDisabledListRequest>, I>>(_: I): QueryDisabledListRequest {
     const message = createBaseQueryDisabledListRequest();
     return message;
   },
@@ -505,7 +505,7 @@ export const DisabledListResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<DisabledListResponse>): DisabledListResponse {
+  fromPartial<I extends Exact<DeepPartial<DisabledListResponse>, I>>(object: I): DisabledListResponse {
     const message = createBaseDisabledListResponse();
     message.disabledList = object.disabledList?.map(e => e) || [];
     return message;

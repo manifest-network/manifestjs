@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 /** ParameterChangeProposal defines a proposal to change one or more parameters. */
 export interface ParameterChangeProposal {
   $typeUrl?: "/cosmos.params.v1beta1.ParameterChangeProposal";
@@ -109,7 +109,7 @@ export const ParameterChangeProposal = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ParameterChangeProposal>): ParameterChangeProposal {
+  fromPartial<I extends Exact<DeepPartial<ParameterChangeProposal>, I>>(object: I): ParameterChangeProposal {
     const message = createBaseParameterChangeProposal();
     message.title = object.title ?? "";
     message.description = object.description ?? "";
@@ -205,7 +205,7 @@ export const ParamChange = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ParamChange>): ParamChange {
+  fromPartial<I extends Exact<DeepPartial<ParamChange>, I>>(object: I): ParamChange {
     const message = createBaseParamChange();
     message.subspace = object.subspace ?? "";
     message.key = object.key ?? "";

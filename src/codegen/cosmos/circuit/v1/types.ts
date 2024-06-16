@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 /** Level is the permission level. */
 export enum Permissions_Level {
   /**
@@ -191,7 +191,7 @@ export const Permissions = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Permissions>): Permissions {
+  fromPartial<I extends Exact<DeepPartial<Permissions>, I>>(object: I): Permissions {
     const message = createBasePermissions();
     message.level = object.level ?? 0;
     message.limitTypeUrls = object.limitTypeUrls?.map(e => e) || [];
@@ -275,7 +275,7 @@ export const GenesisAccountPermissions = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<GenesisAccountPermissions>): GenesisAccountPermissions {
+  fromPartial<I extends Exact<DeepPartial<GenesisAccountPermissions>, I>>(object: I): GenesisAccountPermissions {
     const message = createBaseGenesisAccountPermissions();
     message.address = object.address ?? "";
     message.permissions = object.permissions !== undefined && object.permissions !== null ? Permissions.fromPartial(object.permissions) : undefined;
@@ -357,7 +357,7 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<GenesisState>): GenesisState {
+  fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(object: I): GenesisState {
     const message = createBaseGenesisState();
     message.accountPermissions = object.accountPermissions?.map(e => GenesisAccountPermissions.fromPartial(e)) || [];
     message.disabledTypeUrls = object.disabledTypeUrls?.map(e => e) || [];

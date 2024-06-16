@@ -1,7 +1,7 @@
 import { Params, ParamsAmino, ParamsSDKType } from "./genesis";
 import { Coin, CoinAmino, CoinSDKType } from "../../cosmos/base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../binary";
-import { DeepPartial } from "../../helpers";
+import { DeepPartial, Exact } from "../../helpers";
 /**
  * MsgUpdateParams is the Msg/UpdateParams request type.
  * 
@@ -220,7 +220,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(object: I): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.authority = object.authority ?? "";
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
@@ -280,7 +280,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(_: I): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },
@@ -345,7 +345,7 @@ export const MsgPayout = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgPayout>): MsgPayout {
+  fromPartial<I extends Exact<DeepPartial<MsgPayout>, I>>(object: I): MsgPayout {
     const message = createBaseMsgPayout();
     message.authority = object.authority ?? "";
     message.payoutPairs = object.payoutPairs?.map(e => PayoutPair.fromPartial(e)) || [];
@@ -422,7 +422,7 @@ export const PayoutPair = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<PayoutPair>): PayoutPair {
+  fromPartial<I extends Exact<DeepPartial<PayoutPair>, I>>(object: I): PayoutPair {
     const message = createBasePayoutPair();
     message.address = object.address ?? "";
     message.coin = object.coin !== undefined && object.coin !== null ? Coin.fromPartial(object.coin) : undefined;
@@ -482,7 +482,7 @@ export const MsgPayoutResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgPayoutResponse>): MsgPayoutResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgPayoutResponse>, I>>(_: I): MsgPayoutResponse {
     const message = createBaseMsgPayoutResponse();
     return message;
   },
@@ -547,7 +547,7 @@ export const MsgBurnHeldBalance = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgBurnHeldBalance>): MsgBurnHeldBalance {
+  fromPartial<I extends Exact<DeepPartial<MsgBurnHeldBalance>, I>>(object: I): MsgBurnHeldBalance {
     const message = createBaseMsgBurnHeldBalance();
     message.authority = object.authority ?? "";
     message.burnCoins = object.burnCoins?.map(e => Coin.fromPartial(e)) || [];
@@ -609,7 +609,7 @@ export const MsgBurnHeldBalanceResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgBurnHeldBalanceResponse>): MsgBurnHeldBalanceResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgBurnHeldBalanceResponse>, I>>(_: I): MsgBurnHeldBalanceResponse {
     const message = createBaseMsgBurnHeldBalanceResponse();
     return message;
   },

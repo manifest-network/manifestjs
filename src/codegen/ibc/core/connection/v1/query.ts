@@ -3,7 +3,7 @@ import { ConnectionEnd, ConnectionEndAmino, ConnectionEndSDKType, IdentifiedConn
 import { Height, HeightAmino, HeightSDKType, IdentifiedClientState, IdentifiedClientStateAmino, IdentifiedClientStateSDKType } from "../../client/v1/client";
 import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /**
  * QueryConnectionRequest is the request type for the Query/Connection RPC
  * method
@@ -407,7 +407,7 @@ export const QueryConnectionRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryConnectionRequest>): QueryConnectionRequest {
+  fromPartial<I extends Exact<DeepPartial<QueryConnectionRequest>, I>>(object: I): QueryConnectionRequest {
     const message = createBaseQueryConnectionRequest();
     message.connectionId = object.connectionId ?? "";
     return message;
@@ -491,7 +491,7 @@ export const QueryConnectionResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryConnectionResponse>): QueryConnectionResponse {
+  fromPartial<I extends Exact<DeepPartial<QueryConnectionResponse>, I>>(object: I): QueryConnectionResponse {
     const message = createBaseQueryConnectionResponse();
     message.connection = object.connection !== undefined && object.connection !== null ? ConnectionEnd.fromPartial(object.connection) : undefined;
     message.proof = object.proof ?? new Uint8Array();
@@ -571,7 +571,7 @@ export const QueryConnectionsRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryConnectionsRequest>): QueryConnectionsRequest {
+  fromPartial<I extends Exact<DeepPartial<QueryConnectionsRequest>, I>>(object: I): QueryConnectionsRequest {
     const message = createBaseQueryConnectionsRequest();
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
     return message;
@@ -655,7 +655,7 @@ export const QueryConnectionsResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryConnectionsResponse>): QueryConnectionsResponse {
+  fromPartial<I extends Exact<DeepPartial<QueryConnectionsResponse>, I>>(object: I): QueryConnectionsResponse {
     const message = createBaseQueryConnectionsResponse();
     message.connections = object.connections?.map(e => IdentifiedConnection.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
@@ -737,7 +737,7 @@ export const QueryClientConnectionsRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryClientConnectionsRequest>): QueryClientConnectionsRequest {
+  fromPartial<I extends Exact<DeepPartial<QueryClientConnectionsRequest>, I>>(object: I): QueryClientConnectionsRequest {
     const message = createBaseQueryClientConnectionsRequest();
     message.clientId = object.clientId ?? "";
     return message;
@@ -821,7 +821,7 @@ export const QueryClientConnectionsResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryClientConnectionsResponse>): QueryClientConnectionsResponse {
+  fromPartial<I extends Exact<DeepPartial<QueryClientConnectionsResponse>, I>>(object: I): QueryClientConnectionsResponse {
     const message = createBaseQueryClientConnectionsResponse();
     message.connectionPaths = object.connectionPaths?.map(e => e) || [];
     message.proof = object.proof ?? new Uint8Array();
@@ -903,7 +903,7 @@ export const QueryConnectionClientStateRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryConnectionClientStateRequest>): QueryConnectionClientStateRequest {
+  fromPartial<I extends Exact<DeepPartial<QueryConnectionClientStateRequest>, I>>(object: I): QueryConnectionClientStateRequest {
     const message = createBaseQueryConnectionClientStateRequest();
     message.connectionId = object.connectionId ?? "";
     return message;
@@ -987,7 +987,7 @@ export const QueryConnectionClientStateResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryConnectionClientStateResponse>): QueryConnectionClientStateResponse {
+  fromPartial<I extends Exact<DeepPartial<QueryConnectionClientStateResponse>, I>>(object: I): QueryConnectionClientStateResponse {
     const message = createBaseQueryConnectionClientStateResponse();
     message.identifiedClientState = object.identifiedClientState !== undefined && object.identifiedClientState !== null ? IdentifiedClientState.fromPartial(object.identifiedClientState) : undefined;
     message.proof = object.proof ?? new Uint8Array();
@@ -1081,7 +1081,7 @@ export const QueryConnectionConsensusStateRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryConnectionConsensusStateRequest>): QueryConnectionConsensusStateRequest {
+  fromPartial<I extends Exact<DeepPartial<QueryConnectionConsensusStateRequest>, I>>(object: I): QueryConnectionConsensusStateRequest {
     const message = createBaseQueryConnectionConsensusStateRequest();
     message.connectionId = object.connectionId ?? "";
     message.revisionNumber = object.revisionNumber !== undefined && object.revisionNumber !== null ? BigInt(object.revisionNumber.toString()) : BigInt(0);
@@ -1182,7 +1182,7 @@ export const QueryConnectionConsensusStateResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<QueryConnectionConsensusStateResponse>): QueryConnectionConsensusStateResponse {
+  fromPartial<I extends Exact<DeepPartial<QueryConnectionConsensusStateResponse>, I>>(object: I): QueryConnectionConsensusStateResponse {
     const message = createBaseQueryConnectionConsensusStateResponse();
     message.consensusState = object.consensusState !== undefined && object.consensusState !== null ? Any.fromPartial(object.consensusState) : undefined;
     message.clientId = object.clientId ?? "";

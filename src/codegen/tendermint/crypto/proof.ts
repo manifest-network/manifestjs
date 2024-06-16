@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../binary";
-import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../helpers";
+import { DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../helpers";
 export interface Proof {
   total: bigint;
   index: bigint;
@@ -182,7 +182,7 @@ export const Proof = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Proof>): Proof {
+  fromPartial<I extends Exact<DeepPartial<Proof>, I>>(object: I): Proof {
     const message = createBaseProof();
     message.total = object.total !== undefined && object.total !== null ? BigInt(object.total.toString()) : BigInt(0);
     message.index = object.index !== undefined && object.index !== null ? BigInt(object.index.toString()) : BigInt(0);
@@ -269,7 +269,7 @@ export const ValueOp = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ValueOp>): ValueOp {
+  fromPartial<I extends Exact<DeepPartial<ValueOp>, I>>(object: I): ValueOp {
     const message = createBaseValueOp();
     message.key = object.key ?? new Uint8Array();
     message.proof = object.proof !== undefined && object.proof !== null ? Proof.fromPartial(object.proof) : undefined;
@@ -351,7 +351,7 @@ export const DominoOp = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<DominoOp>): DominoOp {
+  fromPartial<I extends Exact<DeepPartial<DominoOp>, I>>(object: I): DominoOp {
     const message = createBaseDominoOp();
     message.key = object.key ?? "";
     message.input = object.input ?? "";
@@ -438,7 +438,7 @@ export const ProofOp = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ProofOp>): ProofOp {
+  fromPartial<I extends Exact<DeepPartial<ProofOp>, I>>(object: I): ProofOp {
     const message = createBaseProofOp();
     message.type = object.type ?? "";
     message.key = object.key ?? new Uint8Array();
@@ -511,7 +511,7 @@ export const ProofOps = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ProofOps>): ProofOps {
+  fromPartial<I extends Exact<DeepPartial<ProofOps>, I>>(object: I): ProofOps {
     const message = createBaseProofOps();
     message.ops = object.ops?.map(e => ProofOp.fromPartial(e)) || [];
     return message;

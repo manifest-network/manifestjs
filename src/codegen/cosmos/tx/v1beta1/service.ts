@@ -4,7 +4,7 @@ import { TxResponse, TxResponseAmino, TxResponseSDKType, GasInfo, GasInfoAmino, 
 import { BlockID, BlockIDAmino, BlockIDSDKType } from "../../../tendermint/types/types";
 import { Block, BlockAmino, BlockSDKType } from "../../../tendermint/types/block";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../helpers";
+import { DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../helpers";
 /** OrderBy defines the sorting order */
 export enum OrderBy {
   /**
@@ -122,31 +122,31 @@ export interface GetTxsEventRequest {
    * events query.
    */
   /** @deprecated */
-  events?: string[];
+  events: string[];
   /**
    * pagination defines a pagination for the request.
    * Deprecated post v0.46.x: use page and limit instead.
    */
   /** @deprecated */
   pagination?: PageRequest;
-  orderBy?: OrderBy;
+  orderBy: OrderBy;
   /**
    * page is the page number to query, starts at 1. If not provided, will
    * default to first page.
    */
-  page?: bigint;
+  page: bigint;
   /**
    * limit is the total number of results to be returned in the result page.
    * If left empty it will default to a value to be set by each app.
    */
-  limit?: bigint;
+  limit: bigint;
   /**
    * query defines the transaction event query that is proxied to Tendermint's
    * TxSearch RPC method. The query must be valid.
    * 
    * Since cosmos-sdk 0.50
    */
-  query?: string;
+  query: string;
 }
 export interface GetTxsEventRequestProtoMsg {
   typeUrl: "/cosmos.tx.v1beta1.GetTxsEventRequest";
@@ -199,13 +199,13 @@ export interface GetTxsEventRequestAminoMsg {
  */
 export interface GetTxsEventRequestSDKType {
   /** @deprecated */
-  events?: string[];
+  events: string[];
   /** @deprecated */
   pagination?: PageRequestSDKType;
-  order_by?: OrderBy;
-  page?: bigint;
-  limit?: bigint;
-  query?: string;
+  order_by: OrderBy;
+  page: bigint;
+  limit: bigint;
+  query: string;
 }
 /**
  * GetTxsEventResponse is the response type for the Service.TxsByEvents
@@ -918,7 +918,7 @@ export const GetTxsEventRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<GetTxsEventRequest>): GetTxsEventRequest {
+  fromPartial<I extends Exact<DeepPartial<GetTxsEventRequest>, I>>(object: I): GetTxsEventRequest {
     const message = createBaseGetTxsEventRequest();
     message.events = object.events?.map(e => e) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
@@ -1036,7 +1036,7 @@ export const GetTxsEventResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<GetTxsEventResponse>): GetTxsEventResponse {
+  fromPartial<I extends Exact<DeepPartial<GetTxsEventResponse>, I>>(object: I): GetTxsEventResponse {
     const message = createBaseGetTxsEventResponse();
     message.txs = object.txs?.map(e => Tx.fromPartial(e)) || [];
     message.txResponses = object.txResponses?.map(e => TxResponse.fromPartial(e)) || [];
@@ -1132,7 +1132,7 @@ export const BroadcastTxRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<BroadcastTxRequest>): BroadcastTxRequest {
+  fromPartial<I extends Exact<DeepPartial<BroadcastTxRequest>, I>>(object: I): BroadcastTxRequest {
     const message = createBaseBroadcastTxRequest();
     message.txBytes = object.txBytes ?? new Uint8Array();
     message.mode = object.mode ?? 0;
@@ -1207,7 +1207,7 @@ export const BroadcastTxResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<BroadcastTxResponse>): BroadcastTxResponse {
+  fromPartial<I extends Exact<DeepPartial<BroadcastTxResponse>, I>>(object: I): BroadcastTxResponse {
     const message = createBaseBroadcastTxResponse();
     message.txResponse = object.txResponse !== undefined && object.txResponse !== null ? TxResponse.fromPartial(object.txResponse) : undefined;
     return message;
@@ -1284,7 +1284,7 @@ export const SimulateRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<SimulateRequest>): SimulateRequest {
+  fromPartial<I extends Exact<DeepPartial<SimulateRequest>, I>>(object: I): SimulateRequest {
     const message = createBaseSimulateRequest();
     message.tx = object.tx !== undefined && object.tx !== null ? Tx.fromPartial(object.tx) : undefined;
     message.txBytes = object.txBytes ?? new Uint8Array();
@@ -1366,7 +1366,7 @@ export const SimulateResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<SimulateResponse>): SimulateResponse {
+  fromPartial<I extends Exact<DeepPartial<SimulateResponse>, I>>(object: I): SimulateResponse {
     const message = createBaseSimulateResponse();
     message.gasInfo = object.gasInfo !== undefined && object.gasInfo !== null ? GasInfo.fromPartial(object.gasInfo) : undefined;
     message.result = object.result !== undefined && object.result !== null ? Result.fromPartial(object.result) : undefined;
@@ -1441,7 +1441,7 @@ export const GetTxRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<GetTxRequest>): GetTxRequest {
+  fromPartial<I extends Exact<DeepPartial<GetTxRequest>, I>>(object: I): GetTxRequest {
     const message = createBaseGetTxRequest();
     message.hash = object.hash ?? "";
     return message;
@@ -1518,7 +1518,7 @@ export const GetTxResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<GetTxResponse>): GetTxResponse {
+  fromPartial<I extends Exact<DeepPartial<GetTxResponse>, I>>(object: I): GetTxResponse {
     const message = createBaseGetTxResponse();
     message.tx = object.tx !== undefined && object.tx !== null ? Tx.fromPartial(object.tx) : undefined;
     message.txResponse = object.txResponse !== undefined && object.txResponse !== null ? TxResponse.fromPartial(object.txResponse) : undefined;
@@ -1600,7 +1600,7 @@ export const GetBlockWithTxsRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<GetBlockWithTxsRequest>): GetBlockWithTxsRequest {
+  fromPartial<I extends Exact<DeepPartial<GetBlockWithTxsRequest>, I>>(object: I): GetBlockWithTxsRequest {
     const message = createBaseGetBlockWithTxsRequest();
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
@@ -1696,7 +1696,7 @@ export const GetBlockWithTxsResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<GetBlockWithTxsResponse>): GetBlockWithTxsResponse {
+  fromPartial<I extends Exact<DeepPartial<GetBlockWithTxsResponse>, I>>(object: I): GetBlockWithTxsResponse {
     const message = createBaseGetBlockWithTxsResponse();
     message.txs = object.txs?.map(e => Tx.fromPartial(e)) || [];
     message.blockId = object.blockId !== undefined && object.blockId !== null ? BlockID.fromPartial(object.blockId) : undefined;
@@ -1783,7 +1783,7 @@ export const TxDecodeRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<TxDecodeRequest>): TxDecodeRequest {
+  fromPartial<I extends Exact<DeepPartial<TxDecodeRequest>, I>>(object: I): TxDecodeRequest {
     const message = createBaseTxDecodeRequest();
     message.txBytes = object.txBytes ?? new Uint8Array();
     return message;
@@ -1853,7 +1853,7 @@ export const TxDecodeResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<TxDecodeResponse>): TxDecodeResponse {
+  fromPartial<I extends Exact<DeepPartial<TxDecodeResponse>, I>>(object: I): TxDecodeResponse {
     const message = createBaseTxDecodeResponse();
     message.tx = object.tx !== undefined && object.tx !== null ? Tx.fromPartial(object.tx) : undefined;
     return message;
@@ -1923,7 +1923,7 @@ export const TxEncodeRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<TxEncodeRequest>): TxEncodeRequest {
+  fromPartial<I extends Exact<DeepPartial<TxEncodeRequest>, I>>(object: I): TxEncodeRequest {
     const message = createBaseTxEncodeRequest();
     message.tx = object.tx !== undefined && object.tx !== null ? Tx.fromPartial(object.tx) : undefined;
     return message;
@@ -1993,7 +1993,7 @@ export const TxEncodeResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<TxEncodeResponse>): TxEncodeResponse {
+  fromPartial<I extends Exact<DeepPartial<TxEncodeResponse>, I>>(object: I): TxEncodeResponse {
     const message = createBaseTxEncodeResponse();
     message.txBytes = object.txBytes ?? new Uint8Array();
     return message;
@@ -2063,7 +2063,7 @@ export const TxEncodeAminoRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<TxEncodeAminoRequest>): TxEncodeAminoRequest {
+  fromPartial<I extends Exact<DeepPartial<TxEncodeAminoRequest>, I>>(object: I): TxEncodeAminoRequest {
     const message = createBaseTxEncodeAminoRequest();
     message.aminoJson = object.aminoJson ?? "";
     return message;
@@ -2133,7 +2133,7 @@ export const TxEncodeAminoResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<TxEncodeAminoResponse>): TxEncodeAminoResponse {
+  fromPartial<I extends Exact<DeepPartial<TxEncodeAminoResponse>, I>>(object: I): TxEncodeAminoResponse {
     const message = createBaseTxEncodeAminoResponse();
     message.aminoBinary = object.aminoBinary ?? new Uint8Array();
     return message;
@@ -2203,7 +2203,7 @@ export const TxDecodeAminoRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<TxDecodeAminoRequest>): TxDecodeAminoRequest {
+  fromPartial<I extends Exact<DeepPartial<TxDecodeAminoRequest>, I>>(object: I): TxDecodeAminoRequest {
     const message = createBaseTxDecodeAminoRequest();
     message.aminoBinary = object.aminoBinary ?? new Uint8Array();
     return message;
@@ -2273,7 +2273,7 @@ export const TxDecodeAminoResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<TxDecodeAminoResponse>): TxDecodeAminoResponse {
+  fromPartial<I extends Exact<DeepPartial<TxDecodeAminoResponse>, I>>(object: I): TxDecodeAminoResponse {
     const message = createBaseTxDecodeAminoResponse();
     message.aminoJson = object.aminoJson ?? "";
     return message;

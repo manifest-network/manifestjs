@@ -1,7 +1,7 @@
 import { RequestFinalizeBlock, RequestFinalizeBlockAmino, RequestFinalizeBlockSDKType, ResponseFinalizeBlock, ResponseFinalizeBlockAmino, ResponseFinalizeBlockSDKType, ResponseCommit, ResponseCommitAmino, ResponseCommitSDKType } from "../../../../tendermint/abci/types";
 import { StoreKVPair, StoreKVPairAmino, StoreKVPairSDKType } from "../../v1beta1/listening";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial } from "../../../../helpers";
+import { DeepPartial, Exact } from "../../../../helpers";
 /** ListenEndBlockRequest is the request type for the ListenEndBlock RPC method */
 export interface ListenFinalizeBlockRequest {
   req?: RequestFinalizeBlock;
@@ -119,7 +119,7 @@ export const ListenFinalizeBlockRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ListenFinalizeBlockRequest>): ListenFinalizeBlockRequest {
+  fromPartial<I extends Exact<DeepPartial<ListenFinalizeBlockRequest>, I>>(object: I): ListenFinalizeBlockRequest {
     const message = createBaseListenFinalizeBlockRequest();
     message.req = object.req !== undefined && object.req !== null ? RequestFinalizeBlock.fromPartial(object.req) : undefined;
     message.res = object.res !== undefined && object.res !== null ? ResponseFinalizeBlock.fromPartial(object.res) : undefined;
@@ -186,7 +186,7 @@ export const ListenFinalizeBlockResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<ListenFinalizeBlockResponse>): ListenFinalizeBlockResponse {
+  fromPartial<I extends Exact<DeepPartial<ListenFinalizeBlockResponse>, I>>(_: I): ListenFinalizeBlockResponse {
     const message = createBaseListenFinalizeBlockResponse();
     return message;
   },
@@ -265,7 +265,7 @@ export const ListenCommitRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ListenCommitRequest>): ListenCommitRequest {
+  fromPartial<I extends Exact<DeepPartial<ListenCommitRequest>, I>>(object: I): ListenCommitRequest {
     const message = createBaseListenCommitRequest();
     message.blockHeight = object.blockHeight !== undefined && object.blockHeight !== null ? BigInt(object.blockHeight.toString()) : BigInt(0);
     message.res = object.res !== undefined && object.res !== null ? ResponseCommit.fromPartial(object.res) : undefined;
@@ -339,7 +339,7 @@ export const ListenCommitResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<ListenCommitResponse>): ListenCommitResponse {
+  fromPartial<I extends Exact<DeepPartial<ListenCommitResponse>, I>>(_: I): ListenCommitResponse {
     const message = createBaseListenCommitResponse();
     return message;
   },

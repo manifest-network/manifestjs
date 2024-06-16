@@ -2,7 +2,7 @@ import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
 import { ConnectionEnd, ConnectionEndAmino, ConnectionEndSDKType } from "../../../core/connection/v1/connection";
 import { Channel, ChannelAmino, ChannelSDKType } from "../../../core/channel/v1/channel";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /**
  * DataType defines the type of solo machine proof being created. This is done
  * to preserve uniqueness of different data sign byte encodings.
@@ -698,7 +698,7 @@ export const ClientState = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ClientState>): ClientState {
+  fromPartial<I extends Exact<DeepPartial<ClientState>, I>>(object: I): ClientState {
     const message = createBaseClientState();
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
     message.isFrozen = object.isFrozen ?? false;
@@ -797,7 +797,7 @@ export const ConsensusState = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ConsensusState>): ConsensusState {
+  fromPartial<I extends Exact<DeepPartial<ConsensusState>, I>>(object: I): ConsensusState {
     const message = createBaseConsensusState();
     message.publicKey = object.publicKey !== undefined && object.publicKey !== null ? Any.fromPartial(object.publicKey) : undefined;
     message.diversifier = object.diversifier ?? "";
@@ -905,7 +905,7 @@ export const Header = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Header>): Header {
+  fromPartial<I extends Exact<DeepPartial<Header>, I>>(object: I): Header {
     const message = createBaseHeader();
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
     message.timestamp = object.timestamp !== undefined && object.timestamp !== null ? BigInt(object.timestamp.toString()) : BigInt(0);
@@ -1016,7 +1016,7 @@ export const Misbehaviour = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<Misbehaviour>): Misbehaviour {
+  fromPartial<I extends Exact<DeepPartial<Misbehaviour>, I>>(object: I): Misbehaviour {
     const message = createBaseMisbehaviour();
     message.clientId = object.clientId ?? "";
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
@@ -1122,7 +1122,7 @@ export const SignatureAndData = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<SignatureAndData>): SignatureAndData {
+  fromPartial<I extends Exact<DeepPartial<SignatureAndData>, I>>(object: I): SignatureAndData {
     const message = createBaseSignatureAndData();
     message.signature = object.signature ?? new Uint8Array();
     message.dataType = object.dataType ?? 0;
@@ -1214,7 +1214,7 @@ export const TimestampedSignatureData = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<TimestampedSignatureData>): TimestampedSignatureData {
+  fromPartial<I extends Exact<DeepPartial<TimestampedSignatureData>, I>>(object: I): TimestampedSignatureData {
     const message = createBaseTimestampedSignatureData();
     message.signatureData = object.signatureData ?? new Uint8Array();
     message.timestamp = object.timestamp !== undefined && object.timestamp !== null ? BigInt(object.timestamp.toString()) : BigInt(0);
@@ -1317,7 +1317,7 @@ export const SignBytes = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<SignBytes>): SignBytes {
+  fromPartial<I extends Exact<DeepPartial<SignBytes>, I>>(object: I): SignBytes {
     const message = createBaseSignBytes();
     message.sequence = object.sequence !== undefined && object.sequence !== null ? BigInt(object.sequence.toString()) : BigInt(0);
     message.timestamp = object.timestamp !== undefined && object.timestamp !== null ? BigInt(object.timestamp.toString()) : BigInt(0);
@@ -1414,7 +1414,7 @@ export const HeaderData = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<HeaderData>): HeaderData {
+  fromPartial<I extends Exact<DeepPartial<HeaderData>, I>>(object: I): HeaderData {
     const message = createBaseHeaderData();
     message.newPubKey = object.newPubKey !== undefined && object.newPubKey !== null ? Any.fromPartial(object.newPubKey) : undefined;
     message.newDiversifier = object.newDiversifier ?? "";
@@ -1496,7 +1496,7 @@ export const ClientStateData = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ClientStateData>): ClientStateData {
+  fromPartial<I extends Exact<DeepPartial<ClientStateData>, I>>(object: I): ClientStateData {
     const message = createBaseClientStateData();
     message.path = object.path ?? new Uint8Array();
     message.clientState = object.clientState !== undefined && object.clientState !== null ? Any.fromPartial(object.clientState) : undefined;
@@ -1578,7 +1578,7 @@ export const ConsensusStateData = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ConsensusStateData>): ConsensusStateData {
+  fromPartial<I extends Exact<DeepPartial<ConsensusStateData>, I>>(object: I): ConsensusStateData {
     const message = createBaseConsensusStateData();
     message.path = object.path ?? new Uint8Array();
     message.consensusState = object.consensusState !== undefined && object.consensusState !== null ? Any.fromPartial(object.consensusState) : undefined;
@@ -1660,7 +1660,7 @@ export const ConnectionStateData = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ConnectionStateData>): ConnectionStateData {
+  fromPartial<I extends Exact<DeepPartial<ConnectionStateData>, I>>(object: I): ConnectionStateData {
     const message = createBaseConnectionStateData();
     message.path = object.path ?? new Uint8Array();
     message.connection = object.connection !== undefined && object.connection !== null ? ConnectionEnd.fromPartial(object.connection) : undefined;
@@ -1742,7 +1742,7 @@ export const ChannelStateData = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ChannelStateData>): ChannelStateData {
+  fromPartial<I extends Exact<DeepPartial<ChannelStateData>, I>>(object: I): ChannelStateData {
     const message = createBaseChannelStateData();
     message.path = object.path ?? new Uint8Array();
     message.channel = object.channel !== undefined && object.channel !== null ? Channel.fromPartial(object.channel) : undefined;
@@ -1824,7 +1824,7 @@ export const PacketCommitmentData = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<PacketCommitmentData>): PacketCommitmentData {
+  fromPartial<I extends Exact<DeepPartial<PacketCommitmentData>, I>>(object: I): PacketCommitmentData {
     const message = createBasePacketCommitmentData();
     message.path = object.path ?? new Uint8Array();
     message.commitment = object.commitment ?? new Uint8Array();
@@ -1906,7 +1906,7 @@ export const PacketAcknowledgementData = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<PacketAcknowledgementData>): PacketAcknowledgementData {
+  fromPartial<I extends Exact<DeepPartial<PacketAcknowledgementData>, I>>(object: I): PacketAcknowledgementData {
     const message = createBasePacketAcknowledgementData();
     message.path = object.path ?? new Uint8Array();
     message.acknowledgement = object.acknowledgement ?? new Uint8Array();
@@ -1981,7 +1981,7 @@ export const PacketReceiptAbsenceData = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<PacketReceiptAbsenceData>): PacketReceiptAbsenceData {
+  fromPartial<I extends Exact<DeepPartial<PacketReceiptAbsenceData>, I>>(object: I): PacketReceiptAbsenceData {
     const message = createBasePacketReceiptAbsenceData();
     message.path = object.path ?? new Uint8Array();
     return message;
@@ -2058,7 +2058,7 @@ export const NextSequenceRecvData = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<NextSequenceRecvData>): NextSequenceRecvData {
+  fromPartial<I extends Exact<DeepPartial<NextSequenceRecvData>, I>>(object: I): NextSequenceRecvData {
     const message = createBaseNextSequenceRecvData();
     message.path = object.path ?? new Uint8Array();
     message.nextSeqRecv = object.nextSeqRecv !== undefined && object.nextSeqRecv !== null ? BigInt(object.nextSeqRecv.toString()) : BigInt(0);

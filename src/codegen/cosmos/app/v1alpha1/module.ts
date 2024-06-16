@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 /** ModuleDescriptor describes an app module. */
 export interface ModuleDescriptor {
   /**
@@ -247,7 +247,7 @@ export const ModuleDescriptor = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ModuleDescriptor>): ModuleDescriptor {
+  fromPartial<I extends Exact<DeepPartial<ModuleDescriptor>, I>>(object: I): ModuleDescriptor {
     const message = createBaseModuleDescriptor();
     message.goImport = object.goImport ?? "";
     message.usePackage = object.usePackage?.map(e => PackageReference.fromPartial(e)) || [];
@@ -338,7 +338,7 @@ export const PackageReference = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<PackageReference>): PackageReference {
+  fromPartial<I extends Exact<DeepPartial<PackageReference>, I>>(object: I): PackageReference {
     const message = createBasePackageReference();
     message.name = object.name ?? "";
     message.revision = object.revision ?? 0;
@@ -413,7 +413,7 @@ export const MigrateFromInfo = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MigrateFromInfo>): MigrateFromInfo {
+  fromPartial<I extends Exact<DeepPartial<MigrateFromInfo>, I>>(object: I): MigrateFromInfo {
     const message = createBaseMigrateFromInfo();
     message.module = object.module ?? "";
     return message;

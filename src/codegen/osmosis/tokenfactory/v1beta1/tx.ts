@@ -1,7 +1,7 @@
 import { Coin, CoinAmino, CoinSDKType } from "../../../cosmos/base/v1beta1/coin";
 import { Metadata, MetadataAmino, MetadataSDKType, Params, ParamsAmino, ParamsSDKType } from "../../../cosmos/bank/v1beta1/bank";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 /**
  * MsgCreateDenom defines the message structure for the CreateDenom gRPC service
  * method. It allows an account to create a new denom. It requires a sender
@@ -442,7 +442,7 @@ export const MsgCreateDenom = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgCreateDenom>): MsgCreateDenom {
+  fromPartial<I extends Exact<DeepPartial<MsgCreateDenom>, I>>(object: I): MsgCreateDenom {
     const message = createBaseMsgCreateDenom();
     message.sender = object.sender ?? "";
     message.subdenom = object.subdenom ?? "";
@@ -517,7 +517,7 @@ export const MsgCreateDenomResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgCreateDenomResponse>): MsgCreateDenomResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgCreateDenomResponse>, I>>(object: I): MsgCreateDenomResponse {
     const message = createBaseMsgCreateDenomResponse();
     message.newTokenDenom = object.newTokenDenom ?? "";
     return message;
@@ -601,7 +601,7 @@ export const MsgMint = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgMint>): MsgMint {
+  fromPartial<I extends Exact<DeepPartial<MsgMint>, I>>(object: I): MsgMint {
     const message = createBaseMsgMint();
     message.sender = object.sender ?? "";
     message.amount = object.amount !== undefined && object.amount !== null ? Coin.fromPartial(object.amount) : undefined;
@@ -673,7 +673,7 @@ export const MsgMintResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgMintResponse>): MsgMintResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgMintResponse>, I>>(_: I): MsgMintResponse {
     const message = createBaseMsgMintResponse();
     return message;
   },
@@ -752,7 +752,7 @@ export const MsgBurn = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgBurn>): MsgBurn {
+  fromPartial<I extends Exact<DeepPartial<MsgBurn>, I>>(object: I): MsgBurn {
     const message = createBaseMsgBurn();
     message.sender = object.sender ?? "";
     message.amount = object.amount !== undefined && object.amount !== null ? Coin.fromPartial(object.amount) : undefined;
@@ -824,7 +824,7 @@ export const MsgBurnResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgBurnResponse>): MsgBurnResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgBurnResponse>, I>>(_: I): MsgBurnResponse {
     const message = createBaseMsgBurnResponse();
     return message;
   },
@@ -903,7 +903,7 @@ export const MsgChangeAdmin = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgChangeAdmin>): MsgChangeAdmin {
+  fromPartial<I extends Exact<DeepPartial<MsgChangeAdmin>, I>>(object: I): MsgChangeAdmin {
     const message = createBaseMsgChangeAdmin();
     message.sender = object.sender ?? "";
     message.denom = object.denom ?? "";
@@ -975,7 +975,7 @@ export const MsgChangeAdminResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgChangeAdminResponse>): MsgChangeAdminResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgChangeAdminResponse>, I>>(_: I): MsgChangeAdminResponse {
     const message = createBaseMsgChangeAdminResponse();
     return message;
   },
@@ -1047,7 +1047,7 @@ export const MsgSetDenomMetadata = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgSetDenomMetadata>): MsgSetDenomMetadata {
+  fromPartial<I extends Exact<DeepPartial<MsgSetDenomMetadata>, I>>(object: I): MsgSetDenomMetadata {
     const message = createBaseMsgSetDenomMetadata();
     message.sender = object.sender ?? "";
     message.metadata = object.metadata !== undefined && object.metadata !== null ? Metadata.fromPartial(object.metadata) : undefined;
@@ -1114,7 +1114,7 @@ export const MsgSetDenomMetadataResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgSetDenomMetadataResponse>): MsgSetDenomMetadataResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgSetDenomMetadataResponse>, I>>(_: I): MsgSetDenomMetadataResponse {
     const message = createBaseMsgSetDenomMetadataResponse();
     return message;
   },
@@ -1200,7 +1200,7 @@ export const MsgForceTransfer = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgForceTransfer>): MsgForceTransfer {
+  fromPartial<I extends Exact<DeepPartial<MsgForceTransfer>, I>>(object: I): MsgForceTransfer {
     const message = createBaseMsgForceTransfer();
     message.sender = object.sender ?? "";
     message.amount = object.amount !== undefined && object.amount !== null ? Coin.fromPartial(object.amount) : undefined;
@@ -1277,7 +1277,7 @@ export const MsgForceTransferResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgForceTransferResponse>): MsgForceTransferResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgForceTransferResponse>, I>>(_: I): MsgForceTransferResponse {
     const message = createBaseMsgForceTransferResponse();
     return message;
   },
@@ -1349,7 +1349,7 @@ export const MsgUpdateParams = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<MsgUpdateParams>): MsgUpdateParams {
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(object: I): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
     message.authority = object.authority ?? "";
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
@@ -1416,7 +1416,7 @@ export const MsgUpdateParamsResponse = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<MsgUpdateParamsResponse>): MsgUpdateParamsResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(_: I): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
     return message;
   },

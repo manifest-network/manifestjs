@@ -26,14 +26,12 @@ telescope({
     },
 
     prototypes: {
-      optionalQueryParams: true,
+      optionalQueryParams: false,
       useOptionalNullable: true,
-      fieldDefaultIsOptional: true,
-
+      fieldDefaultIsOptional: false,
       addTypeUrlToObjects: true,
       addTypeUrlToDecoders: true,
       addAminoTypeToObjects: true,
-
       excluded: {
         packages: [
           'ibc.applications.fee.v1', // issue with parsing protos (LCD routes with nested objects in params)
@@ -77,8 +75,12 @@ telescope({
         useDeepPartial: true,
         duration: 'duration',
         timestamp: 'date',
-        useExact: false,
-        autoFixUndefinedEnumDefault: true
+        useExact: true,
+        autoFixUndefinedEnumDefault: true,
+        num64: 'bigint',
+        customTypes: {
+          useCosmosSDKDecimal: true
+        }
       }
     },
     interfaces: {
@@ -97,17 +99,6 @@ telescope({
       enabled: true,
       camelCase: true,
       useConnectComet: true
-    },
-    packages: {
-      cosmos: {
-        authz: {
-          v1beta1: {
-            aminoEncoding: {
-              enabled: false
-            }
-          }
-        }
-      }
     }
   }
 })

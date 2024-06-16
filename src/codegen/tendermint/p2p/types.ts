@@ -1,5 +1,5 @@
 import { BinaryReader, BinaryWriter } from "../../binary";
-import { DeepPartial, bytesFromBase64, base64FromBytes } from "../../helpers";
+import { DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../helpers";
 export interface NetAddress {
   id: string;
   ip: string;
@@ -148,7 +148,7 @@ export const NetAddress = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<NetAddress>): NetAddress {
+  fromPartial<I extends Exact<DeepPartial<NetAddress>, I>>(object: I): NetAddress {
     const message = createBaseNetAddress();
     message.id = object.id ?? "";
     message.ip = object.ip ?? "";
@@ -235,7 +235,7 @@ export const ProtocolVersion = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ProtocolVersion>): ProtocolVersion {
+  fromPartial<I extends Exact<DeepPartial<ProtocolVersion>, I>>(object: I): ProtocolVersion {
     const message = createBaseProtocolVersion();
     message.p2p = object.p2p !== undefined && object.p2p !== null ? BigInt(object.p2p.toString()) : BigInt(0);
     message.block = object.block !== undefined && object.block !== null ? BigInt(object.block.toString()) : BigInt(0);
@@ -357,7 +357,7 @@ export const DefaultNodeInfo = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<DefaultNodeInfo>): DefaultNodeInfo {
+  fromPartial<I extends Exact<DeepPartial<DefaultNodeInfo>, I>>(object: I): DefaultNodeInfo {
     const message = createBaseDefaultNodeInfo();
     message.protocolVersion = object.protocolVersion !== undefined && object.protocolVersion !== null ? ProtocolVersion.fromPartial(object.protocolVersion) : undefined;
     message.defaultNodeId = object.defaultNodeId ?? "";
@@ -462,7 +462,7 @@ export const DefaultNodeInfoOther = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<DefaultNodeInfoOther>): DefaultNodeInfoOther {
+  fromPartial<I extends Exact<DeepPartial<DefaultNodeInfoOther>, I>>(object: I): DefaultNodeInfoOther {
     const message = createBaseDefaultNodeInfoOther();
     message.txIndex = object.txIndex ?? "";
     message.rpcAddress = object.rpcAddress ?? "";

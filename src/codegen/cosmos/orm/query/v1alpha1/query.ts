@@ -3,7 +3,7 @@ import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
 import { Timestamp } from "../../../../google/protobuf/timestamp";
 import { Duration, DurationAmino, DurationSDKType } from "../../../../google/protobuf/duration";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial, toTimestamp, fromTimestamp, bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { DeepPartial, Exact, toTimestamp, fromTimestamp, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 /** GetRequest is the Query/Get request type. */
 export interface GetRequest {
   /** message_name is the fully-qualified message name of the ORM table being queried. */
@@ -342,7 +342,7 @@ export const GetRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<GetRequest>): GetRequest {
+  fromPartial<I extends Exact<DeepPartial<GetRequest>, I>>(object: I): GetRequest {
     const message = createBaseGetRequest();
     message.messageName = object.messageName ?? "";
     message.index = object.index ?? "";
@@ -424,7 +424,7 @@ export const GetResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<GetResponse>): GetResponse {
+  fromPartial<I extends Exact<DeepPartial<GetResponse>, I>>(object: I): GetResponse {
     const message = createBaseGetResponse();
     message.result = object.result !== undefined && object.result !== null ? Any.fromPartial(object.result) : undefined;
     return message;
@@ -522,7 +522,7 @@ export const ListRequest = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ListRequest>): ListRequest {
+  fromPartial<I extends Exact<DeepPartial<ListRequest>, I>>(object: I): ListRequest {
     const message = createBaseListRequest();
     message.messageName = object.messageName ?? "";
     message.index = object.index ?? "";
@@ -612,7 +612,7 @@ export const ListRequest_Prefix = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ListRequest_Prefix>): ListRequest_Prefix {
+  fromPartial<I extends Exact<DeepPartial<ListRequest_Prefix>, I>>(object: I): ListRequest_Prefix {
     const message = createBaseListRequest_Prefix();
     message.values = object.values?.map(e => IndexValue.fromPartial(e)) || [];
     return message;
@@ -691,7 +691,7 @@ export const ListRequest_Range = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ListRequest_Range>): ListRequest_Range {
+  fromPartial<I extends Exact<DeepPartial<ListRequest_Range>, I>>(object: I): ListRequest_Range {
     const message = createBaseListRequest_Range();
     message.start = object.start?.map(e => IndexValue.fromPartial(e)) || [];
     message.end = object.end?.map(e => IndexValue.fromPartial(e)) || [];
@@ -777,7 +777,7 @@ export const ListResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<ListResponse>): ListResponse {
+  fromPartial<I extends Exact<DeepPartial<ListResponse>, I>>(object: I): ListResponse {
     const message = createBaseListResponse();
     message.results = object.results?.map(e => Any.fromPartial(e)) || [];
     message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
@@ -903,7 +903,7 @@ export const IndexValue = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<IndexValue>): IndexValue {
+  fromPartial<I extends Exact<DeepPartial<IndexValue>, I>>(object: I): IndexValue {
     const message = createBaseIndexValue();
     message.uint = object.uint !== undefined && object.uint !== null ? BigInt(object.uint.toString()) : undefined;
     message.int = object.int !== undefined && object.int !== null ? BigInt(object.int.toString()) : undefined;

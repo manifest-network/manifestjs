@@ -1,6 +1,6 @@
 import { FileDescriptorProto, FileDescriptorProtoAmino, FileDescriptorProtoSDKType } from "../../../google/protobuf/descriptor";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial } from "../../../helpers";
+import { DeepPartial, Exact } from "../../../helpers";
 /** FileDescriptorsRequest is the Query/FileDescriptors request type. */
 export interface FileDescriptorsRequest {}
 export interface FileDescriptorsRequestProtoMsg {
@@ -60,7 +60,7 @@ export const FileDescriptorsRequest = {
     }
     return message;
   },
-  fromPartial(_: DeepPartial<FileDescriptorsRequest>): FileDescriptorsRequest {
+  fromPartial<I extends Exact<DeepPartial<FileDescriptorsRequest>, I>>(_: I): FileDescriptorsRequest {
     const message = createBaseFileDescriptorsRequest();
     return message;
   },
@@ -125,7 +125,7 @@ export const FileDescriptorsResponse = {
     }
     return message;
   },
-  fromPartial(object: DeepPartial<FileDescriptorsResponse>): FileDescriptorsResponse {
+  fromPartial<I extends Exact<DeepPartial<FileDescriptorsResponse>, I>>(object: I): FileDescriptorsResponse {
     const message = createBaseFileDescriptorsResponse();
     message.files = object.files?.map(e => FileDescriptorProto.fromPartial(e)) || [];
     return message;
