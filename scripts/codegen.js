@@ -81,6 +81,17 @@ telescope({
         customTypes: {
           useCosmosSDKDecimal: true
         }
+      },
+      patch: {
+        'cosmos/group/v1/tx.proto': [
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)': 'cosmos.bank.v1beta1.MsgSend'
+            }
+          }
+        ]
       }
     },
     interfaces: {

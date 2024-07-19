@@ -541,7 +541,7 @@ export interface MsgSubmitProposal {
   /** metadata is any arbitrary metadata attached to the proposal. */
   metadata: string;
   /** messages is a list of `sdk.Msg`s that will be executed if the proposal passes. */
-  messages: Any[];
+  messages: (Any)[] | Any[];
   /**
    * exec defines the mode of execution of the proposal,
    * whether it should be executed immediately on creation or not.
@@ -565,6 +565,9 @@ export interface MsgSubmitProposalProtoMsg {
   typeUrl: "/cosmos.group.v1.MsgSubmitProposal";
   value: Uint8Array;
 }
+export type MsgSubmitProposalEncoded = Omit<MsgSubmitProposal, "messages"> & {
+  /** messages is a list of `sdk.Msg`s that will be executed if the proposal passes. */messages: (AnyProtoMsg)[];
+};
 /** MsgSubmitProposal is the Msg/SubmitProposal request type. */
 export interface MsgSubmitProposalAmino {
   /** group_policy_address is the account address of group policy. */
@@ -606,7 +609,7 @@ export interface MsgSubmitProposalSDKType {
   group_policy_address: string;
   proposers: string[];
   metadata: string;
-  messages: AnySDKType[];
+  messages: (AnySDKType)[];
   exec: Exec;
   title: string;
   summary: string;
@@ -2315,7 +2318,7 @@ export const MsgSubmitProposal = {
       writer.uint32(26).string(message.metadata);
     }
     for (const v of message.messages) {
-      Any.encode(v!, writer.uint32(34).fork()).ldelim();
+      Any.encode((v! as Any), writer.uint32(34).fork()).ldelim();
     }
     if (message.exec !== 0) {
       writer.uint32(40).int32(message.exec);
@@ -2345,7 +2348,7 @@ export const MsgSubmitProposal = {
           message.metadata = reader.string();
           break;
         case 4:
-          message.messages.push(Any.decode(reader, reader.uint32()));
+          message.messages.push((Any.decode(reader, reader.uint32()) as Any));
           break;
         case 5:
           message.exec = (reader.int32() as any);
@@ -2383,7 +2386,7 @@ export const MsgSubmitProposal = {
     if (object.metadata !== undefined && object.metadata !== null) {
       message.metadata = object.metadata;
     }
-    message.messages = object.messages?.map(e => Any.fromAmino(e)) || [];
+    message.messages = object.messages?.map(e => Cosmos_bankv1beta1MsgSend_FromAmino(e)) || [];
     if (object.exec !== undefined && object.exec !== null) {
       message.exec = object.exec;
     }
@@ -2405,7 +2408,7 @@ export const MsgSubmitProposal = {
     }
     obj.metadata = message.metadata === "" ? undefined : message.metadata;
     if (message.messages) {
-      obj.messages = message.messages.map(e => e ? Any.toAmino(e) : undefined);
+      obj.messages = message.messages.map(e => e ? Cosmos_bankv1beta1MsgSend_ToAmino((e as Any)) : undefined);
     } else {
       obj.messages = message.messages;
     }
@@ -3154,4 +3157,18 @@ export const Cosmos_groupv1DecisionPolicy_ToAmino = (content: Any) => {
     default:
       return Any.toAmino(content);
   }
+};
+export const Cosmos_bankv1beta1MsgSend_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_bankv1beta1MsgSend_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_bankv1beta1MsgSend_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
 };
