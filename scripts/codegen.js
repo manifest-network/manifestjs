@@ -11,7 +11,7 @@ telescope({
   protoDirs,
   outPath,
   options: {
-    removeUnusedImports: true, // testing...
+    removeUnusedImports: true,
     classesUseArrowFunctions: true,
 
     tsDisable: {
@@ -34,7 +34,7 @@ telescope({
       addAminoTypeToObjects: true,
       excluded: {
         packages: [
-          'ibc.applications.fee.v1', // issue with parsing protos (LCD routes with nested objects in params)
+          'ibc.applications.fee.v1',
 
           // 'cosmos.auth.v1beta1',
           'cosmos.app.v1alpha1',
@@ -81,18 +81,174 @@ telescope({
         customTypes: {
           useCosmosSDKDecimal: true
         }
+      },
+      patch: {
+        'cosmos/group/v1/tx.proto': [
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)': 'cosmos.bank.v1beta1.MsgSend'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'strangelove_ventures.poa.v1.MsgUpdateParams'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'strangelove_ventures.poa.v1.MsgRemoveValidator'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'strangelove_ventures.poa.v1.MsgRemovePending'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'strangelove_ventures.poa.v1.MsgUpdateStakingParams'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'strangelove_ventures.poa.v1.MsgSetPower'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)': 'manifest.v1.MsgUpdateParams'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)': 'manifest.v1.MsgPayout'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'cosmos.group.v1.MsgUpdateGroupAdmin'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'cosmos.group.v1.MsgUpdateGroupMembers'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'cosmos.group.v1.MsgUpdateGroupMetadata'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'cosmos.group.v1.MsgUpdateGroupPolicyAdmin'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'cosmos.group.v1.MsgCreateGroupWithPolicy'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'cosmos.group.v1.MsgSubmitProposal'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)': 'cosmos.group.v1.MsgVote'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'cosmos.group.v1.MsgWithdrawProposal'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)': 'cosmos.group.v1.MsgExec'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'cosmos.group.v1.MsgLeaveGroup'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'cosmos.bank.v1beta1.MsgMultiSend'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'cosmos.upgrade.v1beta1.MsgSoftwareUpgrade'
+            }
+          },
+          {
+            op: 'add',
+            path: '@/MsgSubmitProposal/fields/messages/options',
+            value: {
+              '(cosmos_proto.accepts_interface)':
+                'cosmos.upgrade.v1beta1.MsgCancelUpgrade'
+            }
+          }
+        ]
       }
-      // patch: {
-      //   'cosmos/group/v1/tx.proto': [
-      //     {
-      //       op: 'add',
-      //       path: '@/MsgSubmitProposal/fields/messages/options',
-      //       value: {
-      //         '(cosmos_proto.accepts_interface)': 'cosmos.bank.v1beta1.MsgSend'
-      //       }
-      //     }
-      //   ],
-      // }
     },
     interfaces: {
       enabled: true,
