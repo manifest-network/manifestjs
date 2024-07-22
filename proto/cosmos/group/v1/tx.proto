@@ -296,7 +296,29 @@ message MsgSubmitProposal {
   string metadata = 3;
 
   // messages is a list of `sdk.Msg`s that will be executed if the proposal passes.
-  repeated google.protobuf.Any messages = 4;
+  repeated google.protobuf.Any messages = 4 [(cosmos_proto.accepts_interface) = 
+  "cosmos.bank.v1beta1.MsgSend,"
+  "strangelove_ventures.poa.v1.MsgUpdateParams,"
+  "strangelove_ventures.poa.v1.MsgRemoveValidator,"
+  "strangelove_ventures.poa.v1.MsgRemovePending,"
+  "strangelove_ventures.poa.v1.MsgUpdateStakingParams,"
+  "strangelove_ventures.poa.v1.MsgSetPower,"
+  "manifest.v1.MsgUpdateParams,"
+  "manifest.v1.MsgPayout,"
+  "cosmos.group.v1.MsgUpdateGroupAdmin,"
+  "cosmos.group.v1.MsgUpdateGroupMembers,"
+  "cosmos.group.v1.MsgUpdateGroupMetadata,"
+  "cosmos.group.v1.MsgUpdateGroupPolicyAdmin,"
+  "cosmos.group.v1.MsgCreateGroupWithPolicy,"
+  "cosmos.group.v1.MsgSubmitProposal,"
+  "cosmos.group.v1.MsgVote,"
+  "cosmos.group.v1.MsgWithdrawProposal,"
+  "cosmos.group.v1.MsgExec,"
+  "cosmos.group.v1.MsgLeaveGroup,"
+  "cosmos.bank.v1beta1.MsgMultiSend,"
+  "cosmos.upgrade.v1beta1.MsgSoftwareUpgrade,"
+  "cosmos.upgrade.v1beta1.MsgCancelUpgrade"
+];
 
   // exec defines the mode of execution of the proposal,
   // whether it should be executed immediately on creation or not.

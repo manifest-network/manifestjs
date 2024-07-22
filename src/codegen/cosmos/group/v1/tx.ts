@@ -2386,7 +2386,7 @@ export const MsgSubmitProposal = {
     if (object.metadata !== undefined && object.metadata !== null) {
       message.metadata = object.metadata;
     }
-    message.messages = object.messages?.map(e => Cosmos_bankv1beta1MsgSend_FromAmino(e)) || [];
+    message.messages = object.messages?.map(e => Cosmos_bankv1beta1MsgSendstrangelove_venturespoav1MsgUpdateParamsstrangelove_venturespoav1MsgRemoveValidatorstrangelove_venturespoav1MsgRemovePendingstrangelove_venturespoav1MsgUpdateStakingParamsstrangelove_venturespoav1MsgSetPowermanifestv1MsgUpdateParamsmanifestv1MsgPayoutcosmosgroupv1MsgUpdateGroupAdmincosmosgroupv1MsgUpdateGroupMemberscosmosgroupv1MsgUpdateGroupMetadatacosmosgroupv1MsgUpdateGroupPolicyAdmincosmosgroupv1MsgCreateGroupWithPolicycosmosgroupv1MsgSubmitProposalcosmosgroupv1MsgVotecosmosgroupv1MsgWithdrawProposalcosmosgroupv1MsgExeccosmosgroupv1MsgLeaveGroupcosmosbankv1beta1MsgMultiSendcosmosupgradev1beta1MsgSoftwareUpgradecosmosupgradev1beta1MsgCancelUpgrade_FromAmino(e)) || [];
     if (object.exec !== undefined && object.exec !== null) {
       message.exec = object.exec;
     }
@@ -2408,7 +2408,7 @@ export const MsgSubmitProposal = {
     }
     obj.metadata = message.metadata === "" ? undefined : message.metadata;
     if (message.messages) {
-      obj.messages = message.messages.map(e => e ? Cosmos_bankv1beta1MsgSend_ToAmino((e as Any)) : undefined);
+      obj.messages = message.messages.map(e => e ? Cosmos_bankv1beta1MsgSendstrangelove_venturespoav1MsgUpdateParamsstrangelove_venturespoav1MsgRemoveValidatorstrangelove_venturespoav1MsgRemovePendingstrangelove_venturespoav1MsgUpdateStakingParamsstrangelove_venturespoav1MsgSetPowermanifestv1MsgUpdateParamsmanifestv1MsgPayoutcosmosgroupv1MsgUpdateGroupAdmincosmosgroupv1MsgUpdateGroupMemberscosmosgroupv1MsgUpdateGroupMetadatacosmosgroupv1MsgUpdateGroupPolicyAdmincosmosgroupv1MsgCreateGroupWithPolicycosmosgroupv1MsgSubmitProposalcosmosgroupv1MsgVotecosmosgroupv1MsgWithdrawProposalcosmosgroupv1MsgExeccosmosgroupv1MsgLeaveGroupcosmosbankv1beta1MsgMultiSendcosmosupgradev1beta1MsgSoftwareUpgradecosmosupgradev1beta1MsgCancelUpgrade_ToAmino((e as Any)) : undefined);
     } else {
       obj.messages = message.messages;
     }
@@ -3170,5 +3170,285 @@ export const Cosmos_bankv1beta1MsgSend_FromAmino = (content: AnyAmino): Any => {
   return Any.fromAmino(content);
 };
 export const Cosmos_bankv1beta1MsgSend_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Strangelove_ventures_poav1MsgUpdateParams_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Strangelove_ventures_poav1MsgUpdateParams_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Strangelove_ventures_poav1MsgUpdateParams_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Strangelove_ventures_poav1MsgRemoveValidator_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Strangelove_ventures_poav1MsgRemoveValidator_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Strangelove_ventures_poav1MsgRemoveValidator_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Strangelove_ventures_poav1MsgRemovePending_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Strangelove_ventures_poav1MsgRemovePending_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Strangelove_ventures_poav1MsgRemovePending_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Strangelove_ventures_poav1MsgUpdateStakingParams_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Strangelove_ventures_poav1MsgUpdateStakingParams_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Strangelove_ventures_poav1MsgUpdateStakingParams_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Strangelove_ventures_poav1MsgSetPower_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Strangelove_ventures_poav1MsgSetPower_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Strangelove_ventures_poav1MsgSetPower_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Manifest_v1MsgUpdateParams_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Manifest_v1MsgUpdateParams_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Manifest_v1MsgUpdateParams_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Manifest_v1MsgPayout_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Manifest_v1MsgPayout_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Manifest_v1MsgPayout_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_groupv1MsgUpdateGroupAdmin_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_groupv1MsgUpdateGroupAdmin_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_groupv1MsgUpdateGroupAdmin_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_groupv1MsgUpdateGroupMembers_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_groupv1MsgUpdateGroupMembers_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_groupv1MsgUpdateGroupMembers_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_groupv1MsgUpdateGroupMetadata_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_groupv1MsgUpdateGroupMetadata_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_groupv1MsgUpdateGroupMetadata_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_groupv1MsgUpdateGroupPolicyAdmin_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_groupv1MsgUpdateGroupPolicyAdmin_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_groupv1MsgUpdateGroupPolicyAdmin_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_groupv1MsgCreateGroupWithPolicy_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_groupv1MsgCreateGroupWithPolicy_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_groupv1MsgCreateGroupWithPolicy_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_groupv1MsgSubmitProposal_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_groupv1MsgSubmitProposal_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_groupv1MsgSubmitProposal_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_groupv1MsgVote_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_groupv1MsgVote_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_groupv1MsgVote_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_groupv1MsgWithdrawProposal_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_groupv1MsgWithdrawProposal_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_groupv1MsgWithdrawProposal_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_groupv1MsgExec_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_groupv1MsgExec_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_groupv1MsgExec_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_groupv1MsgLeaveGroup_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_groupv1MsgLeaveGroup_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_groupv1MsgLeaveGroup_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_bankv1beta1MsgMultiSend_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_bankv1beta1MsgMultiSend_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_bankv1beta1MsgMultiSend_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_upgradev1beta1MsgSoftwareUpgrade_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_upgradev1beta1MsgSoftwareUpgrade_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_upgradev1beta1MsgSoftwareUpgrade_ToAmino = (content: Any) => {
+  return Any.toAmino(content);
+};
+export const Cosmos_upgradev1beta1MsgCancelUpgrade_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+  const data = Any.decode(reader, reader.uint32());
+  switch (data.typeUrl) {
+    default:
+      return data;
+  }
+};
+export const Cosmos_upgradev1beta1MsgCancelUpgrade_FromAmino = (content: AnyAmino): Any => {
+  return Any.fromAmino(content);
+};
+export const Cosmos_upgradev1beta1MsgCancelUpgrade_ToAmino = (content: Any) => {
   return Any.toAmino(content);
 };
