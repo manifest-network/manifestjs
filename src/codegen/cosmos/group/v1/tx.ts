@@ -2386,7 +2386,7 @@ export const MsgSubmitProposal = {
     if (object.metadata !== undefined && object.metadata !== null) {
       message.metadata = object.metadata;
     }
-    message.messages = object.messages?.map(e => Cosmos_upgradev1beta1MsgCancelUpgrade_FromAmino(e)) || [];
+    message.messages = object.messages?.map(e => Cosmos_basev1beta1Msg_FromAmino(e)) || [];
     if (object.exec !== undefined && object.exec !== null) {
       message.exec = object.exec;
     }
@@ -2408,7 +2408,7 @@ export const MsgSubmitProposal = {
     }
     obj.metadata = message.metadata === "" ? undefined : message.metadata;
     if (message.messages) {
-      obj.messages = message.messages.map(e => e ? Cosmos_upgradev1beta1MsgCancelUpgrade_ToAmino((e as Any)) : undefined);
+      obj.messages = message.messages.map(e => e ? Cosmos_basev1beta1Msg_ToAmino((e as Any)) : undefined);
     } else {
       obj.messages = message.messages;
     }
@@ -3158,7 +3158,7 @@ export const Cosmos_groupv1DecisionPolicy_ToAmino = (content: Any) => {
       return Any.toAmino(content);
   }
 };
-export const Cosmos_upgradev1beta1MsgCancelUpgrade_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
+export const Cosmos_basev1beta1Msg_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
   const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
   const data = Any.decode(reader, reader.uint32());
   switch (data.typeUrl) {
@@ -3166,9 +3166,9 @@ export const Cosmos_upgradev1beta1MsgCancelUpgrade_InterfaceDecoder = (input: Bi
       return data;
   }
 };
-export const Cosmos_upgradev1beta1MsgCancelUpgrade_FromAmino = (content: AnyAmino): Any => {
+export const Cosmos_basev1beta1Msg_FromAmino = (content: AnyAmino): Any => {
   return Any.fromAmino(content);
 };
-export const Cosmos_upgradev1beta1MsgCancelUpgrade_ToAmino = (content: Any) => {
+export const Cosmos_basev1beta1Msg_ToAmino = (content: Any) => {
   return Any.toAmino(content);
 };

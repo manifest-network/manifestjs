@@ -1,10 +1,9 @@
-import { Params, ParamsAmino, ParamsSDKType } from "./params";
+import { Validator, ValidatorAmino, ValidatorSDKType } from "./validator";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { DeepPartial, Exact } from "../../../helpers";
 /** GenesisState defines the poa module's genesis state. */
 export interface GenesisState {
-  /** Params defines all the parameters of the module. */
-  params: Params;
+  vals: Validator[];
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/strangelove_ventures.poa.v1.GenesisState";
@@ -12,8 +11,7 @@ export interface GenesisStateProtoMsg {
 }
 /** GenesisState defines the poa module's genesis state. */
 export interface GenesisStateAmino {
-  /** Params defines all the parameters of the module. */
-  params?: ParamsAmino;
+  vals?: ValidatorAmino[];
 }
 export interface GenesisStateAminoMsg {
   type: "/strangelove_ventures.poa.v1.GenesisState";
@@ -21,7 +19,7 @@ export interface GenesisStateAminoMsg {
 }
 /** GenesisState defines the poa module's genesis state. */
 export interface GenesisStateSDKType {
-  params: ParamsSDKType;
+  vals: ValidatorSDKType[];
 }
 /** PowerCache is a cached block or absolute change in power for ibc-go validations. */
 export interface PowerCache {
@@ -45,14 +43,14 @@ export interface PowerCacheSDKType {
 }
 function createBaseGenesisState(): GenesisState {
   return {
-    params: Params.fromPartial({})
+    vals: []
   };
 }
 export const GenesisState = {
   typeUrl: "/strangelove_ventures.poa.v1.GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.params !== undefined) {
-      Params.encode(message.params, writer.uint32(10).fork()).ldelim();
+    for (const v of message.vals) {
+      Validator.encode(v!, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -63,8 +61,8 @@ export const GenesisState = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.params = Params.decode(reader, reader.uint32());
+        case 2:
+          message.vals.push(Validator.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -75,19 +73,21 @@ export const GenesisState = {
   },
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(object: I): GenesisState {
     const message = createBaseGenesisState();
-    message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
+    message.vals = object.vals?.map(e => Validator.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
     const message = createBaseGenesisState();
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromAmino(object.params);
-    }
+    message.vals = object.vals?.map(e => Validator.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
     const obj: any = {};
-    obj.params = message.params ? Params.toAmino(message.params) : undefined;
+    if (message.vals) {
+      obj.vals = message.vals.map(e => e ? Validator.toAmino(e) : undefined);
+    } else {
+      obj.vals = message.vals;
+    }
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {

@@ -1,6 +1,6 @@
 import { Rpc } from "../../../helpers";
 import { BinaryReader } from "../../../binary";
-import { MsgCreateValidator, MsgCreateValidatorResponse, MsgSetPower, MsgSetPowerResponse, MsgRemoveValidator, MsgRemoveValidatorResponse, MsgRemovePending, MsgRemovePendingResponse, MsgUpdateParams, MsgUpdateParamsResponse, MsgUpdateStakingParams, MsgUpdateStakingParamsResponse } from "./tx";
+import { MsgCreateValidator, MsgCreateValidatorResponse, MsgSetPower, MsgSetPowerResponse, MsgRemoveValidator, MsgRemoveValidatorResponse, MsgRemovePending, MsgRemovePendingResponse, MsgUpdateStakingParams, MsgUpdateStakingParamsResponse } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /** CreateValidator is a wrapper method around the SDK's x/staking MsgCreateValidator. */
@@ -11,8 +11,6 @@ export interface Msg {
   removeValidator(request: MsgRemoveValidator): Promise<MsgRemoveValidatorResponse>;
   /** RemovePending removes a pending validator from the queue. */
   removePending(request: MsgRemovePending): Promise<MsgRemovePendingResponse>;
-  /** UpdateParams updates the module parameters. */
-  updateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
   /** UpdateStakingParams updates the module parameters. */
   updateStakingParams(request: MsgUpdateStakingParams): Promise<MsgUpdateStakingParamsResponse>;
 }
@@ -44,12 +42,6 @@ export class MsgClientImpl implements Msg {
     const data = MsgRemovePending.encode(request).finish();
     const promise = this.rpc.request("strangelove_ventures.poa.v1.Msg", "RemovePending", data);
     return promise.then(data => MsgRemovePendingResponse.decode(new BinaryReader(data)));
-  };
-  /* UpdateParams updates the module parameters. */
-  updateParams = async (request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> => {
-    const data = MsgUpdateParams.encode(request).finish();
-    const promise = this.rpc.request("strangelove_ventures.poa.v1.Msg", "UpdateParams", data);
-    return promise.then(data => MsgUpdateParamsResponse.decode(new BinaryReader(data)));
   };
   /* UpdateStakingParams updates the module parameters. */
   updateStakingParams = async (request: MsgUpdateStakingParams): Promise<MsgUpdateStakingParamsResponse> => {

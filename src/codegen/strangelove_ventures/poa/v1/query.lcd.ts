@@ -1,5 +1,5 @@
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, ParamsResponseSDKType, QueryPendingValidatorsRequest, PendingValidatorsResponseSDKType, QueryConsensusPowerRequest, QueryConsensusPowerResponseSDKType } from "./query";
+import { QueryPendingValidatorsRequest, PendingValidatorsResponseSDKType, QueryConsensusPowerRequest, QueryConsensusPowerResponseSDKType, QueryPoaAuthorityRequest, QueryPoaAuthorityResponseSDKType } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -9,11 +9,6 @@ export class LCDQueryClient {
   }) {
     this.req = requestClient;
   }
-  /* Params returns the current params of the module. */
-  params = async (_params: QueryParamsRequest = {}): Promise<ParamsResponseSDKType> => {
-    const endpoint = `poa/v1/params`;
-    return await this.req.get<ParamsResponseSDKType>(endpoint);
-  };
   /* PendingValidators returns currently pending validators of the module. */
   pendingValidators = async (_params: QueryPendingValidatorsRequest = {}): Promise<PendingValidatorsResponseSDKType> => {
     const endpoint = `poa/v1/pending_validators`;
@@ -29,5 +24,10 @@ export class LCDQueryClient {
     }
     const endpoint = `poa/v1/consensus_power`;
     return await this.req.get<QueryConsensusPowerResponseSDKType>(endpoint, options);
+  };
+  /* POA Authority */
+  poaAuthority = async (_params: QueryPoaAuthorityRequest = {}): Promise<QueryPoaAuthorityResponseSDKType> => {
+    const endpoint = `poa/v1/authority`;
+    return await this.req.get<QueryPoaAuthorityResponseSDKType>(endpoint);
   };
 }

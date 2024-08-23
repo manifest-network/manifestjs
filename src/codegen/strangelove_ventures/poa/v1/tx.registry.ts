@@ -1,7 +1,7 @@
 //@ts-nocheck
 import { GeneratedType, Registry } from "@cosmjs/proto-signing";
-import { MsgCreateValidator, MsgSetPower, MsgRemoveValidator, MsgRemovePending, MsgUpdateParams, MsgUpdateStakingParams } from "./tx";
-export const registry: ReadonlyArray<[string, GeneratedType]> = [["/strangelove_ventures.poa.v1.MsgCreateValidator", MsgCreateValidator], ["/strangelove_ventures.poa.v1.MsgSetPower", MsgSetPower], ["/strangelove_ventures.poa.v1.MsgRemoveValidator", MsgRemoveValidator], ["/strangelove_ventures.poa.v1.MsgRemovePending", MsgRemovePending], ["/strangelove_ventures.poa.v1.MsgUpdateParams", MsgUpdateParams], ["/strangelove_ventures.poa.v1.MsgUpdateStakingParams", MsgUpdateStakingParams]];
+import { MsgCreateValidator, MsgSetPower, MsgRemoveValidator, MsgRemovePending, MsgUpdateStakingParams } from "./tx";
+export const registry: ReadonlyArray<[string, GeneratedType]> = [["/strangelove_ventures.poa.v1.MsgCreateValidator", MsgCreateValidator], ["/strangelove_ventures.poa.v1.MsgSetPower", MsgSetPower], ["/strangelove_ventures.poa.v1.MsgRemoveValidator", MsgRemoveValidator], ["/strangelove_ventures.poa.v1.MsgRemovePending", MsgRemovePending], ["/strangelove_ventures.poa.v1.MsgUpdateStakingParams", MsgUpdateStakingParams]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -31,12 +31,6 @@ export const MessageComposer = {
       return {
         typeUrl: "/strangelove_ventures.poa.v1.MsgRemovePending",
         value: MsgRemovePending.encode(value).finish()
-      };
-    },
-    updateParams(value: MsgUpdateParams) {
-      return {
-        typeUrl: "/strangelove_ventures.poa.v1.MsgUpdateParams",
-        value: MsgUpdateParams.encode(value).finish()
       };
     },
     updateStakingParams(value: MsgUpdateStakingParams) {
@@ -71,12 +65,6 @@ export const MessageComposer = {
         value
       };
     },
-    updateParams(value: MsgUpdateParams) {
-      return {
-        typeUrl: "/strangelove_ventures.poa.v1.MsgUpdateParams",
-        value
-      };
-    },
     updateStakingParams(value: MsgUpdateStakingParams) {
       return {
         typeUrl: "/strangelove_ventures.poa.v1.MsgUpdateStakingParams",
@@ -107,12 +95,6 @@ export const MessageComposer = {
       return {
         typeUrl: "/strangelove_ventures.poa.v1.MsgRemovePending",
         value: MsgRemovePending.fromPartial(value)
-      };
-    },
-    updateParams(value: MsgUpdateParams) {
-      return {
-        typeUrl: "/strangelove_ventures.poa.v1.MsgUpdateParams",
-        value: MsgUpdateParams.fromPartial(value)
       };
     },
     updateStakingParams(value: MsgUpdateStakingParams) {

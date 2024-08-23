@@ -1,4 +1,4 @@
-import { MsgCreateValidator, MsgSetPower, MsgRemoveValidator, MsgRemovePending, MsgUpdateParams, MsgUpdateStakingParams } from "./tx";
+import { MsgCreateValidator, MsgSetPower, MsgRemoveValidator, MsgRemovePending, MsgUpdateStakingParams } from "./tx";
 export const AminoConverter = {
   "/strangelove_ventures.poa.v1.MsgCreateValidator": {
     aminoType: "poa/MsgCreateValidator",
@@ -19,11 +19,6 @@ export const AminoConverter = {
     aminoType: "poa/MsgRemovePending",
     toAmino: MsgRemovePending.toAmino,
     fromAmino: MsgRemovePending.fromAmino
-  },
-  "/strangelove_ventures.poa.v1.MsgUpdateParams": {
-    aminoType: "poa/MsgUpdateParams",
-    toAmino: MsgUpdateParams.toAmino,
-    fromAmino: MsgUpdateParams.fromAmino
   },
   "/strangelove_ventures.poa.v1.MsgUpdateStakingParams": {
     aminoType: "poa/MsgUpdateStakingParams",

@@ -1,34 +1,7 @@
 import { Duration, DurationAmino, DurationSDKType } from "../../../google/protobuf/duration";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial, Exact } from "../../../helpers";
 import { Decimal } from "@cosmjs/math";
-/** Params defines the parameters for the module. */
-export interface Params {
-  /** Array of addresses that are allowed to control the chains validators power. */
-  admins: string[];
-  /** allow_validator_self_exit allows for a valdiator to remove themselves from the validator set. */
-  allowValidatorSelfExit: boolean;
-}
-export interface ParamsProtoMsg {
-  typeUrl: "/strangelove_ventures.poa.v1.Params";
-  value: Uint8Array;
-}
-/** Params defines the parameters for the module. */
-export interface ParamsAmino {
-  /** Array of addresses that are allowed to control the chains validators power. */
-  admins?: string[];
-  /** allow_validator_self_exit allows for a valdiator to remove themselves from the validator set. */
-  allow_validator_self_exit?: boolean;
-}
-export interface ParamsAminoMsg {
-  type: "poa/params";
-  value: ParamsAmino;
-}
-/** Params defines the parameters for the module. */
-export interface ParamsSDKType {
-  admins: string[];
-  allow_validator_self_exit: boolean;
-}
+import { DeepPartial, Exact } from "../../../helpers";
 /** StakingParams defines the parameters for the x/staking module. */
 export interface StakingParams {
   /** unbonding_time is the time duration of unbonding. */
@@ -88,90 +61,6 @@ export interface StakingParamsSDKType {
   bond_denom: string;
   min_commission_rate: string;
 }
-function createBaseParams(): Params {
-  return {
-    admins: [],
-    allowValidatorSelfExit: false
-  };
-}
-export const Params = {
-  typeUrl: "/strangelove_ventures.poa.v1.Params",
-  aminoType: "poa/params",
-  encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    for (const v of message.admins) {
-      writer.uint32(10).string(v!);
-    }
-    if (message.allowValidatorSelfExit === true) {
-      writer.uint32(16).bool(message.allowValidatorSelfExit);
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): Params {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseParams();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.admins.push(reader.string());
-          break;
-        case 2:
-          message.allowValidatorSelfExit = reader.bool();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
-    const message = createBaseParams();
-    message.admins = object.admins?.map(e => e) || [];
-    message.allowValidatorSelfExit = object.allowValidatorSelfExit ?? false;
-    return message;
-  },
-  fromAmino(object: ParamsAmino): Params {
-    const message = createBaseParams();
-    message.admins = object.admins?.map(e => e) || [];
-    if (object.allow_validator_self_exit !== undefined && object.allow_validator_self_exit !== null) {
-      message.allowValidatorSelfExit = object.allow_validator_self_exit;
-    }
-    return message;
-  },
-  toAmino(message: Params): ParamsAmino {
-    const obj: any = {};
-    if (message.admins) {
-      obj.admins = message.admins.map(e => e);
-    } else {
-      obj.admins = message.admins;
-    }
-    obj.allow_validator_self_exit = message.allowValidatorSelfExit === false ? undefined : message.allowValidatorSelfExit;
-    return obj;
-  },
-  fromAminoMsg(object: ParamsAminoMsg): Params {
-    return Params.fromAmino(object.value);
-  },
-  toAminoMsg(message: Params): ParamsAminoMsg {
-    return {
-      type: "poa/params",
-      value: Params.toAmino(message)
-    };
-  },
-  fromProtoMsg(message: ParamsProtoMsg): Params {
-    return Params.decode(message.value);
-  },
-  toProto(message: Params): Uint8Array {
-    return Params.encode(message).finish();
-  },
-  toProtoMsg(message: Params): ParamsProtoMsg {
-    return {
-      typeUrl: "/strangelove_ventures.poa.v1.Params",
-      value: Params.encode(message).finish()
-    };
-  }
-};
 function createBaseStakingParams(): StakingParams {
   return {
     unbondingTime: Duration.fromPartial({}),
