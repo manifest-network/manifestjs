@@ -1,0 +1,3 @@
+helmName: manifestjs
+helmFile: ./config.yaml
+helmVersion: v0.1.38
