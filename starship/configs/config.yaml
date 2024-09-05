@@ -1,39 +1,38 @@
-name: manifestjs
-version: v1.2.1
+name: starship-manifestjs
+version: v0.2.12
 
 chains:
   - id: manifest-ledger-beta
-    name: manifest
+    name: custom
     image: ghcr.io/liftedinit/manifest-ledger:v0.0.1-alpha.12
+    home: /root/.manifest
+    binary: manifestd
+    prefix: manifest
+    denom: umfx
+    coins: 1000000000000000000umfx
+    hdPath: m/44'/118'/0'/0/0
+    coinType: 118
+    repo: https://github.com/liftedinit/manifest-ledger
     numValidators: 1
     ports:
       rest: 1317
       rpc: 26657
-      faucet: 8007
-
   - id: cosmos-2
     name: cosmoshub
     numValidators: 1
     ports:
       rest: 1313
       rpc: 26653
-      faucet: 8003
 
-relayers:
-  - name: manifest-cosmos
-    type: hermes
-    replicas: 1
-    chains:
-      - manifest-ledger-beta
-      - cosmos-2
-
-explorer:
-  enabled: true
-  ports:
-    rest: 8080
+#relayers:
+#  - name: manifest-cosmos
+#    type: hermes
+#    replicas: 1
+#    chains:
+#      - manifest-ledger-beta
+#      - cosmos-2
 
 registry:
   enabled: true
   ports:
     rest: 8081
-    grpc: 9091
