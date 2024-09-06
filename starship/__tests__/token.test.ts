@@ -1,34 +1,32 @@
-import './setup.test';
+import "./setup.test";
 
-import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { assertIsDeliverTxSuccess, StargateClient } from '@cosmjs/stargate';
-import { generateMnemonic, useChain } from 'starshipjs';
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
+import { assertIsDeliverTxSuccess, StargateClient } from "@cosmjs/stargate";
+import { generateMnemonic, useChain } from "starshipjs";
 
-import { getSigningOsmosisClient, ibc } from '../../src';
+import { getSigningManifestClient, ibc } from "../../src";
+import { MsgTransfer } from "../../src/codegen/ibc/applications/transfer/v1/tx";
 
-describe('Token transfers', () => {
+describe("Token transfers", () => {
   let wallet, denom, address;
   let chainInfo, getCoin, getRpcEndpoint, creditFromFaucet;
 
   beforeAll(async () => {
-    ({
-      chainInfo,
-      getCoin,
-      getRpcEndpoint,
-      creditFromFaucet
-    } = useChain('osmosis'));
+    ({ chainInfo, getCoin, getRpcEndpoint, creditFromFaucet } = useChain(
+      "manifest-ledger-beta"
+    ));
     denom = (await getCoin()).base;
 
     // Initialize wallet
     wallet = await DirectSecp256k1HdWallet.fromMnemonic(generateMnemonic(), {
-      prefix: chainInfo.chain.bech32_prefix
+      prefix: chainInfo.chain.bech32_prefix,
     });
     address = (await wallet.getAccounts())[0].address;
 
     await creditFromFaucet(address);
   });
 
-  it('send osmosis token to address', async () => {
+  it("send manifest token to address", async () => {
     // Initialize wallet
     const wallet2 = await DirectSecp256k1HdWallet.fromMnemonic(
       generateMnemonic(),
@@ -36,33 +34,33 @@ describe('Token transfers', () => {
     );
     const address2 = (await wallet2.getAccounts())[0].address;
 
-    const signingClient = await getSigningOsmosisClient({
+    const signingClient = await getSigningManifestClient({
       rpcEndpoint: await getRpcEndpoint(),
-      signer: wallet
+      signer: wallet,
     });
 
     const fee = {
       amount: [
         {
           denom,
-          amount: '100000'
-        }
+          amount: "100000",
+        },
       ],
-      gas: '550000'
+      gas: "550000",
     };
 
     const token = {
-      amount: '10000000',
-      denom
+      amount: "10000000",
+      denom,
     };
 
-    // Transfer uosmo tokens from faceut
+    // Transfer umfx tokens from facet
     await signingClient.sendTokens(
       address,
       address2,
       [token],
       fee,
-      'send tokens test'
+      "send tokens test"
     );
 
     const balance = await signingClient.getBalance(address2, denom);
@@ -71,20 +69,14 @@ describe('Token transfers', () => {
     expect(balance.denom).toEqual(denom);
   }, 10000);
 
-  it('send ibc osmo tokens to address on cosmos chain', async () => {
-    const signingClient = await getSigningOsmosisClient({
+  it("send ibc umfx tokens to address on cosmos chain", async () => {
+    const signingClient = await getSigningManifestClient({
       rpcEndpoint: await getRpcEndpoint(),
-      signer: wallet
+      signer: wallet,
     });
 
-    const {
-      chainInfo: cosmosChainInfo,
-      getRpcEndpoint: cosmosRpcEndpoint
-    } = useChain('cosmoshub');
-
-    const {
-      getRpcEndpoint: osmosisRpcEndpoint
-    } = useChain('osmosis');
+    const { chainInfo: cosmosChainInfo, getRpcEndpoint: cosmosRpcEndpoint } =
+      useChain("cosmoshub");
 
     // Initialize wallet address for cosmos chain
     const cosmosWallet = await DirectSecp256k1HdWallet.fromMnemonic(
@@ -107,7 +99,7 @@ describe('Token transfers', () => {
     const { port_id: sourcePort, channel_id: sourceChannel } =
       ibcInfo.channels[0].chain_1;
 
-    // Transfer osmosis tokens via IBC to cosmos chain
+    // Transfer manifest tokens via IBC to cosmos chain
     const currentTime = Math.floor(Date.now() / 1000);
     const timeoutTime = currentTime + 300; // 5 minutes
 
@@ -115,54 +107,58 @@ describe('Token transfers', () => {
       amount: [
         {
           denom,
-          amount: '100000'
-        }
+          amount: "100000",
+        },
       ],
-      gas: '550000'
+      gas: "550000",
     };
 
     const token = {
       denom,
-      amount: '10000000'
+      amount: "10000000",
     };
 
     // send ibc tokens
-    const resp = await signingClient.sendIbcTokens(
+    const transferMsg = {
+      typeUrl: MsgTransfer.typeUrl,
+      value: MsgTransfer.fromPartial({
+        sourcePort,
+        sourceChannel,
+        sender: address,
+        receiver: cosmosAddress,
+        token: token,
+        timeoutTimestamp: BigInt(timeoutTime) * BigInt(1_000_000_000), // Timeout in nanoseconds
+      }),
+    };
+    const resp = await signingClient.signAndBroadcast(
       address,
-      cosmosAddress,
-      token,
-      sourcePort,
-      sourceChannel,
-      undefined,
-      timeoutTime,
+      [transferMsg],
       fee
     );
 
     assertIsDeliverTxSuccess(resp);
 
     // Check osmos in address on cosmos chain
-    const cosmosClient = await StargateClient.connect(await cosmosRpcEndpoint());
+    const cosmosClient = await StargateClient.connect(
+      await cosmosRpcEndpoint()
+    );
     const balances = await cosmosClient.getAllBalances(cosmosAddress);
 
     // check balances
     expect(balances.length).toEqual(1);
     const ibcBalance = balances.find((balance) => {
-      return balance.denom.startsWith('ibc/');
+      return balance.denom.startsWith("ibc/");
     });
-    // @ts-ignore
     expect(ibcBalance.amount).toEqual(token.amount);
-    // @ts-ignore
-    expect(ibcBalance.denom).toContain('ibc/');
+    expect(ibcBalance.denom).toContain("ibc/");
 
     // check ibc denom trace of the same
     const queryClient = await ibc.ClientFactory.createRPCQueryClient({
-      rpcEndpoint: await cosmosRpcEndpoint()
+      rpcEndpoint: await cosmosRpcEndpoint(),
     });
     const trace = await queryClient.ibc.applications.transfer.v1.denomTrace({
-      // @ts-ignore
-      hash: ibcBalance.denom.replace('ibc/', '')
+      hash: ibcBalance.denom.replace("ibc/", ""),
     });
-    // @ts-ignore
     expect(trace.denomTrace.baseDenom).toEqual(denom);
   }, 10000);
 });
