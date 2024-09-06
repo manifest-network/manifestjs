@@ -14,6 +14,11 @@ chains:
     coinType: 118
     repo: https://github.com/liftedinit/manifest-ledger
     numValidators: 1
+    env:
+      # This is the address of the `genesis` entry defined in
+      # https://github.com/cosmology-tech/starship/blob/main/starship/charts/devnet/configs/keys.json
+      - name: POA_ADMIN_ADDRESS
+        value: manifest1qjtcxl86z0zua2egcsz4ncff2gzlcndzrtglqv
     ports:
       rest: 1317
       rpc: 26657
