@@ -4,8 +4,8 @@ import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { assertIsDeliverTxSuccess, StargateClient } from "@cosmjs/stargate";
 import { generateMnemonic, useChain } from "starshipjs";
 
-import { getSigningManifestClient, ibc } from "../../src";
 import { MsgTransfer } from "../../src/codegen/ibc/applications/transfer/v1/tx";
+import {getSigningLiftedinitClient, ibc} from "../../src";
 
 describe("Token transfers", () => {
   let wallet, denom, address;
@@ -34,7 +34,7 @@ describe("Token transfers", () => {
     );
     const address2 = (await wallet2.getAccounts())[0].address;
 
-    const signingClient = await getSigningManifestClient({
+    const signingClient = await getSigningLiftedinitClient({
       rpcEndpoint: await getRpcEndpoint(),
       signer: wallet,
     });
@@ -54,7 +54,7 @@ describe("Token transfers", () => {
       denom,
     };
 
-    // Transfer umfx tokens from facet
+    // Transfer umfx tokens from faucet
     await signingClient.sendTokens(
       address,
       address2,
@@ -70,7 +70,7 @@ describe("Token transfers", () => {
   }, 10000);
 
   it("send ibc umfx tokens to address on cosmos chain", async () => {
-    const signingClient = await getSigningManifestClient({
+    const signingClient = await getSigningLiftedinitClient({
       rpcEndpoint: await getRpcEndpoint(),
       signer: wallet,
     });
