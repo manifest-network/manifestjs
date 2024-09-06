@@ -5,7 +5,7 @@ import { assertIsDeliverTxSuccess, StargateClient } from "@cosmjs/stargate";
 import { generateMnemonic, useChain } from "starshipjs";
 
 import { MsgTransfer } from "../../src/codegen/ibc/applications/transfer/v1/tx";
-import {getSigningLiftedinitClient, ibc} from "../../src";
+import { getSigningLiftedinitClient, ibc } from "../../src";
 
 describe("Token transfers", () => {
   let wallet, denom, address;

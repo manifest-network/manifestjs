@@ -1,15 +1,16 @@
 import "./setup.test";
 
-import {generateMnemonic, useChain} from "starshipjs";
-import {DirectSecp256k1HdWallet} from "@cosmjs/proto-signing";
-import {assertIsDeliverTxSuccess} from "@cosmjs/stargate";
-import {MsgPayout} from "../../src/codegen/liftedinit/manifest/v1/tx";
-import {getSigningLiftedinitClient} from "../../src";
+import { generateMnemonic, useChain } from "starshipjs";
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
+import { assertIsDeliverTxSuccess } from "@cosmjs/stargate";
+import { MsgPayout } from "../../src/codegen/liftedinit/manifest/v1/tx";
+import { getSigningLiftedinitClient } from "../../src";
 
 // This is the POA_ADMIN_ADDRESS mnemonic as defined in the config.yaml file
-const poaAdminMnemonic = 'razor dog gown public private couple ecology paper flee connect local robot diamond stay rude join sound win ribbon soup kidney glass robot vehicle'
+const poaAdminMnemonic =
+  "razor dog gown public private couple ecology paper flee connect local robot diamond stay rude join sound win ribbon soup kidney glass robot vehicle";
 
-describe('manifest module', () => {
+describe("manifest module", () => {
   let wallet, denom, address;
   let chainInfo, getCoin, getRpcEndpoint, creditFromFaucet;
 
@@ -26,9 +27,9 @@ describe('manifest module', () => {
     address = (await wallet.getAccounts())[0].address;
 
     await creditFromFaucet(address);
-  })
+  });
 
-  test('mint tokens', async () => {
+  test("mint tokens", async () => {
     const wallet2 = await DirectSecp256k1HdWallet.fromMnemonic(
       generateMnemonic(),
       { prefix: chainInfo.chain.bech32_prefix }
@@ -58,7 +59,7 @@ describe('manifest module', () => {
     await signingClient.sendTokens(
       address,
       address2,
-      [{amount: initialAmount.toString(), denom}],
+      [{ amount: initialAmount.toString(), denom }],
       fee,
       "send 1 token to address2"
     );
@@ -69,21 +70,25 @@ describe('manifest module', () => {
     expect(balance.denom).toEqual(denom);
 
     // Mint tokens
-    const payoutMsg  = {
+    const payoutMsg = {
       typeUrl: MsgPayout.typeUrl,
       value: MsgPayout.fromPartial({
         authority: address,
         payoutPairs: [
-          {address: address2, coin: {denom, amount: mintAmount.toString()}},
+          { address: address2, coin: { denom, amount: mintAmount.toString() } },
         ],
-      })
-    }
-    const resp = await signingClient.signAndBroadcast(address, [payoutMsg], fee);
+      }),
+    };
+    const resp = await signingClient.signAndBroadcast(
+      address,
+      [payoutMsg],
+      fee
+    );
 
     assertIsDeliverTxSuccess(resp);
 
     const balance2 = await signingClient.getBalance(address2, denom);
     expect(balance2.amount).toBe(resultBalance.toString());
     expect(balance2.denom).toBe(denom);
-  })
+  });
 });
