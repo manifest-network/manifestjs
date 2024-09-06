@@ -4,7 +4,7 @@ version: v0.2.12
 chains:
   - id: manifest-ledger-beta
     name: custom
-    image: ghcr.io/liftedinit/manifest-ledger:v0.0.1-alpha.12
+    image: ghcr.io/liftedinit/manifest-ledger:v0.0.1-alpha.13
     home: /root/.manifest
     binary: manifestd
     prefix: manifest
@@ -17,22 +17,30 @@ chains:
     ports:
       rest: 1317
       rpc: 26657
+      faucet: 8001
   - id: cosmos-2
     name: cosmoshub
     numValidators: 1
     ports:
       rest: 1313
       rpc: 26653
+      faucet: 8002
 
-#relayers:
-#  - name: manifest-cosmos
-#    type: hermes
-#    replicas: 1
-#    chains:
-#      - manifest-ledger-beta
-#      - cosmos-2
+relayers:
+  - name: manifest-cosmos
+    type: hermes
+    replicas: 1
+    chains:
+      - manifest-ledger-beta
+      - cosmos-2
 
 registry:
   enabled: true
   ports:
     rest: 8081
+
+explorer:
+  enabled: true
+  type: ping-pub
+  ports:
+    rest: 8080
