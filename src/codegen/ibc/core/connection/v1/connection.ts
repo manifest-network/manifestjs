@@ -392,7 +392,7 @@ export const ConnectionEnd = {
           message.versions.push(Version.decode(reader, reader.uint32()));
           break;
         case 3:
-          message.state = (reader.int32() as any);
+          message.state = reader.int32() as any;
           break;
         case 4:
           message.counterparty = Counterparty.decode(reader, reader.uint32());
@@ -519,7 +519,7 @@ export const IdentifiedConnection = {
           message.versions.push(Version.decode(reader, reader.uint32()));
           break;
         case 4:
-          message.state = (reader.int32() as any);
+          message.state = reader.int32() as any;
           break;
         case 5:
           message.counterparty = Counterparty.decode(reader, reader.uint32());
