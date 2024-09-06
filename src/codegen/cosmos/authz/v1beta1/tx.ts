@@ -338,7 +338,7 @@ export const MsgExec = {
       writer.uint32(10).string(message.grantee);
     }
     for (const v of message.msgs) {
-      Any.encode((v! as Any), writer.uint32(18).fork()).ldelim();
+      Any.encode(v! as Any, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -353,7 +353,7 @@ export const MsgExec = {
           message.grantee = reader.string();
           break;
         case 2:
-          message.msgs.push((Any.decode(reader, reader.uint32()) as Any));
+          message.msgs.push(Any.decode(reader, reader.uint32()) as Any);
           break;
         default:
           reader.skipType(tag & 7);
@@ -380,7 +380,7 @@ export const MsgExec = {
     const obj: any = {};
     obj.grantee = message.grantee === "" ? undefined : message.grantee;
     if (message.msgs) {
-      obj.msgs = message.msgs.map(e => e ? Cosmos_basev1beta1Msg_ToAmino((e as Any)) : undefined);
+      obj.msgs = message.msgs.map(e => e ? Cosmos_basev1beta1Msg_ToAmino(e as Any) : undefined);
     } else {
       obj.msgs = message.msgs;
     }

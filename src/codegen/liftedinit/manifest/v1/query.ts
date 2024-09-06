@@ -1,16 +1,16 @@
 import { Params, ParamsAmino, ParamsSDKType } from "./genesis";
-import { BinaryReader, BinaryWriter } from "../../binary";
-import { DeepPartial, Exact } from "../../helpers";
+import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial, Exact } from "../../../helpers";
 /** QueryParamsRequest is the request type for the Query/Params RPC method. */
 export interface QueryParamsRequest {}
 export interface QueryParamsRequestProtoMsg {
-  typeUrl: "/manifest.v1.QueryParamsRequest";
+  typeUrl: "/liftedinit.manifest.v1.QueryParamsRequest";
   value: Uint8Array;
 }
 /** QueryParamsRequest is the request type for the Query/Params RPC method. */
 export interface QueryParamsRequestAmino {}
 export interface QueryParamsRequestAminoMsg {
-  type: "/manifest.v1.QueryParamsRequest";
+  type: "/liftedinit.manifest.v1.QueryParamsRequest";
   value: QueryParamsRequestAmino;
 }
 /** QueryParamsRequest is the request type for the Query/Params RPC method. */
@@ -21,7 +21,7 @@ export interface QueryParamsResponse {
   params?: Params;
 }
 export interface QueryParamsResponseProtoMsg {
-  typeUrl: "/manifest.v1.QueryParamsResponse";
+  typeUrl: "/liftedinit.manifest.v1.QueryParamsResponse";
   value: Uint8Array;
 }
 /** QueryParamsResponse is the response type for the Query/Params RPC method. */
@@ -30,7 +30,7 @@ export interface QueryParamsResponseAmino {
   params?: ParamsAmino;
 }
 export interface QueryParamsResponseAminoMsg {
-  type: "/manifest.v1.QueryParamsResponse";
+  type: "/liftedinit.manifest.v1.QueryParamsResponse";
   value: QueryParamsResponseAmino;
 }
 /** QueryParamsResponse is the response type for the Query/Params RPC method. */
@@ -41,7 +41,7 @@ function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
 export const QueryParamsRequest = {
-  typeUrl: "/manifest.v1.QueryParamsRequest",
+  typeUrl: "/liftedinit.manifest.v1.QueryParamsRequest",
   encode(_: QueryParamsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -82,7 +82,7 @@ export const QueryParamsRequest = {
   },
   toProtoMsg(message: QueryParamsRequest): QueryParamsRequestProtoMsg {
     return {
-      typeUrl: "/manifest.v1.QueryParamsRequest",
+      typeUrl: "/liftedinit.manifest.v1.QueryParamsRequest",
       value: QueryParamsRequest.encode(message).finish()
     };
   }
@@ -93,7 +93,7 @@ function createBaseQueryParamsResponse(): QueryParamsResponse {
   };
 }
 export const QueryParamsResponse = {
-  typeUrl: "/manifest.v1.QueryParamsResponse",
+  typeUrl: "/liftedinit.manifest.v1.QueryParamsResponse",
   encode(message: QueryParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -145,7 +145,7 @@ export const QueryParamsResponse = {
   },
   toProtoMsg(message: QueryParamsResponse): QueryParamsResponseProtoMsg {
     return {
-      typeUrl: "/manifest.v1.QueryParamsResponse",
+      typeUrl: "/liftedinit.manifest.v1.QueryParamsResponse",
       value: QueryParamsResponse.encode(message).finish()
     };
   }

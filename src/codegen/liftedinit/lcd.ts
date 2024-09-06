@@ -90,10 +90,12 @@ export const createLCDClient = async ({
         })
       }
     },
-    manifest: {
-      v1: new (await import("./v1/query.lcd")).LCDQueryClient({
-        requestClient
-      })
+    liftedinit: {
+      manifest: {
+        v1: new (await import("./manifest/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      }
     }
   };
 };

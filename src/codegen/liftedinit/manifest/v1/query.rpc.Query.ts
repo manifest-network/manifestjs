@@ -1,5 +1,5 @@
-import { Rpc } from "../../helpers";
-import { BinaryReader } from "../../binary";
+import { Rpc } from "../../../helpers";
+import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
 import { QueryParamsRequest, QueryParamsResponse } from "./query";
 /** Query provides defines the gRPC querier service. */
@@ -15,7 +15,7 @@ export class QueryClientImpl implements Query {
   /* Params queries all parameters of the module. */
   params = async (request: QueryParamsRequest = {}): Promise<QueryParamsResponse> => {
     const data = QueryParamsRequest.encode(request).finish();
-    const promise = this.rpc.request("manifest.v1.Query", "Params", data);
+    const promise = this.rpc.request("liftedinit.manifest.v1.Query", "Params", data);
     return promise.then(data => QueryParamsResponse.decode(new BinaryReader(data)));
   };
 }
