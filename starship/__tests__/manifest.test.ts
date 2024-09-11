@@ -132,10 +132,7 @@ describe("manifest module", () => {
     const cometClient = await Tendermint37Client.connect(
       await getRpcEndpoint()
     );
-    return QueryClient.withExtensions(
-      cometClient,
-      setupBankExtension
-    );
+    return QueryClient.withExtensions(cometClient, setupBankExtension);
   };
 
   const checkBalance = async (

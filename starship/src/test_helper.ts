@@ -1,7 +1,7 @@
 // This is the POA_ADMIN_ADDRESS mnemonic as defined in the config.yaml file
-import {Any} from "../../src/codegen/google/protobuf/any";
-import {PubKey as CosmosCryptoEd25519Pubkey} from "cosmjs-types/cosmos/crypto/ed25519/keys";
-import {fromBase64} from "@cosmjs/encoding";
+import { Any } from "../../src/codegen/google/protobuf/any";
+import { PubKey as CosmosCryptoEd25519Pubkey } from "cosmjs-types/cosmos/crypto/ed25519/keys";
+import { fromBase64 } from "@cosmjs/encoding";
 
 export const poaAdminMnemonic =
   "razor dog gown public private couple ecology paper flee connect local robot diamond stay rude join sound win ribbon soup kidney glass robot vehicle";
