@@ -1,80 +1,75 @@
 import "./setup.test";
 
-import { generateMnemonic, useChain } from "starshipjs";
-import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
-import {
-  assertIsDeliverTxSuccess,
-  createProtobufRpcClient,
-  QueryClient,
-  setupBankExtension,
-} from "@cosmjs/stargate";
-import {
-  MsgBurnHeldBalance,
-  MsgPayout,
-} from "../../src/codegen/liftedinit/manifest/v1/tx";
+import { OfflineSigner } from "@cosmjs/proto-signing";
+import { assertIsDeliverTxSuccess } from "@cosmjs/stargate";
 import { getSigningLiftedinitClient } from "../../src";
-import { QueryClientImpl } from "../../src/codegen/liftedinit/manifest/v1/query.rpc.Query";
 // @ts-ignore
-import { poaAdminMnemonic } from "../src/test_helper";
-import { HttpEndpoint, Tendermint37Client } from "@cosmjs/tendermint-rpc";
+import {
+  createAminoWallet,
+  createBurnMsg,
+  createMsgPayout,
+  createPayoutPair,
+  createProtoWallet,
+  initChain,
+  poaAdminMnemonic,
+  test1Mnemonic,
+} from "../src/test_helper";
 
-describe("manifest module", () => {
-  let poaWallet: DirectSecp256k1HdWallet,
-    randomWallet: DirectSecp256k1HdWallet,
-    denom: string;
-  let getRpcEndpoint: () =>
-    | string
-    | HttpEndpoint
-    | PromiseLike<string | HttpEndpoint>;
+const inits = [
+  {
+    description: "manifest-module (proto-signing)",
+    createWallets: createProtoWallet,
+    mnemonics: [poaAdminMnemonic, test1Mnemonic],
+  },
+  {
+    description: "manifest-module (amino-signing)",
+    createWallets: createAminoWallet,
+    mnemonics: [poaAdminMnemonic, test1Mnemonic],
+  },
+];
+
+// Test all endpoints of the Manifest module with both Proto and Amino signing
+describe.each(inits)("$description", ({ createWallets, mnemonics }) => {
+  let poaWallet: OfflineSigner,
+    test1Wallet: OfflineSigner,
+    poaAddress: string,
+    test1Address: string,
+    denom: string,
+    rpcEndpoint: string,
+    fee: { amount: { denom: string; amount: string }[]; gas: string };
 
   beforeAll(async () => {
-    let chainInfo: { chain: { bech32_prefix: any } },
-      getCoin: () => any,
-      creditFromFaucet: (arg0: string) => any;
-    ({ chainInfo, getCoin, getRpcEndpoint, creditFromFaucet } = useChain(
-      "manifest-ledger-beta"
-    ));
-    denom = (await getCoin()).base;
+    expect(mnemonics.length).toEqual(2);
 
-    // Initialize wallet
-    poaWallet = await DirectSecp256k1HdWallet.fromMnemonic(poaAdminMnemonic, {
-      prefix: chainInfo.chain.bech32_prefix,
-    });
-    const address = (await poaWallet.getAccounts())[0].address;
+    const chainData = await initChain("manifest-ledger-beta");
+    denom = chainData.denom;
+    rpcEndpoint = chainData.rpcEndpoint;
 
-    randomWallet = await DirectSecp256k1HdWallet.fromMnemonic(
-      generateMnemonic(),
-      { prefix: chainInfo.chain.bech32_prefix }
-    );
-    const randomAddress = (await randomWallet.getAccounts())[0].address;
+    poaWallet = await createWallets(mnemonics[0], chainData.prefix);
+    test1Wallet = await createWallets(mnemonics[1], chainData.prefix);
 
-    await creditFromFaucet(address);
-    await creditFromFaucet(randomAddress);
+    fee = { amount: [{ denom, amount: "100000" }], gas: "550000" };
+
+    poaAddress = (await poaWallet.getAccounts())[0].address;
+    test1Address = (await test1Wallet.getAccounts())[0].address;
+
+    await chainData.creditFromFaucet(poaAddress);
+    await chainData.creditFromFaucet(test1Address);
   });
 
   test("mint tokens to destination", async () => {
     const signingClient = await getSigningClient();
-    const fee = getFee();
-    const initialAmount = 1000000000000;
     const mintAmount = 1000000;
-    const resultBalance = initialAmount + mintAmount;
 
-    const poaAddress = (await poaWallet.getAccounts())[0].address;
-    const randomAddress = (await randomWallet.getAccounts())[0].address;
-    await checkBalance(randomAddress, initialAmount);
+    const test1InitBalance = await signingClient.getBalance(
+      test1Address,
+      denom
+    );
+    const resultBalance = BigInt(test1InitBalance.amount) + BigInt(mintAmount);
 
-    const payoutMsg = {
-      typeUrl: MsgPayout.typeUrl,
-      value: MsgPayout.fromPartial({
-        authority: poaAddress,
-        payoutPairs: [
-          {
-            address: randomAddress,
-            coin: { denom, amount: mintAmount.toString() },
-          },
-        ],
-      }),
-    };
+    const payoutMsg = createMsgPayout(poaAddress, [
+      createPayoutPair(test1Address, denom, mintAmount),
+    ]);
     const resp = await signingClient.signAndBroadcast(
       poaAddress,
       [payoutMsg],
@@ -82,30 +77,21 @@ describe("manifest module", () => {
     );
 
     assertIsDeliverTxSuccess(resp);
-    await checkBalance(randomAddress, resultBalance);
+    const test1Balance = await signingClient.getBalance(test1Address, denom);
+    expect(test1Balance.amount).toEqual(resultBalance.toString());
   });
 
   test("burn tokens from self", async () => {
     const signingClient = await getSigningClient();
-    const fee = getFee();
     const burnAmount = 1000000;
 
-    const poaAddress = (await poaWallet.getAccounts())[0].address;
-    const balance = await signingClient.getBalance(poaAddress, denom);
-    expect(balance.denom).toEqual(denom);
-
+    const poaInitialBalance = await signingClient.getBalance(poaAddress, denom);
     const resultBalance =
-      BigInt(balance.amount) -
+      BigInt(poaInitialBalance.amount) -
       BigInt(burnAmount) -
       BigInt(fee.amount[0].amount);
 
-    const burnMsg = {
-      typeUrl: MsgBurnHeldBalance.typeUrl,
-      value: MsgBurnHeldBalance.fromPartial({
-        authority: poaAddress,
-        burnCoins: [{ denom, amount: burnAmount.toString() }],
-      }),
-    };
+    const burnMsg = createBurnMsg(poaAddress, burnAmount, denom);
     const resp = await signingClient.signAndBroadcast(
       poaAddress,
       [burnMsg],
@@ -113,35 +99,14 @@ describe("manifest module", () => {
     );
 
     assertIsDeliverTxSuccess(resp);
-    await checkBalance(poaAddress, resultBalance);
-  });
-
-  const getFee = () => ({
-    amount: [{ denom, amount: "100000" }],
-    gas: "550000",
+    const poaBalance = await signingClient.getBalance(poaAddress, denom);
+    expect(poaBalance.amount).toEqual(resultBalance.toString());
   });
 
   const getSigningClient = async () => {
     return await getSigningLiftedinitClient({
-      rpcEndpoint: await getRpcEndpoint(),
+      rpcEndpoint,
       signer: poaWallet,
     });
-  };
-
-  const getQueryClient = async () => {
-    const cometClient = await Tendermint37Client.connect(
-      await getRpcEndpoint()
-    );
-    return QueryClient.withExtensions(cometClient, setupBankExtension);
-  };
-
-  const checkBalance = async (
-    addr: string,
-    expectedAmount: number | bigint
-  ) => {
-    const client = await getQueryClient();
-    const balance = await client.bank.balance(addr, denom);
-    expect(balance.amount).toEqual(expectedAmount.toString());
-    expect(balance.denom).toEqual(denom);
   };
 });

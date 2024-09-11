@@ -1,298 +1,193 @@
 import "./setup.test";
 
-import { useChain } from "starshipjs";
-import { DirectSecp256k1HdWallet, OfflineSigner } from "@cosmjs/proto-signing";
+import { OfflineSigner } from "@cosmjs/proto-signing";
 import {
   assertIsDeliverTxSuccess,
-  createProtobufRpcClient,
   QueryClient,
   setupStakingExtension,
 } from "@cosmjs/stargate";
 import { getSigningStrangeloveVenturesClient } from "../../src";
-import {
-  MsgCreateValidator,
-  MsgRemovePending,
-  MsgRemoveValidator,
-  MsgSetPower,
-} from "../../src/codegen/strangelove_ventures/poa/v1/tx";
-import {
-  CommissionRates,
-  Description,
-} from "../../src/codegen/strangelove_ventures/poa/v1/validator";
-import { Any } from "../../src/codegen/google/protobuf/any";
-import { QueryClientImpl } from "../../src/codegen/strangelove_ventures/poa/v1/query.rpc.Query";
-import { HttpEndpoint, Tendermint37Client } from "@cosmjs/tendermint-rpc";
+import { Tendermint37Client } from "@cosmjs/tendermint-rpc";
 // @ts-ignore
 import {
+  BONDED,
+  createAminoWallet,
+  createDefaultCommissionRates,
+  createDefaultDescription,
+  createMsgCreateValidator,
+  createMsgRemovePendingValidator,
+  createMsgRemoveValidator,
+  createMsgSetPower,
+  createProtoWallet,
+  initChain,
   poaAdminMnemonic,
+  setupPoaExtension,
   test1Mnemonic,
   test1Val,
   test2Mnemonic,
   test2Val,
+  test3Mnemonic,
+  test3Val,
+  test4Mnemonic,
+  test4Val,
+  UNBONDING,
 } from "../src/test_helper";
 
-// QueryClient extension for the POA module
-function setupPoaExtension(base: QueryClient) {
-  const rpcClient = createProtobufRpcClient(base);
-  const queryService = new QueryClientImpl(rpcClient);
+const inits = [
+  {
+    description: "poa-module (proto-signing)",
+    createWallets: createProtoWallet,
+    mnemonics: [poaAdminMnemonic, test1Mnemonic, test2Mnemonic],
+    validators: [test1Val, test2Val],
+  },
+  {
+    description: "poa-module (amino-signing)",
+    createWallets: createAminoWallet,
+    mnemonics: [poaAdminMnemonic, test3Mnemonic, test4Mnemonic],
+    validators: [test3Val, test4Val],
+  },
+];
 
-  return {
-    poa: {
-      poaAuthority: async () => {
-        return await queryService.poaAuthority();
-      },
-      consensusPower: async (valAddr: string) => {
-        return await queryService.consensusPower({ validatorAddress: valAddr });
-      },
-      pendingValidators: async () => {
-        return await queryService.pendingValidators();
-      },
-    },
-  };
-}
+// Test all endpoints of the POA module with both Proto and Amino signing
+describe.each(inits)(
+  "$description",
+  ({ createWallets, mnemonics, validators }) => {
+    let poaWallet: OfflineSigner,
+      test1Wallet: OfflineSigner,
+      test2Wallet: OfflineSigner,
+      poaAddress: string,
+      t1Addr: string,
+      t2Addr: string,
+      denom: string,
+      rpcEndpoint: string,
+      fee: { amount: { denom: string; amount: string }[]; gas: string };
 
-describe("poa module", () => {
-  let poaWallet: OfflineSigner,
-    test1Wallet: OfflineSigner,
-    test2Wallet: OfflineSigner,
-    denom: string;
-  let getRpcEndpoint: () =>
-    | string
-    | HttpEndpoint
-    | PromiseLike<string | HttpEndpoint>;
+    beforeAll(async () => {
+      expect(validators.length).toEqual(2);
+      expect(mnemonics.length).toEqual(3);
 
-  beforeAll(async () => {
-    let chainInfo: { chain: { bech32_prefix: any } },
-      getCoin: () => any,
-      creditFromFaucet: (arg0: string, arg1: string) => any;
-    ({ chainInfo, getCoin, getRpcEndpoint, creditFromFaucet } = useChain(
-      "manifest-ledger-beta"
-    ));
-    denom = (await getCoin()).base;
+      const chainData = await initChain("manifest-ledger-beta");
+      denom = chainData.denom;
+      rpcEndpoint = chainData.rpcEndpoint;
 
-    poaWallet = await DirectSecp256k1HdWallet.fromMnemonic(poaAdminMnemonic, {
-      prefix: chainInfo.chain.bech32_prefix,
+      poaWallet = await createWallets(mnemonics[0], chainData.prefix);
+      test1Wallet = await createWallets(mnemonics[1], chainData.prefix);
+      test2Wallet = await createWallets(mnemonics[2], chainData.prefix);
+      fee = { amount: [{ denom, amount: "100000" }], gas: "550000" };
+
+      poaAddress = (await poaWallet.getAccounts())[0].address;
+      t1Addr = (await test1Wallet.getAccounts())[0].address;
+      t2Addr = (await test2Wallet.getAccounts())[0].address;
+
+      await chainData.creditFromFaucet(poaAddress, denom);
+      await chainData.creditFromFaucet(t1Addr, denom);
+      await chainData.creditFromFaucet(t2Addr, denom);
     });
-    const poaAddress = (await poaWallet.getAccounts())[0].address;
 
-    test1Wallet = await DirectSecp256k1HdWallet.fromMnemonic(test1Mnemonic, {
-      prefix: chainInfo.chain.bech32_prefix,
+    test("create validator", async () => {
+      const signingClient = await getSigningClient(test1Wallet);
+      const desc = createDefaultDescription();
+      const rates = createDefaultCommissionRates();
+      const valAddr = validators[0].address;
+      const pubkey = validators[0].pubkey;
+
+      const msg = createMsgCreateValidator(valAddr, desc, rates, pubkey);
+      const result = await signingClient.signAndBroadcast(t1Addr, [msg], fee);
+
+      assertIsDeliverTxSuccess(result);
+      expect(result.code).toEqual(0);
+
+      const queryClient = await getQueryClient();
+      const pendingValidators = await queryClient.poa.pendingValidators();
+      expect(pendingValidators.pending.length).toEqual(1);
+      expect(pendingValidators.pending[0].description).toEqual(desc);
     });
-    const test1Account = (await test1Wallet.getAccounts())[0];
-    const test1Address = test1Account.address;
 
-    test2Wallet = await DirectSecp256k1HdWallet.fromMnemonic(test2Mnemonic, {
-      prefix: chainInfo.chain.bech32_prefix,
+    test("set power", async () => {
+      const client = await getSigningClient(poaWallet);
+      const valAddr = validators[0].address;
+      const msg = createMsgSetPower(poaAddress, valAddr, 2000000n, true);
+      const result = await client.signAndBroadcast(poaAddress, [msg], fee);
+
+      assertIsDeliverTxSuccess(result);
+      expect(result.code).toEqual(0);
+
+      const queryClient = await getQueryClient();
+      const consensusPower = await queryClient.poa.consensusPower(valAddr);
+      expect(consensusPower.consensusPower).toEqual(2n);
+
+      const pendingValidators = await queryClient.poa.pendingValidators();
+      expect(pendingValidators.pending.length).toEqual(0);
+      const bondedValidators = await queryClient.staking.validators(BONDED);
+      expect(bondedValidators.validators.length).toEqual(2);
     });
-    const test2Account = (await test2Wallet.getAccounts())[0];
-    const test2Address = test2Account.address;
 
-    await creditFromFaucet(poaAddress, denom);
-    await creditFromFaucet(test1Address, denom);
-    await creditFromFaucet(test2Address, denom);
-  });
+    test("remove validator", async () => {
+      const client = await getSigningClient(poaWallet);
+      const valAddr = validators[0].address;
+      const msg = createMsgRemoveValidator(poaAddress, valAddr);
+      const result = await client.signAndBroadcast(poaAddress, [msg], fee);
 
-  test("create validator", async () => {
-    await createValidator(test1Wallet, test1Val.address, test1Val.pubkey);
+      assertIsDeliverTxSuccess(result);
+      expect(result.code).toEqual(0);
 
-    const queryClient = await getQueryClient();
-    const pendingValidators = await queryClient.poa.pendingValidators();
-    expect(pendingValidators.pending.length).toEqual(1);
-    expect(pendingValidators.pending[0].description).toEqual(description);
-  });
+      const queryClient = await getQueryClient();
+      const pendingValidators = await queryClient.poa.pendingValidators();
+      expect(pendingValidators.pending.length).toEqual(0);
 
-  test("set power", async () => {
-    await setPower(poaWallet, test1Val.address, 2000000n);
-    const queryClient = await getQueryClient();
-    const consensusPower = await queryClient.poa.consensusPower(
-      test1Val.address
-    );
-    expect(consensusPower.consensusPower).toEqual(2n);
+      // Wait for the validator to be removed to the bonded validators
+      setTimeout(() => {}, 10000);
 
-    const pendingValidators = await queryClient.poa.pendingValidators();
-    expect(pendingValidators.pending.length).toEqual(0);
-    const bondedValidators = await queryClient.staking.validators(
-      "BOND_STATUS_BONDED"
-    );
-    expect(bondedValidators.validators.length).toEqual(2);
-  });
-
-  test("remove validator", async () => {
-    await removeValidator(poaWallet, test1Val.address);
-
-    const queryClient = await getQueryClient();
-    const pendingValidators = await queryClient.poa.pendingValidators();
-    expect(pendingValidators.pending.length).toEqual(0);
-
-    // Wait for the validator to be removed to the bonded validators
-    setTimeout(() => {}, 10000);
-
-    const bondedValidators = await queryClient.staking.validators(
-      "BOND_STATUS_BONDED"
-    );
-    expect(bondedValidators.validators.length).toEqual(1);
-
-    const unbondingValidators = await queryClient.staking.validators(
-      "BOND_STATUS_UNBONDING"
-    );
-    expect(unbondingValidators.validators.length).toEqual(1);
-  });
-
-  test("remove pending validator", async () => {
-    await createValidator(test2Wallet, test2Val.address, test2Val.pubkey);
-
-    const queryClient = await getQueryClient();
-    const pendingValidators = await queryClient.poa.pendingValidators();
-    expect(pendingValidators.pending.length).toEqual(1);
-
-    await removePendingValidator(poaWallet, test2Val.address);
-
-    const pendingValidators2 = await queryClient.poa.pendingValidators();
-    expect(pendingValidators2.pending.length).toEqual(0);
-  });
-
-  const getFee = () => ({
-    amount: [{ denom, amount: "100000" }],
-    gas: "550000",
-  });
-
-  const description = Description.fromPartial({
-    moniker: "SomeMonicker",
-    identity: "Some Identity",
-    website: "https://manifestai.org",
-    securityContact: "security@liftedinit.org",
-    details: "This is a test validator",
-  });
-
-  const commission = CommissionRates.fromPartial({
-    rate: "0.0",
-    maxRate: "0.0",
-    maxChangeRate: "0.0",
-  });
-
-  const getSigningClient = async (signer: OfflineSigner) => {
-    return await getSigningStrangeloveVenturesClient({
-      rpcEndpoint: await getRpcEndpoint(),
-      signer: signer,
+      const bondedVal = await queryClient.staking.validators(BONDED);
+      expect(bondedVal.validators.length).toEqual(1);
+      const unbondingVal = await queryClient.staking.validators(UNBONDING);
+      expect(unbondingVal.validators.length).toEqual(1);
     });
-  };
 
-  const getQueryClient = async () => {
-    const cometClient = await Tendermint37Client.connect(
-      await getRpcEndpoint()
-    );
-    return QueryClient.withExtensions(
-      cometClient,
-      setupPoaExtension,
-      setupStakingExtension
-    );
-  };
+    test("remove pending validator", async () => {
+      const test2Client = await getSigningClient(test2Wallet);
+      const desc = createDefaultDescription();
+      const rates = createDefaultCommissionRates();
+      const valAddr = validators[1].address;
+      const pubkey = validators[1].pubkey;
+      const msgCreate = createMsgCreateValidator(valAddr, desc, rates, pubkey);
+      const resultCreate = await test2Client.signAndBroadcast(
+        t2Addr,
+        [msgCreate],
+        fee
+      );
+      assertIsDeliverTxSuccess(resultCreate);
+      expect(resultCreate.code).toEqual(0);
 
-  const createValidator = async (
-    signer: OfflineSigner,
-    validatorAddress: string,
-    valPubKey: Any
-  ) => {
-    const signingClient = await getSigningClient(signer);
-    const fee = getFee();
+      const queryClient = await getQueryClient();
+      const pendingValidators = await queryClient.poa.pendingValidators();
+      expect(pendingValidators.pending.length).toEqual(1);
 
-    const sender = (await signer.getAccounts())[0].address;
-    const msg = {
-      typeUrl: MsgCreateValidator.typeUrl,
-      value: MsgCreateValidator.fromPartial({
-        description,
-        commission,
-        minSelfDelegation: "1",
-        validatorAddress,
-        pubkey: valPubKey,
-      }),
+      const poaClient = await getSigningClient(poaWallet);
+      const msg = createMsgRemovePendingValidator(poaAddress, valAddr);
+      const result = await poaClient.signAndBroadcast(poaAddress, [msg], fee);
+
+      assertIsDeliverTxSuccess(result);
+      expect(result.code).toEqual(0);
+
+      const pendingValidators2 = await queryClient.poa.pendingValidators();
+      expect(pendingValidators2.pending.length).toEqual(0);
+    });
+
+    const getSigningClient = async (signer: OfflineSigner) => {
+      return await getSigningStrangeloveVenturesClient({
+        rpcEndpoint,
+        signer: signer,
+      });
     };
-    const result = await signingClient.signAndBroadcast(
-      sender,
-      [msg],
-      fee,
-      "create validator test"
-    );
 
-    assertIsDeliverTxSuccess(result);
-    expect(result.code).toEqual(0);
-  };
-
-  const setPower = async (
-    signer: OfflineSigner,
-    validatorAddress: string,
-    power: bigint
-  ) => {
-    const client = await getSigningClient(signer);
-    const fee = getFee();
-
-    const sender = (await signer.getAccounts())[0].address;
-    const msg = {
-      typeUrl: MsgSetPower.typeUrl,
-      value: MsgSetPower.fromPartial({
-        sender,
-        validatorAddress,
-        power,
-        unsafe: true,
-      }),
+    const getQueryClient = async () => {
+      const cometClient = await Tendermint37Client.connect(rpcEndpoint);
+      return QueryClient.withExtensions(
+        cometClient,
+        setupPoaExtension,
+        setupStakingExtension
+      );
     };
-    const result = await client.signAndBroadcast(
-      sender,
-      [msg],
-      fee,
-      "set power test"
-    );
-    assertIsDeliverTxSuccess(result);
-    expect(result.code).toEqual(0);
-  };
-
-  const removePendingValidator = async (
-    signer: OfflineSigner,
-    validatorAddress: string
-  ) => {
-    const client = await getSigningClient(signer);
-    const fee = getFee();
-
-    const sender = (await signer.getAccounts())[0].address;
-    const msg = {
-      typeUrl: MsgRemovePending.typeUrl,
-      value: MsgRemovePending.fromPartial({
-        sender,
-        validatorAddress,
-      }),
-    };
-    const result = await client.signAndBroadcast(
-      sender,
-      [msg],
-      fee,
-      "remove pending validator test"
-    );
-    assertIsDeliverTxSuccess(result);
-    expect(result.code).toEqual(0);
-  };
-
-  const removeValidator = async (
-    signer: OfflineSigner,
-    validatorAddress: string
-  ) => {
-    const client = await getSigningClient(signer);
-    const fee = getFee();
-
-    const sender = (await signer.getAccounts())[0].address;
-    const msg = {
-      typeUrl: MsgRemoveValidator.typeUrl,
-      value: MsgRemoveValidator.fromPartial({
-        sender,
-        validatorAddress,
-      }),
-    };
-    const result = await client.signAndBroadcast(
-      sender,
-      [msg],
-      fee,
-      "remove validator test"
-    );
-    assertIsDeliverTxSuccess(result);
-    expect(result.code).toEqual(0);
-  };
-});
+  }
+);
