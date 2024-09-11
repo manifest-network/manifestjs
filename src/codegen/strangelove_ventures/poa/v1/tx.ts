@@ -834,7 +834,7 @@ export const MsgCreateValidator = {
       writer.uint32(42).string(message.validatorAddress);
     }
     if (message.pubkey !== undefined) {
-      Any.encode((message.pubkey as Any), writer.uint32(50).fork()).ldelim();
+      Any.encode(message.pubkey as Any, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -861,7 +861,7 @@ export const MsgCreateValidator = {
           message.validatorAddress = reader.string();
           break;
         case 6:
-          message.pubkey = (Cosmos_cryptoPubKey_InterfaceDecoder(reader) as Any);
+          message.pubkey = Cosmos_cryptoPubKey_InterfaceDecoder(reader) as Any;
           break;
         default:
           reader.skipType(tag & 7);

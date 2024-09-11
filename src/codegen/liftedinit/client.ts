@@ -1,30 +1,28 @@
 import { GeneratedType, Registry, OfflineSigner } from "@cosmjs/proto-signing";
 import { defaultRegistryTypes, AminoTypes, SigningStargateClient } from "@cosmjs/stargate";
 import { HttpEndpoint } from "@cosmjs/tendermint-rpc";
-import * as manifestV1TxRegistry from "./v1/tx.registry";
-import * as manifestV1TxAmino from "./v1/tx.amino";
-export const manifestAminoConverters = {
-  ...manifestV1TxAmino.AminoConverter
+import * as liftedinitManifestV1TxRegistry from "./manifest/v1/tx.registry";
+import * as liftedinitManifestV1TxAmino from "./manifest/v1/tx.amino";
+export const liftedinitAminoConverters = {
+  ...liftedinitManifestV1TxAmino.AminoConverter
 };
-export const manifestProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...manifestV1TxRegistry.registry];
-export const getSigningManifestClientOptions = ({
+export const liftedinitProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...liftedinitManifestV1TxRegistry.registry];
+export const getSigningLiftedinitClientOptions = ({
   defaultTypes = defaultRegistryTypes
-}: {
-  defaultTypes?: ReadonlyArray<[string, GeneratedType]>;
 } = {}): {
   registry: Registry;
   aminoTypes: AminoTypes;
 } => {
-  const registry = new Registry([...defaultTypes, ...manifestProtoRegistry]);
+  const registry = new Registry([...defaultTypes, ...liftedinitProtoRegistry]);
   const aminoTypes = new AminoTypes({
-    ...manifestAminoConverters
+    ...liftedinitAminoConverters
   });
   return {
     registry,
     aminoTypes
   };
 };
-export const getSigningManifestClient = async ({
+export const getSigningLiftedinitClient = async ({
   rpcEndpoint,
   signer,
   defaultTypes = defaultRegistryTypes
@@ -36,11 +34,11 @@ export const getSigningManifestClient = async ({
   const {
     registry,
     aminoTypes
-  } = getSigningManifestClientOptions({
+  } = getSigningLiftedinitClientOptions({
     defaultTypes
   });
   const client = await SigningStargateClient.connectWithSigner(rpcEndpoint, signer, {
-    registry: (registry as any),
+    registry: registry as any,
     aminoTypes
   });
   return client;

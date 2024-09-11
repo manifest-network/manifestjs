@@ -63,8 +63,10 @@ export const createRPCQueryClient = async ({
         v1beta1: (await import("../cosmos/upgrade/v1beta1/query.rpc.Query")).createRpcQueryExtension(client)
       }
     },
-    manifest: {
-      v1: (await import("./v1/query.rpc.Query")).createRpcQueryExtension(client)
+    liftedinit: {
+      manifest: {
+        v1: (await import("./manifest/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      }
     }
   };
 };

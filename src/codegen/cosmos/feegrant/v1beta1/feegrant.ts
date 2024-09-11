@@ -410,7 +410,7 @@ export const AllowedMsgAllowance = {
   aminoType: "cosmos-sdk/AllowedMsgAllowance",
   encode(message: AllowedMsgAllowance, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.allowance !== undefined) {
-      Any.encode((message.allowance as Any), writer.uint32(10).fork()).ldelim();
+      Any.encode(message.allowance as Any, writer.uint32(10).fork()).ldelim();
     }
     for (const v of message.allowedMessages) {
       writer.uint32(18).string(v!);
@@ -425,7 +425,7 @@ export const AllowedMsgAllowance = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.allowance = (Cosmos_feegrantv1beta1FeeAllowanceI_InterfaceDecoder(reader) as Any);
+          message.allowance = Cosmos_feegrantv1beta1FeeAllowanceI_InterfaceDecoder(reader) as Any;
           break;
         case 2:
           message.allowedMessages.push(reader.string());
@@ -453,7 +453,7 @@ export const AllowedMsgAllowance = {
   },
   toAmino(message: AllowedMsgAllowance): AllowedMsgAllowanceAmino {
     const obj: any = {};
-    obj.allowance = message.allowance ? Cosmos_feegrantv1beta1FeeAllowanceI_ToAmino((message.allowance as Any)) : undefined;
+    obj.allowance = message.allowance ? Cosmos_feegrantv1beta1FeeAllowanceI_ToAmino(message.allowance as Any) : undefined;
     if (message.allowedMessages) {
       obj.allowed_messages = message.allowedMessages.map(e => e);
     } else {
@@ -501,7 +501,7 @@ export const Grant = {
       writer.uint32(18).string(message.grantee);
     }
     if (message.allowance !== undefined) {
-      Any.encode((message.allowance as Any), writer.uint32(26).fork()).ldelim();
+      Any.encode(message.allowance as Any, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -519,7 +519,7 @@ export const Grant = {
           message.grantee = reader.string();
           break;
         case 3:
-          message.allowance = (Cosmos_feegrantv1beta1FeeAllowanceI_InterfaceDecoder(reader) as Any);
+          message.allowance = Cosmos_feegrantv1beta1FeeAllowanceI_InterfaceDecoder(reader) as Any;
           break;
         default:
           reader.skipType(tag & 7);
@@ -552,7 +552,7 @@ export const Grant = {
     const obj: any = {};
     obj.granter = message.granter === "" ? undefined : message.granter;
     obj.grantee = message.grantee === "" ? undefined : message.grantee;
-    obj.allowance = message.allowance ? Cosmos_feegrantv1beta1FeeAllowanceI_ToAmino((message.allowance as Any)) : undefined;
+    obj.allowance = message.allowance ? Cosmos_feegrantv1beta1FeeAllowanceI_ToAmino(message.allowance as Any) : undefined;
     return obj;
   },
   fromAminoMsg(object: GrantAminoMsg): Grant {

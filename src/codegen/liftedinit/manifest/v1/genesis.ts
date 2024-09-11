@@ -1,12 +1,12 @@
-import { BinaryReader, BinaryWriter } from "../../binary";
-import { DeepPartial, Exact } from "../../helpers";
+import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial, Exact } from "../../../helpers";
 /** GenesisState defines the module genesis state */
 export interface GenesisState {
   /** Params defines all the paramaters of the module. */
   params: Params;
 }
 export interface GenesisStateProtoMsg {
-  typeUrl: "/manifest.v1.GenesisState";
+  typeUrl: "/liftedinit.manifest.v1.GenesisState";
   value: Uint8Array;
 }
 /** GenesisState defines the module genesis state */
@@ -15,7 +15,7 @@ export interface GenesisStateAmino {
   params?: ParamsAmino;
 }
 export interface GenesisStateAminoMsg {
-  type: "/manifest.v1.GenesisState";
+  type: "/liftedinit.manifest.v1.GenesisState";
   value: GenesisStateAmino;
 }
 /** GenesisState defines the module genesis state */
@@ -25,7 +25,7 @@ export interface GenesisStateSDKType {
 /** Params defines the set of module parameters. */
 export interface Params {}
 export interface ParamsProtoMsg {
-  typeUrl: "/manifest.v1.Params";
+  typeUrl: "/liftedinit.manifest.v1.Params";
   value: Uint8Array;
 }
 /** Params defines the set of module parameters. */
@@ -42,7 +42,7 @@ function createBaseGenesisState(): GenesisState {
   };
 }
 export const GenesisState = {
-  typeUrl: "/manifest.v1.GenesisState",
+  typeUrl: "/liftedinit.manifest.v1.GenesisState",
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.params !== undefined) {
       Params.encode(message.params, writer.uint32(10).fork()).ldelim();
@@ -94,7 +94,7 @@ export const GenesisState = {
   },
   toProtoMsg(message: GenesisState): GenesisStateProtoMsg {
     return {
-      typeUrl: "/manifest.v1.GenesisState",
+      typeUrl: "/liftedinit.manifest.v1.GenesisState",
       value: GenesisState.encode(message).finish()
     };
   }
@@ -103,7 +103,7 @@ function createBaseParams(): Params {
   return {};
 }
 export const Params = {
-  typeUrl: "/manifest.v1.Params",
+  typeUrl: "/liftedinit.manifest.v1.Params",
   aminoType: "manifest/params",
   encode(_: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
@@ -151,7 +151,7 @@ export const Params = {
   },
   toProtoMsg(message: Params): ParamsProtoMsg {
     return {
-      typeUrl: "/manifest.v1.Params",
+      typeUrl: "/liftedinit.manifest.v1.Params",
       value: Params.encode(message).finish()
     };
   }

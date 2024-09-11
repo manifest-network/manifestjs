@@ -9,8 +9,6 @@ export const strangeloveVenturesAminoConverters = {
 export const strangeloveVenturesProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...strangeloveVenturesPoaV1TxRegistry.registry];
 export const getSigningStrangeloveVenturesClientOptions = ({
   defaultTypes = defaultRegistryTypes
-}: {
-  defaultTypes?: ReadonlyArray<[string, GeneratedType]>;
 } = {}): {
   registry: Registry;
   aminoTypes: AminoTypes;
@@ -40,7 +38,7 @@ export const getSigningStrangeloveVenturesClient = async ({
     defaultTypes
   });
   const client = await SigningStargateClient.connectWithSigner(rpcEndpoint, signer, {
-    registry: (registry as any),
+    registry: registry as any,
     aminoTypes
   });
   return client;

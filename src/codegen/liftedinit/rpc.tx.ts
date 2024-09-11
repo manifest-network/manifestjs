@@ -46,7 +46,9 @@ export const createRPCMsgClient = async ({
       v1beta1: new (await import("../cosmos/vesting/v1beta1/tx.rpc.msg")).MsgClientImpl(rpc)
     }
   },
-  manifest: {
-    v1: new (await import("./v1/tx.rpc.msg")).MsgClientImpl(rpc)
+  liftedinit: {
+    manifest: {
+      v1: new (await import("./manifest/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    }
   }
 });

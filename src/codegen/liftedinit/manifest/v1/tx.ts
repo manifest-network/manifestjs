@@ -1,7 +1,7 @@
 import { Params, ParamsAmino, ParamsSDKType } from "./genesis";
-import { Coin, CoinAmino, CoinSDKType } from "../../cosmos/base/v1beta1/coin";
-import { BinaryReader, BinaryWriter } from "../../binary";
-import { DeepPartial, Exact } from "../../helpers";
+import { Coin, CoinAmino, CoinSDKType } from "../../../cosmos/base/v1beta1/coin";
+import { BinaryReader, BinaryWriter } from "../../../binary";
+import { DeepPartial, Exact } from "../../../helpers";
 /**
  * MsgUpdateParams is the Msg/UpdateParams request type.
  * 
@@ -18,7 +18,7 @@ export interface MsgUpdateParams {
   params: Params;
 }
 export interface MsgUpdateParamsProtoMsg {
-  typeUrl: "/manifest.v1.MsgUpdateParams";
+  typeUrl: "/liftedinit.manifest.v1.MsgUpdateParams";
   value: Uint8Array;
 }
 /**
@@ -37,7 +37,7 @@ export interface MsgUpdateParamsAmino {
   params?: ParamsAmino;
 }
 export interface MsgUpdateParamsAminoMsg {
-  type: "/manifest.v1.MsgUpdateParams";
+  type: "/liftedinit.manifest.v1.MsgUpdateParams";
   value: MsgUpdateParamsAmino;
 }
 /**
@@ -57,7 +57,7 @@ export interface MsgUpdateParamsSDKType {
  */
 export interface MsgUpdateParamsResponse {}
 export interface MsgUpdateParamsResponseProtoMsg {
-  typeUrl: "/manifest.v1.MsgUpdateParamsResponse";
+  typeUrl: "/liftedinit.manifest.v1.MsgUpdateParamsResponse";
   value: Uint8Array;
 }
 /**
@@ -68,7 +68,7 @@ export interface MsgUpdateParamsResponseProtoMsg {
  */
 export interface MsgUpdateParamsResponseAmino {}
 export interface MsgUpdateParamsResponseAminoMsg {
-  type: "/manifest.v1.MsgUpdateParamsResponse";
+  type: "/liftedinit.manifest.v1.MsgUpdateParamsResponse";
   value: MsgUpdateParamsResponseAmino;
 }
 /**
@@ -86,7 +86,7 @@ export interface MsgPayout {
   payoutPairs: PayoutPair[];
 }
 export interface MsgPayoutProtoMsg {
-  typeUrl: "/manifest.v1.MsgPayout";
+  typeUrl: "/liftedinit.manifest.v1.MsgPayout";
   value: Uint8Array;
 }
 /** MsgPayout is the Msg/Payout request type. */
@@ -97,7 +97,7 @@ export interface MsgPayoutAmino {
   payout_pairs: PayoutPairAmino[];
 }
 export interface MsgPayoutAminoMsg {
-  type: "/manifest.v1.MsgPayout";
+  type: "/liftedinit.manifest.v1.MsgPayout";
   value: MsgPayoutAmino;
 }
 /** MsgPayout is the Msg/Payout request type. */
@@ -111,7 +111,7 @@ export interface PayoutPair {
   coin: Coin;
 }
 export interface PayoutPairProtoMsg {
-  typeUrl: "/manifest.v1.PayoutPair";
+  typeUrl: "/liftedinit.manifest.v1.PayoutPair";
   value: Uint8Array;
 }
 /** PayoutPair is the object that pairs an address with a coin to be paid out. */
@@ -120,7 +120,7 @@ export interface PayoutPairAmino {
   coin: CoinAmino;
 }
 export interface PayoutPairAminoMsg {
-  type: "/manifest.v1.PayoutPair";
+  type: "/liftedinit.manifest.v1.PayoutPair";
   value: PayoutPairAmino;
 }
 /** PayoutPair is the object that pairs an address with a coin to be paid out. */
@@ -131,13 +131,13 @@ export interface PayoutPairSDKType {
 /** MsgPayoutResponse defines the response structure for executing a MsgPayout message. */
 export interface MsgPayoutResponse {}
 export interface MsgPayoutResponseProtoMsg {
-  typeUrl: "/manifest.v1.MsgPayoutResponse";
+  typeUrl: "/liftedinit.manifest.v1.MsgPayoutResponse";
   value: Uint8Array;
 }
 /** MsgPayoutResponse defines the response structure for executing a MsgPayout message. */
 export interface MsgPayoutResponseAmino {}
 export interface MsgPayoutResponseAminoMsg {
-  type: "/manifest.v1.MsgPayoutResponse";
+  type: "/liftedinit.manifest.v1.MsgPayoutResponse";
   value: MsgPayoutResponseAmino;
 }
 /** MsgPayoutResponse defines the response structure for executing a MsgPayout message. */
@@ -150,7 +150,7 @@ export interface MsgBurnHeldBalance {
   burnCoins: Coin[];
 }
 export interface MsgBurnHeldBalanceProtoMsg {
-  typeUrl: "/manifest.v1.MsgBurnHeldBalance";
+  typeUrl: "/liftedinit.manifest.v1.MsgBurnHeldBalance";
   value: Uint8Array;
 }
 /** MsgPayout is the Msg/BurnHeldBalance request type. */
@@ -161,7 +161,7 @@ export interface MsgBurnHeldBalanceAmino {
   burn_coins: CoinAmino[];
 }
 export interface MsgBurnHeldBalanceAminoMsg {
-  type: "/manifest.v1.MsgBurnHeldBalance";
+  type: "/liftedinit.manifest.v1.MsgBurnHeldBalance";
   value: MsgBurnHeldBalanceAmino;
 }
 /** MsgPayout is the Msg/BurnHeldBalance request type. */
@@ -172,13 +172,13 @@ export interface MsgBurnHeldBalanceSDKType {
 /** MsgBurnHeldBalanceResponse defines the response structure for executing a MsgBurnHeldBalance message. */
 export interface MsgBurnHeldBalanceResponse {}
 export interface MsgBurnHeldBalanceResponseProtoMsg {
-  typeUrl: "/manifest.v1.MsgBurnHeldBalanceResponse";
+  typeUrl: "/liftedinit.manifest.v1.MsgBurnHeldBalanceResponse";
   value: Uint8Array;
 }
 /** MsgBurnHeldBalanceResponse defines the response structure for executing a MsgBurnHeldBalance message. */
 export interface MsgBurnHeldBalanceResponseAmino {}
 export interface MsgBurnHeldBalanceResponseAminoMsg {
-  type: "/manifest.v1.MsgBurnHeldBalanceResponse";
+  type: "/liftedinit.manifest.v1.MsgBurnHeldBalanceResponse";
   value: MsgBurnHeldBalanceResponseAmino;
 }
 /** MsgBurnHeldBalanceResponse defines the response structure for executing a MsgBurnHeldBalance message. */
@@ -190,7 +190,7 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
   };
 }
 export const MsgUpdateParams = {
-  typeUrl: "/manifest.v1.MsgUpdateParams",
+  typeUrl: "/liftedinit.manifest.v1.MsgUpdateParams",
   encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -253,7 +253,7 @@ export const MsgUpdateParams = {
   },
   toProtoMsg(message: MsgUpdateParams): MsgUpdateParamsProtoMsg {
     return {
-      typeUrl: "/manifest.v1.MsgUpdateParams",
+      typeUrl: "/liftedinit.manifest.v1.MsgUpdateParams",
       value: MsgUpdateParams.encode(message).finish()
     };
   }
@@ -262,7 +262,7 @@ function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
   return {};
 }
 export const MsgUpdateParamsResponse = {
-  typeUrl: "/manifest.v1.MsgUpdateParamsResponse",
+  typeUrl: "/liftedinit.manifest.v1.MsgUpdateParamsResponse",
   encode(_: MsgUpdateParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -303,7 +303,7 @@ export const MsgUpdateParamsResponse = {
   },
   toProtoMsg(message: MsgUpdateParamsResponse): MsgUpdateParamsResponseProtoMsg {
     return {
-      typeUrl: "/manifest.v1.MsgUpdateParamsResponse",
+      typeUrl: "/liftedinit.manifest.v1.MsgUpdateParamsResponse",
       value: MsgUpdateParamsResponse.encode(message).finish()
     };
   }
@@ -315,7 +315,7 @@ function createBaseMsgPayout(): MsgPayout {
   };
 }
 export const MsgPayout = {
-  typeUrl: "/manifest.v1.MsgPayout",
+  typeUrl: "/liftedinit.manifest.v1.MsgPayout",
   encode(message: MsgPayout, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -380,7 +380,7 @@ export const MsgPayout = {
   },
   toProtoMsg(message: MsgPayout): MsgPayoutProtoMsg {
     return {
-      typeUrl: "/manifest.v1.MsgPayout",
+      typeUrl: "/liftedinit.manifest.v1.MsgPayout",
       value: MsgPayout.encode(message).finish()
     };
   }
@@ -392,7 +392,7 @@ function createBasePayoutPair(): PayoutPair {
   };
 }
 export const PayoutPair = {
-  typeUrl: "/manifest.v1.PayoutPair",
+  typeUrl: "/liftedinit.manifest.v1.PayoutPair",
   encode(message: PayoutPair, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -455,7 +455,7 @@ export const PayoutPair = {
   },
   toProtoMsg(message: PayoutPair): PayoutPairProtoMsg {
     return {
-      typeUrl: "/manifest.v1.PayoutPair",
+      typeUrl: "/liftedinit.manifest.v1.PayoutPair",
       value: PayoutPair.encode(message).finish()
     };
   }
@@ -464,7 +464,7 @@ function createBaseMsgPayoutResponse(): MsgPayoutResponse {
   return {};
 }
 export const MsgPayoutResponse = {
-  typeUrl: "/manifest.v1.MsgPayoutResponse",
+  typeUrl: "/liftedinit.manifest.v1.MsgPayoutResponse",
   encode(_: MsgPayoutResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -505,7 +505,7 @@ export const MsgPayoutResponse = {
   },
   toProtoMsg(message: MsgPayoutResponse): MsgPayoutResponseProtoMsg {
     return {
-      typeUrl: "/manifest.v1.MsgPayoutResponse",
+      typeUrl: "/liftedinit.manifest.v1.MsgPayoutResponse",
       value: MsgPayoutResponse.encode(message).finish()
     };
   }
@@ -517,7 +517,7 @@ function createBaseMsgBurnHeldBalance(): MsgBurnHeldBalance {
   };
 }
 export const MsgBurnHeldBalance = {
-  typeUrl: "/manifest.v1.MsgBurnHeldBalance",
+  typeUrl: "/liftedinit.manifest.v1.MsgBurnHeldBalance",
   encode(message: MsgBurnHeldBalance, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -582,7 +582,7 @@ export const MsgBurnHeldBalance = {
   },
   toProtoMsg(message: MsgBurnHeldBalance): MsgBurnHeldBalanceProtoMsg {
     return {
-      typeUrl: "/manifest.v1.MsgBurnHeldBalance",
+      typeUrl: "/liftedinit.manifest.v1.MsgBurnHeldBalance",
       value: MsgBurnHeldBalance.encode(message).finish()
     };
   }
@@ -591,7 +591,7 @@ function createBaseMsgBurnHeldBalanceResponse(): MsgBurnHeldBalanceResponse {
   return {};
 }
 export const MsgBurnHeldBalanceResponse = {
-  typeUrl: "/manifest.v1.MsgBurnHeldBalanceResponse",
+  typeUrl: "/liftedinit.manifest.v1.MsgBurnHeldBalanceResponse",
   encode(_: MsgBurnHeldBalanceResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -632,7 +632,7 @@ export const MsgBurnHeldBalanceResponse = {
   },
   toProtoMsg(message: MsgBurnHeldBalanceResponse): MsgBurnHeldBalanceResponseProtoMsg {
     return {
-      typeUrl: "/manifest.v1.MsgBurnHeldBalanceResponse",
+      typeUrl: "/liftedinit.manifest.v1.MsgBurnHeldBalanceResponse",
       value: MsgBurnHeldBalanceResponse.encode(message).finish()
     };
   }

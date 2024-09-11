@@ -1,23 +1,35 @@
-name: manifestjs
-version: v1.2.1
+name: starship-manifestjs
+version: v0.2.12
 
 chains:
   - id: manifest-ledger-beta
-    name: manifest
-    image: ghcr.io/liftedinit/manifest-ledger:v0.0.1-alpha.12
+    name: custom
+    image: ghcr.io/liftedinit/manifest-ledger:v0.0.1-alpha.13
+    home: /root/.manifest
+    binary: manifestd
+    prefix: manifest
+    denom: umfx
+    coins: 1000000000000000000umfx
+    hdPath: m/44'/118'/0'/0/0
+    coinType: 118
+    repo: https://github.com/liftedinit/manifest-ledger
     numValidators: 1
+    env:
+      # This is the address of the `genesis` entry defined in
+      # https://github.com/cosmology-tech/starship/blob/main/starship/charts/devnet/configs/keys.json
+      - name: POA_ADMIN_ADDRESS
+        value: manifest1qjtcxl86z0zua2egcsz4ncff2gzlcndzrtglqv
     ports:
       rest: 1317
       rpc: 26657
-      faucet: 8007
-
+      faucet: 8001
   - id: cosmos-2
     name: cosmoshub
     numValidators: 1
     ports:
       rest: 1313
       rpc: 26653
-      faucet: 8003
+      faucet: 8002
 
 relayers:
   - name: manifest-cosmos
@@ -27,13 +39,13 @@ relayers:
       - manifest-ledger-beta
       - cosmos-2
 
-explorer:
-  enabled: true
-  ports:
-    rest: 8080
-
 registry:
   enabled: true
   ports:
     rest: 8081
-    grpc: 9091
+
+explorer:
+  enabled: true
+  type: ping-pub
+  ports:
+    rest: 8080
