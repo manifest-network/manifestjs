@@ -30,7 +30,7 @@
     "test:watch": "jest --watch",
     "test:debug": "node --inspect node_modules/.bin/jest --runInBand",
     "starship": "starship --config ./starship/configs/config.local.yaml",
-    "starship:test": "jest --config ./jest.starship.config.js --verbose --bail",
+    "starship:test": "jest --config ./jest.starship.config.js --runInBand --verbose --bail",
     "starship:debug": "jest --config ./jest.starship.config.js --runInBand --verbose --bail",
     "starship:watch": "jest --watch --config ./jest.starship.config.js"
   },
