@@ -1,12 +1,8 @@
-import { Any } from "../../src/codegen/google/protobuf/any";
-import { PubKey as CosmosCryptoEd25519Pubkey } from "cosmjs-types/cosmos/crypto/ed25519/keys";
-import { fromBase64 } from "@cosmjs/encoding";
 import { createProtobufRpcClient, QueryClient } from "@cosmjs/stargate";
 import { QueryClientImpl } from "../../src/codegen/strangelove_ventures/poa/v1/query.rpc.Query";
-import { DirectSecp256k1HdWallet, OfflineSigner } from "@cosmjs/proto-signing";
+import { DirectSecp256k1HdWallet, encodePubkey } from "@cosmjs/proto-signing";
 import { Secp256k1HdWallet } from "@cosmjs/amino";
 import { useChain } from "starshipjs";
-import { getSigningLiftedinitClient } from "../../src";
 import {
   MsgBurnHeldBalance,
   MsgPayout,
@@ -22,19 +18,6 @@ import {
   Description,
 } from "../../src/codegen/strangelove_ventures/poa/v1/validator";
 
-const createPubKey = (key: string) => {
-  return Any.fromPartial({
-    typeUrl: "/cosmos.crypto.ed25519.PubKey",
-    value: Uint8Array.from(
-      CosmosCryptoEd25519Pubkey.encode(
-        CosmosCryptoEd25519Pubkey.fromPartial({
-          key: fromBase64(key),
-        })
-      ).finish()
-    ),
-  });
-};
-
 // This is the POA_ADMIN_ADDRESS mnemonic as defined in the config.yaml file
 export const poaAdminMnemonic =
   "razor dog gown public private couple ecology paper flee connect local robot diamond stay rude join sound win ribbon soup kidney glass robot vehicle";
@@ -43,14 +26,14 @@ export const test1Mnemonic =
   "opinion knife other balcony surge more bamboo canoe romance ask argue teach anxiety adjust spike mystery wolf alone torch tail six decide wash alley";
 export const test1Val = {
   address: "manifestvaloper1pss7nxeh3f9md2vuxku8q99femnwdjtcjhuxjm",
-  pubkey: createPubKey("qS4C8i2q1orM463qxf5QA8iAwdZ+Aix7Xm+sJqr1kg4="),
+  pubkey: "qS4C8i2q1orM463qxf5QA8iAwdZ+Aix7Xm+sJqr1kg4=",
 };
 // test2 key as defined in https://github.com/cosmology-tech/starship/blob/main/starship/charts/devnet/configs/keys.json
 export const test2Mnemonic =
   "logic help only text door wealth hurt always remove glory viable income agent olive trial female couch old offer crash menu zero pencil thrive";
 export const test2Val = {
   address: "manifestvaloper16e0p4vwufmsn0lucwsnfmjfx67ry84y4dh5ec7",
-  pubkey: createPubKey("0PViQxy6wVFlGV0qocoxxI+a7+8HZawhpmVbHoSlrpE="),
+  pubkey: "0PViQxy6wVFlGV0qocoxxI+a7+8HZawhpmVbHoSlrpE=",
 };
 
 // test3 key as defined in https://github.com/cosmology-tech/starship/blob/main/starship/charts/devnet/configs/keys.json
@@ -58,14 +41,14 @@ export const test3Mnemonic =
   "middle weather hip ghost quick oxygen awful library broken chicken tackle animal crunch appear fee indoor fitness enough orphan trend tackle faint eyebrow all";
 export const test3Val = {
   address: "manifestvaloper1pn45c2jdwfwrwva0cknfdlnfst28ucpus9qfk4",
-  pubkey: createPubKey("cWa/RsXD2eidssyLnc8UwZY2468DldmWBTCx2/d7L+c="),
+  pubkey: "cWa/RsXD2eidssyLnc8UwZY2468DldmWBTCx2/d7L+c=",
 };
 
 export const test4Mnemonic =
   "fox silver steel pretty vintage document frog little leopard valve base adapt clog success metal share you fresh loyal prosper clown cage guitar settle";
 export const test4Val = {
   address: "manifestvaloper1za9kshgu0l3qfj5z3dvk2jpngadr45awkg5pu8",
-  pubkey: createPubKey("IS7oze6faap8/Vjmfn2dwMwAlVEbb8af5HHGEM4hsyI="),
+  pubkey: "IS7oze6faap8/Vjmfn2dwMwAlVEbb8af5HHGEM4hsyI=",
 };
 
 export function setupPoaExtension(base: QueryClient) {
@@ -144,13 +127,13 @@ const createDescription = (
   securityContact: string,
   details: string
 ) => {
-  return Description.fromPartial({
+  return {
     moniker,
     identity,
     website,
     securityContact,
     details,
-  });
+  };
 };
 
 export const createDefaultDescription = () => {
@@ -168,7 +151,7 @@ const createCommissionRates = (
   maxRate: string,
   maxChangeRate: string
 ) => {
-  return CommissionRates.fromPartial({ rate, maxRate, maxChangeRate });
+  return { rate, maxRate, maxChangeRate };
 };
 
 export const createDefaultCommissionRates = () => {
@@ -179,17 +162,20 @@ export const createMsgCreateValidator = (
   validatorAddress: string,
   description: Description,
   commission: CommissionRates,
-  pubkey: Any
+  pubkey: string
 ) => {
   return {
     typeUrl: MsgCreateValidator.typeUrl,
-    value: MsgCreateValidator.fromPartial({
+    value: {
       description,
       commission,
       minSelfDelegation: "1",
       validatorAddress,
-      pubkey,
-    }),
+      pubkey: encodePubkey({
+        type: "tendermint/PubKeyEd25519",
+        value: pubkey,
+      }),
+    },
   };
 };
 

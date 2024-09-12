@@ -40,6 +40,7 @@ const inits = [
     mnemonics: [poaAdminMnemonic, test1Mnemonic, test2Mnemonic],
     validators: [test1Val, test2Val],
   },
+  // TODO: The amino signing tests are currently failing because of the nested Any message in the MsgCreateValidator message.
   {
     description: "poa-module (amino-signing)",
     createWallets: createAminoWallet,
