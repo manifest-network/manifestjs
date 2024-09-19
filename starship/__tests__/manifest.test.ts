@@ -34,15 +34,14 @@ describe.each(inits)("$description", ({ createWallets, mnemonics }) => {
     test1Wallet: OfflineSigner,
     poaAddress: string,
     test1Address: string,
-    denom: string,
     rpcEndpoint: string,
     fee: { amount: { denom: string; amount: string }[]; gas: string };
+  const denom = "umfx";
 
   beforeAll(async () => {
     expect(mnemonics.length).toEqual(2);
 
     const chainData = await initChain("manifest-ledger-beta");
-    denom = chainData.denom;
     rpcEndpoint = chainData.rpcEndpoint;
 
     poaWallet = await createWallets(mnemonics[0], chainData.prefix);

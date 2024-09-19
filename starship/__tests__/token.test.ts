@@ -8,14 +8,14 @@ import { MsgTransfer } from "../../src/codegen/ibc/applications/transfer/v1/tx";
 import { getSigningLiftedinitClient, ibc } from "../../src";
 
 describe("Token transfers", () => {
-  let wallet, denom, address;
+  let wallet, address;
   let chainInfo, getCoin, getRpcEndpoint, creditFromFaucet;
+  const denom = "umfx";
 
   beforeAll(async () => {
     ({ chainInfo, getCoin, getRpcEndpoint, creditFromFaucet } = useChain(
       "manifest-ledger-beta"
     ));
-    denom = (await getCoin()).base;
 
     // Initialize wallet
     wallet = await DirectSecp256k1HdWallet.fromMnemonic(generateMnemonic(), {

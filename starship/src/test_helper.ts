@@ -1,7 +1,8 @@
 import { createProtobufRpcClient, QueryClient } from "@cosmjs/stargate";
 import { QueryClientImpl } from "../../src/codegen/strangelove_ventures/poa/v1/query.rpc.Query";
 import { DirectSecp256k1HdWallet, encodePubkey } from "@cosmjs/proto-signing";
-import { Secp256k1HdWallet } from "@cosmjs/amino";
+import { Secp256k1HdWallet, encodeEd25519Pubkey } from "@cosmjs/amino";
+import { fromBase64 } from "@cosmjs/encoding"
 import { useChain } from "starshipjs";
 import {
   MsgBurnHeldBalance,
@@ -31,10 +32,6 @@ export const test1Val = {
 // test2 key as defined in https://github.com/cosmology-tech/starship/blob/main/starship/charts/devnet/configs/keys.json
 export const test2Mnemonic =
   "logic help only text door wealth hurt always remove glory viable income agent olive trial female couch old offer crash menu zero pencil thrive";
-export const test2Val = {
-  address: "manifestvaloper16e0p4vwufmsn0lucwsnfmjfx67ry84y4dh5ec7",
-  pubkey: "0PViQxy6wVFlGV0qocoxxI+a7+8HZawhpmVbHoSlrpE=",
-};
 
 // test3 key as defined in https://github.com/cosmology-tech/starship/blob/main/starship/charts/devnet/configs/keys.json
 export const test3Mnemonic =
@@ -44,13 +41,7 @@ export const test3Val = {
   pubkey: "cWa/RsXD2eidssyLnc8UwZY2468DldmWBTCx2/d7L+c=",
 };
 
-export const test4Mnemonic =
-  "fox silver steel pretty vintage document frog little leopard valve base adapt clog success metal share you fresh loyal prosper clown cage guitar settle";
-export const test4Val = {
-  address: "manifestvaloper1za9kshgu0l3qfj5z3dvk2jpngadr45awkg5pu8",
-  pubkey: "IS7oze6faap8/Vjmfn2dwMwAlVEbb8af5HHGEM4hsyI=",
-};
-
+// QueryClient extension for the POA module
 export function setupPoaExtension(base: QueryClient) {
   const rpcClient = createProtobufRpcClient(base);
   const queryService = new QueryClientImpl(rpcClient);
@@ -155,7 +146,9 @@ const createCommissionRates = (
 };
 
 export const createDefaultCommissionRates = () => {
-  return createCommissionRates("0.0", "0.0", "0.0");
+  // The values here must be integers for the AMINO encoding to work properly
+  // E.g., 1000000000000000000 == 1.0
+  return createCommissionRates("0", "0", "0");
 };
 
 export const createMsgCreateValidator = (
@@ -170,11 +163,9 @@ export const createMsgCreateValidator = (
       description,
       commission,
       minSelfDelegation: "1",
+      delegatorAddress: undefined,
       validatorAddress,
-      pubkey: encodePubkey({
-        type: "tendermint/PubKeyEd25519",
-        value: pubkey,
-      }),
+      pubkey: encodePubkey(encodeEd25519Pubkey(fromBase64(pubkey))),
     },
   };
 };
@@ -212,4 +203,3 @@ export const createMsgRemovePendingValidator = (
 };
 
 export const BONDED = "BOND_STATUS_BONDED";
-export const UNBONDING = "BOND_STATUS_UNBONDING";
