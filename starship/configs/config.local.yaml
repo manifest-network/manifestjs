@@ -9,7 +9,7 @@ chains:
     binary: manifestd
     prefix: manifest
     denom: umfx
-    coins: 1000000000000000000umfx
+    coins: 10000000000000umfx
     hdPath: m/44'/118'/0'/0/0
     coinType: 118
     repo: https://github.com/liftedinit/manifest-ledger
@@ -19,6 +19,32 @@ chains:
       # https://github.com/cosmology-tech/starship/blob/main/starship/charts/devnet/configs/keys.json
       - name: POA_ADMIN_ADDRESS
         value: manifest1qjtcxl86z0zua2egcsz4ncff2gzlcndzrtglqv
+    scripts:
+      createGenesis:
+        file: scripts/create-manifest-genesis.sh
+    genesis:
+      app_state:
+        staking:
+          params:
+            bond_denom: "upoa"
+            min_commission_rate: "0"
+        mint:
+          params:
+            mint_denom: "notused"
+            blocks_per_year: "6311520"
+            inflation_rate_change: "0"
+            inflation_max: "0"
+            inflation_min: "0"
+          minter:
+            inflation: "0"
+            annual_provisions: "0"
+        slashing:
+          params:
+            slash_fraction_double_sign: "0"
+            slash_fraction_downtime: "0"
+        distribution:
+          params:
+            community_tax: "0"
     ports:
       rest: 1317
       rpc: 26657
