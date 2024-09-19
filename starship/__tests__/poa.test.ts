@@ -5,7 +5,8 @@ import {
   assertIsDeliverTxFailure,
   assertIsDeliverTxSuccess,
   QueryClient,
-  setupStakingExtension, SigningStargateClient,
+  setupStakingExtension,
+  SigningStargateClient,
 } from "@cosmjs/stargate";
 import { getSigningStrangeloveVenturesClient } from "../../src";
 import { Tendermint37Client } from "@cosmjs/tendermint-rpc";
@@ -53,7 +54,7 @@ describe.each(inits)(
       poaAddress: string,
       t1Addr: string,
       rpcEndpoint: string,
-      fee: { amount: { denom: string; amount: string }[]; gas: string }
+      fee: { amount: { denom: string; amount: string }[]; gas: string };
 
     const denom = "umfx";
 
@@ -116,8 +117,8 @@ describe.each(inits)(
       const bondedVal = await queryClient.staking.validators(BONDED);
       expect(bondedVal.validators.length).toEqual(1);
 
-      const val = bondedVal.validators[0]
-      const valAddr = val.operatorAddress
+      const val = bondedVal.validators[0];
+      const valAddr = val.operatorAddress;
 
       const currentPower = await queryClient.poa.consensusPower(valAddr);
       const newPower = (currentPower.consensusPower + 1n) * 1000000n;
@@ -132,7 +133,9 @@ describe.each(inits)(
       await waitForNBlocks(client, 5);
 
       const consensusPower = await queryClient.poa.consensusPower(valAddr);
-      expect(consensusPower.consensusPower).toEqual(currentPower.consensusPower + 1n);
+      expect(consensusPower.consensusPower).toEqual(
+        currentPower.consensusPower + 1n
+      );
     });
 
     test("remove validator (fail)", async () => {
@@ -140,8 +143,8 @@ describe.each(inits)(
       const bondedVal = await queryClient.staking.validators(BONDED);
       expect(bondedVal.validators.length).toEqual(1);
 
-      const val = bondedVal.validators[0]
-      const valAddr = val.operatorAddress
+      const val = bondedVal.validators[0];
+      const valAddr = val.operatorAddress;
 
       const client = await getSigningClient(poaWallet);
       const msg = createMsgRemoveValidator(poaAddress, valAddr);
@@ -151,7 +154,9 @@ describe.each(inits)(
       // It is expected to fail because the validator is the last one in the set.
       assertIsDeliverTxFailure(result);
       expect(result.code).toEqual(1);
-      expect(result.rawLog).toContain("cannot remove the last validator in the set");
+      expect(result.rawLog).toContain(
+        "cannot remove the last validator in the set"
+      );
     });
 
     const getSigningClient = async (signer: OfflineSigner) => {
@@ -166,16 +171,20 @@ describe.each(inits)(
       return QueryClient.withExtensions(
         cometClient,
         setupPoaExtension,
-        setupStakingExtension,
+        setupStakingExtension
       );
     };
 
-    const waitForNBlocks = async (client: SigningStargateClient, numBlocks: number) => {
+    const waitForNBlocks = async (
+      client: SigningStargateClient,
+      numBlocks: number
+    ) => {
       const height = await client.getHeight();
       let currentHeight = height;
       while (currentHeight < height + numBlocks) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        currentHeight = await client.getHeight()
-    }
-  };
-});
+        currentHeight = await client.getHeight();
+      }
+    };
+  }
+);
