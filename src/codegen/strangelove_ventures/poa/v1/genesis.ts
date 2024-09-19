@@ -151,7 +151,7 @@ export const PowerCache = {
   },
   toAmino(message: PowerCache): PowerCacheAmino {
     const obj: any = {};
-    obj.power = message.power !== BigInt(0) ? message.power.toString() : undefined;
+    obj.power = message.power !== BigInt(0) ? (message.power?.toString)() : undefined;
     return obj;
   },
   fromAminoMsg(object: PowerCacheAminoMsg): PowerCache {

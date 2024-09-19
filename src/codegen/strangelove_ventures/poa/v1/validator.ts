@@ -907,11 +907,11 @@ export const Validator = {
     obj.tokens = message.tokens === "" ? undefined : message.tokens;
     obj.delegator_shares = message.delegatorShares === "" ? undefined : message.delegatorShares;
     obj.description = message.description ? Description.toAmino(message.description) : Description.toAmino(Description.fromPartial({}));
-    obj.unbonding_height = message.unbondingHeight !== BigInt(0) ? message.unbondingHeight.toString() : undefined;
+    obj.unbonding_height = message.unbondingHeight !== BigInt(0) ? (message.unbondingHeight?.toString)() : undefined;
     obj.unbonding_time = message.unbondingTime ? Timestamp.toAmino(toTimestamp(message.unbondingTime)) : new Date();
     obj.commission = message.commission ? Commission.toAmino(message.commission) : Commission.toAmino(Commission.fromPartial({}));
     obj.min_self_delegation = message.minSelfDelegation === "" ? undefined : message.minSelfDelegation;
-    obj.unbonding_on_hold_ref_count = message.unbondingOnHoldRefCount !== BigInt(0) ? message.unbondingOnHoldRefCount.toString() : undefined;
+    obj.unbonding_on_hold_ref_count = message.unbondingOnHoldRefCount !== BigInt(0) ? (message.unbondingOnHoldRefCount?.toString)() : undefined;
     if (message.unbondingIds) {
       obj.unbonding_ids = message.unbondingIds.map(e => e.toString());
     } else {
