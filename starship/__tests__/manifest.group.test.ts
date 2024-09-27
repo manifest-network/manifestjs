@@ -13,15 +13,15 @@ import { OfflineSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import path from "path";
 import { ConfigContext, useRegistry } from "starshipjs";
-import { getSigningCosmosClient } from "../../src/codegen";
+import {getSigningCosmosClient, liftedinit} from "../../src/codegen";
 import { Any } from "../../src/codegen/google/protobuf/any";
 import { MessageComposer as ManifestMessageComposer } from "../../src/codegen/liftedinit/manifest/v1/tx.registry";
 
 const inits = [
-  {
-    description: "group-manifest-admin (proto-signing)",
-    createWallets: createProtoWallet,
-  },
+  // {
+  //   description: "group-manifest-admin (proto-signing)",
+  //   createWallets: createProtoWallet,
+  // },
   {
     description: "group-manifest-admin (amino-signing)",
     createWallets: createAminoWallet,
