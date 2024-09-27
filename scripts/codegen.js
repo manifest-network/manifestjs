@@ -11,6 +11,7 @@ telescope({
   protoDirs,
   outPath,
   options: {
+    env: 'v-next',
     removeUnusedImports: true,
     classesUseArrowFunctions: true,
 
@@ -32,6 +33,17 @@ telescope({
       addTypeUrlToObjects: true,
       addTypeUrlToDecoders: true,
       addAminoTypeToObjects: true,
+      methods: {
+        encode: true,
+        decode: true,
+        fromJSON: true,
+        toJSON: true,
+        fromPartial: true,
+        toAmino: true,
+        fromAmino: true,
+        toProto: true,
+        fromProto: true
+      },
       excluded: {
         packages: [
           'ibc.applications.fee.v1',
@@ -78,6 +90,7 @@ telescope({
         useExact: true,
         autoFixUndefinedEnumDefault: true,
         num64: 'bigint',
+        useTelescopeGeneratedType: true,
         customTypes: {
           useCosmosSDKDecimal: true
         }
@@ -94,8 +107,14 @@ telescope({
         ]
       }
     },
+    stargateClients: {
+      enabled: true,
+      includeCosmosDefaultTypes: true,
+      addGetTxRpc: true
+    },
     interfaces: {
       enabled: true,
+      useGlobalDecoderRegistry: true,
       useUnionTypes: true
     },
     aminoEncoding: {
@@ -109,7 +128,13 @@ telescope({
       type: 'tendermint',
       enabled: true,
       camelCase: true,
-      useConnectComet: true
+      useConnectComet: true,
+      extensions: true,
+      serviceImplement: {
+        Msg: {
+          type: 'Tx'
+        }
+      },
     }
   }
 })

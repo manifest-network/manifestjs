@@ -1,6 +1,8 @@
 import { Permissions, PermissionsAmino, PermissionsSDKType } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial, Exact } from "../../../helpers";
+import { isSet, DeepPartial, Exact } from "../../../helpers";
+import { JsonSafe } from "../../../json-safe";
+import { GlobalDecoderRegistry } from "../../../registry";
 /** MsgAuthorizeCircuitBreaker defines the Msg/AuthorizeCircuitBreaker request type. */
 export interface MsgAuthorizeCircuitBreaker {
   /**
@@ -191,6 +193,15 @@ function createBaseMsgAuthorizeCircuitBreaker(): MsgAuthorizeCircuitBreaker {
 export const MsgAuthorizeCircuitBreaker = {
   typeUrl: "/cosmos.circuit.v1.MsgAuthorizeCircuitBreaker",
   aminoType: "cosmos-sdk/MsgAuthorizeCircuitBreaker",
+  is(o: any): o is MsgAuthorizeCircuitBreaker {
+    return o && (o.$typeUrl === MsgAuthorizeCircuitBreaker.typeUrl || typeof o.granter === "string" && typeof o.grantee === "string");
+  },
+  isSDK(o: any): o is MsgAuthorizeCircuitBreakerSDKType {
+    return o && (o.$typeUrl === MsgAuthorizeCircuitBreaker.typeUrl || typeof o.granter === "string" && typeof o.grantee === "string");
+  },
+  isAmino(o: any): o is MsgAuthorizeCircuitBreakerAmino {
+    return o && (o.$typeUrl === MsgAuthorizeCircuitBreaker.typeUrl || typeof o.granter === "string" && typeof o.grantee === "string");
+  },
   encode(message: MsgAuthorizeCircuitBreaker, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.granter !== "") {
       writer.uint32(10).string(message.granter);
@@ -225,6 +236,20 @@ export const MsgAuthorizeCircuitBreaker = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgAuthorizeCircuitBreaker {
+    return {
+      granter: isSet(object.granter) ? String(object.granter) : "",
+      grantee: isSet(object.grantee) ? String(object.grantee) : "",
+      permissions: isSet(object.permissions) ? Permissions.fromJSON(object.permissions) : undefined
+    };
+  },
+  toJSON(message: MsgAuthorizeCircuitBreaker): JsonSafe<MsgAuthorizeCircuitBreaker> {
+    const obj: any = {};
+    message.granter !== undefined && (obj.granter = message.granter);
+    message.grantee !== undefined && (obj.grantee = message.grantee);
+    message.permissions !== undefined && (obj.permissions = message.permissions ? Permissions.toJSON(message.permissions) : undefined);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgAuthorizeCircuitBreaker>, I>>(object: I): MsgAuthorizeCircuitBreaker {
     const message = createBaseMsgAuthorizeCircuitBreaker();
@@ -275,6 +300,8 @@ export const MsgAuthorizeCircuitBreaker = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgAuthorizeCircuitBreaker.typeUrl, MsgAuthorizeCircuitBreaker);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgAuthorizeCircuitBreaker.aminoType, MsgAuthorizeCircuitBreaker.typeUrl);
 function createBaseMsgAuthorizeCircuitBreakerResponse(): MsgAuthorizeCircuitBreakerResponse {
   return {
     success: false
@@ -283,6 +310,15 @@ function createBaseMsgAuthorizeCircuitBreakerResponse(): MsgAuthorizeCircuitBrea
 export const MsgAuthorizeCircuitBreakerResponse = {
   typeUrl: "/cosmos.circuit.v1.MsgAuthorizeCircuitBreakerResponse",
   aminoType: "cosmos-sdk/MsgAuthorizeCircuitBreakerResponse",
+  is(o: any): o is MsgAuthorizeCircuitBreakerResponse {
+    return o && (o.$typeUrl === MsgAuthorizeCircuitBreakerResponse.typeUrl || typeof o.success === "boolean");
+  },
+  isSDK(o: any): o is MsgAuthorizeCircuitBreakerResponseSDKType {
+    return o && (o.$typeUrl === MsgAuthorizeCircuitBreakerResponse.typeUrl || typeof o.success === "boolean");
+  },
+  isAmino(o: any): o is MsgAuthorizeCircuitBreakerResponseAmino {
+    return o && (o.$typeUrl === MsgAuthorizeCircuitBreakerResponse.typeUrl || typeof o.success === "boolean");
+  },
   encode(message: MsgAuthorizeCircuitBreakerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.success === true) {
       writer.uint32(8).bool(message.success);
@@ -305,6 +341,16 @@ export const MsgAuthorizeCircuitBreakerResponse = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgAuthorizeCircuitBreakerResponse {
+    return {
+      success: isSet(object.success) ? Boolean(object.success) : false
+    };
+  },
+  toJSON(message: MsgAuthorizeCircuitBreakerResponse): JsonSafe<MsgAuthorizeCircuitBreakerResponse> {
+    const obj: any = {};
+    message.success !== undefined && (obj.success = message.success);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgAuthorizeCircuitBreakerResponse>, I>>(object: I): MsgAuthorizeCircuitBreakerResponse {
     const message = createBaseMsgAuthorizeCircuitBreakerResponse();
@@ -345,6 +391,8 @@ export const MsgAuthorizeCircuitBreakerResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgAuthorizeCircuitBreakerResponse.typeUrl, MsgAuthorizeCircuitBreakerResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgAuthorizeCircuitBreakerResponse.aminoType, MsgAuthorizeCircuitBreakerResponse.typeUrl);
 function createBaseMsgTripCircuitBreaker(): MsgTripCircuitBreaker {
   return {
     authority: "",
@@ -354,6 +402,15 @@ function createBaseMsgTripCircuitBreaker(): MsgTripCircuitBreaker {
 export const MsgTripCircuitBreaker = {
   typeUrl: "/cosmos.circuit.v1.MsgTripCircuitBreaker",
   aminoType: "cosmos-sdk/MsgTripCircuitBreaker",
+  is(o: any): o is MsgTripCircuitBreaker {
+    return o && (o.$typeUrl === MsgTripCircuitBreaker.typeUrl || typeof o.authority === "string" && Array.isArray(o.msgTypeUrls) && (!o.msgTypeUrls.length || typeof o.msgTypeUrls[0] === "string"));
+  },
+  isSDK(o: any): o is MsgTripCircuitBreakerSDKType {
+    return o && (o.$typeUrl === MsgTripCircuitBreaker.typeUrl || typeof o.authority === "string" && Array.isArray(o.msg_type_urls) && (!o.msg_type_urls.length || typeof o.msg_type_urls[0] === "string"));
+  },
+  isAmino(o: any): o is MsgTripCircuitBreakerAmino {
+    return o && (o.$typeUrl === MsgTripCircuitBreaker.typeUrl || typeof o.authority === "string" && Array.isArray(o.msg_type_urls) && (!o.msg_type_urls.length || typeof o.msg_type_urls[0] === "string"));
+  },
   encode(message: MsgTripCircuitBreaker, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -382,6 +439,22 @@ export const MsgTripCircuitBreaker = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgTripCircuitBreaker {
+    return {
+      authority: isSet(object.authority) ? String(object.authority) : "",
+      msgTypeUrls: Array.isArray(object?.msgTypeUrls) ? object.msgTypeUrls.map((e: any) => String(e)) : []
+    };
+  },
+  toJSON(message: MsgTripCircuitBreaker): JsonSafe<MsgTripCircuitBreaker> {
+    const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
+    if (message.msgTypeUrls) {
+      obj.msgTypeUrls = message.msgTypeUrls.map(e => e);
+    } else {
+      obj.msgTypeUrls = [];
+    }
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgTripCircuitBreaker>, I>>(object: I): MsgTripCircuitBreaker {
     const message = createBaseMsgTripCircuitBreaker();
@@ -429,6 +502,8 @@ export const MsgTripCircuitBreaker = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgTripCircuitBreaker.typeUrl, MsgTripCircuitBreaker);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgTripCircuitBreaker.aminoType, MsgTripCircuitBreaker.typeUrl);
 function createBaseMsgTripCircuitBreakerResponse(): MsgTripCircuitBreakerResponse {
   return {
     success: false
@@ -437,6 +512,15 @@ function createBaseMsgTripCircuitBreakerResponse(): MsgTripCircuitBreakerRespons
 export const MsgTripCircuitBreakerResponse = {
   typeUrl: "/cosmos.circuit.v1.MsgTripCircuitBreakerResponse",
   aminoType: "cosmos-sdk/MsgTripCircuitBreakerResponse",
+  is(o: any): o is MsgTripCircuitBreakerResponse {
+    return o && (o.$typeUrl === MsgTripCircuitBreakerResponse.typeUrl || typeof o.success === "boolean");
+  },
+  isSDK(o: any): o is MsgTripCircuitBreakerResponseSDKType {
+    return o && (o.$typeUrl === MsgTripCircuitBreakerResponse.typeUrl || typeof o.success === "boolean");
+  },
+  isAmino(o: any): o is MsgTripCircuitBreakerResponseAmino {
+    return o && (o.$typeUrl === MsgTripCircuitBreakerResponse.typeUrl || typeof o.success === "boolean");
+  },
   encode(message: MsgTripCircuitBreakerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.success === true) {
       writer.uint32(8).bool(message.success);
@@ -459,6 +543,16 @@ export const MsgTripCircuitBreakerResponse = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgTripCircuitBreakerResponse {
+    return {
+      success: isSet(object.success) ? Boolean(object.success) : false
+    };
+  },
+  toJSON(message: MsgTripCircuitBreakerResponse): JsonSafe<MsgTripCircuitBreakerResponse> {
+    const obj: any = {};
+    message.success !== undefined && (obj.success = message.success);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgTripCircuitBreakerResponse>, I>>(object: I): MsgTripCircuitBreakerResponse {
     const message = createBaseMsgTripCircuitBreakerResponse();
@@ -499,6 +593,8 @@ export const MsgTripCircuitBreakerResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgTripCircuitBreakerResponse.typeUrl, MsgTripCircuitBreakerResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgTripCircuitBreakerResponse.aminoType, MsgTripCircuitBreakerResponse.typeUrl);
 function createBaseMsgResetCircuitBreaker(): MsgResetCircuitBreaker {
   return {
     authority: "",
@@ -508,6 +604,15 @@ function createBaseMsgResetCircuitBreaker(): MsgResetCircuitBreaker {
 export const MsgResetCircuitBreaker = {
   typeUrl: "/cosmos.circuit.v1.MsgResetCircuitBreaker",
   aminoType: "cosmos-sdk/MsgResetCircuitBreaker",
+  is(o: any): o is MsgResetCircuitBreaker {
+    return o && (o.$typeUrl === MsgResetCircuitBreaker.typeUrl || typeof o.authority === "string" && Array.isArray(o.msgTypeUrls) && (!o.msgTypeUrls.length || typeof o.msgTypeUrls[0] === "string"));
+  },
+  isSDK(o: any): o is MsgResetCircuitBreakerSDKType {
+    return o && (o.$typeUrl === MsgResetCircuitBreaker.typeUrl || typeof o.authority === "string" && Array.isArray(o.msg_type_urls) && (!o.msg_type_urls.length || typeof o.msg_type_urls[0] === "string"));
+  },
+  isAmino(o: any): o is MsgResetCircuitBreakerAmino {
+    return o && (o.$typeUrl === MsgResetCircuitBreaker.typeUrl || typeof o.authority === "string" && Array.isArray(o.msg_type_urls) && (!o.msg_type_urls.length || typeof o.msg_type_urls[0] === "string"));
+  },
   encode(message: MsgResetCircuitBreaker, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -536,6 +641,22 @@ export const MsgResetCircuitBreaker = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgResetCircuitBreaker {
+    return {
+      authority: isSet(object.authority) ? String(object.authority) : "",
+      msgTypeUrls: Array.isArray(object?.msgTypeUrls) ? object.msgTypeUrls.map((e: any) => String(e)) : []
+    };
+  },
+  toJSON(message: MsgResetCircuitBreaker): JsonSafe<MsgResetCircuitBreaker> {
+    const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
+    if (message.msgTypeUrls) {
+      obj.msgTypeUrls = message.msgTypeUrls.map(e => e);
+    } else {
+      obj.msgTypeUrls = [];
+    }
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgResetCircuitBreaker>, I>>(object: I): MsgResetCircuitBreaker {
     const message = createBaseMsgResetCircuitBreaker();
@@ -583,6 +704,8 @@ export const MsgResetCircuitBreaker = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgResetCircuitBreaker.typeUrl, MsgResetCircuitBreaker);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgResetCircuitBreaker.aminoType, MsgResetCircuitBreaker.typeUrl);
 function createBaseMsgResetCircuitBreakerResponse(): MsgResetCircuitBreakerResponse {
   return {
     success: false
@@ -591,6 +714,15 @@ function createBaseMsgResetCircuitBreakerResponse(): MsgResetCircuitBreakerRespo
 export const MsgResetCircuitBreakerResponse = {
   typeUrl: "/cosmos.circuit.v1.MsgResetCircuitBreakerResponse",
   aminoType: "cosmos-sdk/MsgResetCircuitBreakerResponse",
+  is(o: any): o is MsgResetCircuitBreakerResponse {
+    return o && (o.$typeUrl === MsgResetCircuitBreakerResponse.typeUrl || typeof o.success === "boolean");
+  },
+  isSDK(o: any): o is MsgResetCircuitBreakerResponseSDKType {
+    return o && (o.$typeUrl === MsgResetCircuitBreakerResponse.typeUrl || typeof o.success === "boolean");
+  },
+  isAmino(o: any): o is MsgResetCircuitBreakerResponseAmino {
+    return o && (o.$typeUrl === MsgResetCircuitBreakerResponse.typeUrl || typeof o.success === "boolean");
+  },
   encode(message: MsgResetCircuitBreakerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.success === true) {
       writer.uint32(8).bool(message.success);
@@ -613,6 +745,16 @@ export const MsgResetCircuitBreakerResponse = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgResetCircuitBreakerResponse {
+    return {
+      success: isSet(object.success) ? Boolean(object.success) : false
+    };
+  },
+  toJSON(message: MsgResetCircuitBreakerResponse): JsonSafe<MsgResetCircuitBreakerResponse> {
+    const obj: any = {};
+    message.success !== undefined && (obj.success = message.success);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgResetCircuitBreakerResponse>, I>>(object: I): MsgResetCircuitBreakerResponse {
     const message = createBaseMsgResetCircuitBreakerResponse();
@@ -653,3 +795,5 @@ export const MsgResetCircuitBreakerResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgResetCircuitBreakerResponse.typeUrl, MsgResetCircuitBreakerResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgResetCircuitBreakerResponse.aminoType, MsgResetCircuitBreakerResponse.typeUrl);

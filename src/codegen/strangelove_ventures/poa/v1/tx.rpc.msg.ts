@@ -1,52 +1,64 @@
-import { Rpc } from "../../../helpers";
-import { BinaryReader } from "../../../binary";
-import { MsgCreateValidator, MsgCreateValidatorResponse, MsgSetPower, MsgSetPowerResponse, MsgRemoveValidator, MsgRemoveValidatorResponse, MsgRemovePending, MsgRemovePendingResponse, MsgUpdateStakingParams, MsgUpdateStakingParamsResponse } from "./tx";
+import { DeliverTxResponse, StdFee, TxRpc } from "../../../types";
+import { MsgCreateValidator, MsgSetPower, MsgRemoveValidator, MsgRemovePending, MsgUpdateStakingParams } from "./tx";
 /** Msg defines the Msg service. */
 export interface Msg {
   /** CreateValidator is a wrapper method around the SDK's x/staking MsgCreateValidator. */
-  createValidator(request: MsgCreateValidator): Promise<MsgCreateValidatorResponse>;
+  createValidator(signerAddress: string, message: MsgCreateValidator, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /** SetPower sets the new power of a validator and accepts new validators into the set. */
-  setPower(request: MsgSetPower): Promise<MsgSetPowerResponse>;
+  setPower(signerAddress: string, message: MsgSetPower, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /** RemoveValidator removes a validator from the active set and unbonds their delegations. */
-  removeValidator(request: MsgRemoveValidator): Promise<MsgRemoveValidatorResponse>;
+  removeValidator(signerAddress: string, message: MsgRemoveValidator, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /** RemovePending removes a pending validator from the queue. */
-  removePending(request: MsgRemovePending): Promise<MsgRemovePendingResponse>;
+  removePending(signerAddress: string, message: MsgRemovePending, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /** UpdateStakingParams updates the module parameters. */
-  updateStakingParams(request: MsgUpdateStakingParams): Promise<MsgUpdateStakingParamsResponse>;
+  updateStakingParams(signerAddress: string, message: MsgUpdateStakingParams, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
 }
 export class MsgClientImpl implements Msg {
-  private readonly rpc: Rpc;
-  constructor(rpc: Rpc) {
+  private readonly rpc: TxRpc;
+  constructor(rpc: TxRpc) {
     this.rpc = rpc;
   }
   /* CreateValidator is a wrapper method around the SDK's x/staking MsgCreateValidator. */
-  createValidator = async (request: MsgCreateValidator): Promise<MsgCreateValidatorResponse> => {
-    const data = MsgCreateValidator.encode(request).finish();
-    const promise = this.rpc.request("strangelove_ventures.poa.v1.Msg", "CreateValidator", data);
-    return promise.then(data => MsgCreateValidatorResponse.decode(new BinaryReader(data)));
+  createValidator = async (signerAddress: string, message: MsgCreateValidator, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgCreateValidator.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* SetPower sets the new power of a validator and accepts new validators into the set. */
-  setPower = async (request: MsgSetPower): Promise<MsgSetPowerResponse> => {
-    const data = MsgSetPower.encode(request).finish();
-    const promise = this.rpc.request("strangelove_ventures.poa.v1.Msg", "SetPower", data);
-    return promise.then(data => MsgSetPowerResponse.decode(new BinaryReader(data)));
+  setPower = async (signerAddress: string, message: MsgSetPower, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgSetPower.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* RemoveValidator removes a validator from the active set and unbonds their delegations. */
-  removeValidator = async (request: MsgRemoveValidator): Promise<MsgRemoveValidatorResponse> => {
-    const data = MsgRemoveValidator.encode(request).finish();
-    const promise = this.rpc.request("strangelove_ventures.poa.v1.Msg", "RemoveValidator", data);
-    return promise.then(data => MsgRemoveValidatorResponse.decode(new BinaryReader(data)));
+  removeValidator = async (signerAddress: string, message: MsgRemoveValidator, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgRemoveValidator.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* RemovePending removes a pending validator from the queue. */
-  removePending = async (request: MsgRemovePending): Promise<MsgRemovePendingResponse> => {
-    const data = MsgRemovePending.encode(request).finish();
-    const promise = this.rpc.request("strangelove_ventures.poa.v1.Msg", "RemovePending", data);
-    return promise.then(data => MsgRemovePendingResponse.decode(new BinaryReader(data)));
+  removePending = async (signerAddress: string, message: MsgRemovePending, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgRemovePending.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* UpdateStakingParams updates the module parameters. */
-  updateStakingParams = async (request: MsgUpdateStakingParams): Promise<MsgUpdateStakingParamsResponse> => {
-    const data = MsgUpdateStakingParams.encode(request).finish();
-    const promise = this.rpc.request("strangelove_ventures.poa.v1.Msg", "UpdateStakingParams", data);
-    return promise.then(data => MsgUpdateStakingParamsResponse.decode(new BinaryReader(data)));
+  updateStakingParams = async (signerAddress: string, message: MsgUpdateStakingParams, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgUpdateStakingParams.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
 }
+export const createClientImpl = (rpc: TxRpc) => {
+  return new MsgClientImpl(rpc);
+};

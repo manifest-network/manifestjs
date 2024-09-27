@@ -40,9 +40,9 @@ import * as _228 from "./applications/transfer/v1/tx.rpc.msg";
 import * as _229 from "./core/channel/v1/tx.rpc.msg";
 import * as _230 from "./core/client/v1/tx.rpc.msg";
 import * as _231 from "./core/connection/v1/tx.rpc.msg";
-import * as _250 from "./lcd";
-import * as _251 from "./rpc.query";
-import * as _252 from "./rpc.tx";
+import * as _249 from "./lcd";
+import * as _250 from "./rpc.query";
+import * as _251 from "./rpc.tx";
 export namespace ibc {
   export namespace applications {
     export namespace transfer {
@@ -129,8 +129,8 @@ export namespace ibc {
     }
   }
   export const ClientFactory = {
+    ..._249,
     ..._250,
-    ..._251,
-    ..._252
+    ..._251
   };
 }

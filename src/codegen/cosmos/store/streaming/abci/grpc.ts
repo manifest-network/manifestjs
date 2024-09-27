@@ -1,7 +1,9 @@
 import { RequestFinalizeBlock, RequestFinalizeBlockAmino, RequestFinalizeBlockSDKType, ResponseFinalizeBlock, ResponseFinalizeBlockAmino, ResponseFinalizeBlockSDKType, ResponseCommit, ResponseCommitAmino, ResponseCommitSDKType } from "../../../../tendermint/abci/types";
 import { StoreKVPair, StoreKVPairAmino, StoreKVPairSDKType } from "../../v1beta1/listening";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial, Exact } from "../../../../helpers";
+import { isSet, DeepPartial, Exact } from "../../../../helpers";
+import { JsonSafe } from "../../../../json-safe";
+import { GlobalDecoderRegistry } from "../../../../registry";
 /** ListenEndBlockRequest is the request type for the ListenEndBlock RPC method */
 export interface ListenFinalizeBlockRequest {
   req?: RequestFinalizeBlock;
@@ -90,6 +92,15 @@ function createBaseListenFinalizeBlockRequest(): ListenFinalizeBlockRequest {
 export const ListenFinalizeBlockRequest = {
   typeUrl: "/cosmos.store.streaming.abci.ListenFinalizeBlockRequest",
   aminoType: "cosmos-sdk/ListenFinalizeBlockRequest",
+  is(o: any): o is ListenFinalizeBlockRequest {
+    return o && o.$typeUrl === ListenFinalizeBlockRequest.typeUrl;
+  },
+  isSDK(o: any): o is ListenFinalizeBlockRequestSDKType {
+    return o && o.$typeUrl === ListenFinalizeBlockRequest.typeUrl;
+  },
+  isAmino(o: any): o is ListenFinalizeBlockRequestAmino {
+    return o && o.$typeUrl === ListenFinalizeBlockRequest.typeUrl;
+  },
   encode(message: ListenFinalizeBlockRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.req !== undefined) {
       RequestFinalizeBlock.encode(message.req, writer.uint32(10).fork()).ldelim();
@@ -118,6 +129,18 @@ export const ListenFinalizeBlockRequest = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): ListenFinalizeBlockRequest {
+    return {
+      req: isSet(object.req) ? RequestFinalizeBlock.fromJSON(object.req) : undefined,
+      res: isSet(object.res) ? ResponseFinalizeBlock.fromJSON(object.res) : undefined
+    };
+  },
+  toJSON(message: ListenFinalizeBlockRequest): JsonSafe<ListenFinalizeBlockRequest> {
+    const obj: any = {};
+    message.req !== undefined && (obj.req = message.req ? RequestFinalizeBlock.toJSON(message.req) : undefined);
+    message.res !== undefined && (obj.res = message.res ? ResponseFinalizeBlock.toJSON(message.res) : undefined);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<ListenFinalizeBlockRequest>, I>>(object: I): ListenFinalizeBlockRequest {
     const message = createBaseListenFinalizeBlockRequest();
@@ -163,12 +186,23 @@ export const ListenFinalizeBlockRequest = {
     };
   }
 };
+GlobalDecoderRegistry.register(ListenFinalizeBlockRequest.typeUrl, ListenFinalizeBlockRequest);
+GlobalDecoderRegistry.registerAminoProtoMapping(ListenFinalizeBlockRequest.aminoType, ListenFinalizeBlockRequest.typeUrl);
 function createBaseListenFinalizeBlockResponse(): ListenFinalizeBlockResponse {
   return {};
 }
 export const ListenFinalizeBlockResponse = {
   typeUrl: "/cosmos.store.streaming.abci.ListenFinalizeBlockResponse",
   aminoType: "cosmos-sdk/ListenFinalizeBlockResponse",
+  is(o: any): o is ListenFinalizeBlockResponse {
+    return o && o.$typeUrl === ListenFinalizeBlockResponse.typeUrl;
+  },
+  isSDK(o: any): o is ListenFinalizeBlockResponseSDKType {
+    return o && o.$typeUrl === ListenFinalizeBlockResponse.typeUrl;
+  },
+  isAmino(o: any): o is ListenFinalizeBlockResponseAmino {
+    return o && o.$typeUrl === ListenFinalizeBlockResponse.typeUrl;
+  },
   encode(_: ListenFinalizeBlockResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -185,6 +219,13 @@ export const ListenFinalizeBlockResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): ListenFinalizeBlockResponse {
+    return {};
+  },
+  toJSON(_: ListenFinalizeBlockResponse): JsonSafe<ListenFinalizeBlockResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<ListenFinalizeBlockResponse>, I>>(_: I): ListenFinalizeBlockResponse {
     const message = createBaseListenFinalizeBlockResponse();
@@ -220,6 +261,8 @@ export const ListenFinalizeBlockResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(ListenFinalizeBlockResponse.typeUrl, ListenFinalizeBlockResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(ListenFinalizeBlockResponse.aminoType, ListenFinalizeBlockResponse.typeUrl);
 function createBaseListenCommitRequest(): ListenCommitRequest {
   return {
     blockHeight: BigInt(0),
@@ -230,6 +273,15 @@ function createBaseListenCommitRequest(): ListenCommitRequest {
 export const ListenCommitRequest = {
   typeUrl: "/cosmos.store.streaming.abci.ListenCommitRequest",
   aminoType: "cosmos-sdk/ListenCommitRequest",
+  is(o: any): o is ListenCommitRequest {
+    return o && (o.$typeUrl === ListenCommitRequest.typeUrl || typeof o.blockHeight === "bigint" && Array.isArray(o.changeSet) && (!o.changeSet.length || StoreKVPair.is(o.changeSet[0])));
+  },
+  isSDK(o: any): o is ListenCommitRequestSDKType {
+    return o && (o.$typeUrl === ListenCommitRequest.typeUrl || typeof o.block_height === "bigint" && Array.isArray(o.change_set) && (!o.change_set.length || StoreKVPair.isSDK(o.change_set[0])));
+  },
+  isAmino(o: any): o is ListenCommitRequestAmino {
+    return o && (o.$typeUrl === ListenCommitRequest.typeUrl || typeof o.block_height === "bigint" && Array.isArray(o.change_set) && (!o.change_set.length || StoreKVPair.isAmino(o.change_set[0])));
+  },
   encode(message: ListenCommitRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.blockHeight !== BigInt(0)) {
       writer.uint32(8).int64(message.blockHeight);
@@ -264,6 +316,24 @@ export const ListenCommitRequest = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): ListenCommitRequest {
+    return {
+      blockHeight: isSet(object.blockHeight) ? BigInt(object.blockHeight.toString()) : BigInt(0),
+      res: isSet(object.res) ? ResponseCommit.fromJSON(object.res) : undefined,
+      changeSet: Array.isArray(object?.changeSet) ? object.changeSet.map((e: any) => StoreKVPair.fromJSON(e)) : []
+    };
+  },
+  toJSON(message: ListenCommitRequest): JsonSafe<ListenCommitRequest> {
+    const obj: any = {};
+    message.blockHeight !== undefined && (obj.blockHeight = (message.blockHeight || BigInt(0)).toString());
+    message.res !== undefined && (obj.res = message.res ? ResponseCommit.toJSON(message.res) : undefined);
+    if (message.changeSet) {
+      obj.changeSet = message.changeSet.map(e => e ? StoreKVPair.toJSON(e) : undefined);
+    } else {
+      obj.changeSet = [];
+    }
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<ListenCommitRequest>, I>>(object: I): ListenCommitRequest {
     const message = createBaseListenCommitRequest();
@@ -316,12 +386,23 @@ export const ListenCommitRequest = {
     };
   }
 };
+GlobalDecoderRegistry.register(ListenCommitRequest.typeUrl, ListenCommitRequest);
+GlobalDecoderRegistry.registerAminoProtoMapping(ListenCommitRequest.aminoType, ListenCommitRequest.typeUrl);
 function createBaseListenCommitResponse(): ListenCommitResponse {
   return {};
 }
 export const ListenCommitResponse = {
   typeUrl: "/cosmos.store.streaming.abci.ListenCommitResponse",
   aminoType: "cosmos-sdk/ListenCommitResponse",
+  is(o: any): o is ListenCommitResponse {
+    return o && o.$typeUrl === ListenCommitResponse.typeUrl;
+  },
+  isSDK(o: any): o is ListenCommitResponseSDKType {
+    return o && o.$typeUrl === ListenCommitResponse.typeUrl;
+  },
+  isAmino(o: any): o is ListenCommitResponseAmino {
+    return o && o.$typeUrl === ListenCommitResponse.typeUrl;
+  },
   encode(_: ListenCommitResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -338,6 +419,13 @@ export const ListenCommitResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): ListenCommitResponse {
+    return {};
+  },
+  toJSON(_: ListenCommitResponse): JsonSafe<ListenCommitResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<ListenCommitResponse>, I>>(_: I): ListenCommitResponse {
     const message = createBaseListenCommitResponse();
@@ -373,3 +461,5 @@ export const ListenCommitResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(ListenCommitResponse.typeUrl, ListenCommitResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(ListenCommitResponse.aminoType, ListenCommitResponse.typeUrl);

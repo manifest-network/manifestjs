@@ -1,52 +1,36 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { JsonSafe } from "../../../json-safe";
 import { DeepPartial, Exact } from "../../../helpers";
+import { GlobalDecoderRegistry } from "../../../registry";
 /** GenesisState defines the module genesis state */
-export interface GenesisState {
-  /** Params defines all the paramaters of the module. */
-  params: Params;
-}
+export interface GenesisState {}
 export interface GenesisStateProtoMsg {
   typeUrl: "/liftedinit.manifest.v1.GenesisState";
   value: Uint8Array;
 }
 /** GenesisState defines the module genesis state */
-export interface GenesisStateAmino {
-  /** Params defines all the paramaters of the module. */
-  params?: ParamsAmino;
-}
+export interface GenesisStateAmino {}
 export interface GenesisStateAminoMsg {
   type: "/liftedinit.manifest.v1.GenesisState";
   value: GenesisStateAmino;
 }
 /** GenesisState defines the module genesis state */
-export interface GenesisStateSDKType {
-  params: ParamsSDKType;
-}
-/** Params defines the set of module parameters. */
-export interface Params {}
-export interface ParamsProtoMsg {
-  typeUrl: "/liftedinit.manifest.v1.Params";
-  value: Uint8Array;
-}
-/** Params defines the set of module parameters. */
-export interface ParamsAmino {}
-export interface ParamsAminoMsg {
-  type: "manifest/params";
-  value: ParamsAmino;
-}
-/** Params defines the set of module parameters. */
-export interface ParamsSDKType {}
+export interface GenesisStateSDKType {}
 function createBaseGenesisState(): GenesisState {
-  return {
-    params: Params.fromPartial({})
-  };
+  return {};
 }
 export const GenesisState = {
   typeUrl: "/liftedinit.manifest.v1.GenesisState",
-  encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.params !== undefined) {
-      Params.encode(message.params, writer.uint32(10).fork()).ldelim();
-    }
+  is(o: any): o is GenesisState {
+    return o && o.$typeUrl === GenesisState.typeUrl;
+  },
+  isSDK(o: any): o is GenesisStateSDKType {
+    return o && o.$typeUrl === GenesisState.typeUrl;
+  },
+  isAmino(o: any): o is GenesisStateAmino {
+    return o && o.$typeUrl === GenesisState.typeUrl;
+  },
+  encode(_: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): GenesisState {
@@ -56,9 +40,6 @@ export const GenesisState = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          message.params = Params.decode(reader, reader.uint32());
-          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -66,21 +47,23 @@ export const GenesisState = {
     }
     return message;
   },
-  fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(object: I): GenesisState {
-    const message = createBaseGenesisState();
-    message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
-    return message;
+  fromJSON(_: any): GenesisState {
+    return {};
   },
-  fromAmino(object: GenesisStateAmino): GenesisState {
-    const message = createBaseGenesisState();
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromAmino(object.params);
-    }
-    return message;
-  },
-  toAmino(message: GenesisState): GenesisStateAmino {
+  toJSON(_: GenesisState): JsonSafe<GenesisState> {
     const obj: any = {};
-    obj.params = message.params ? Params.toAmino(message.params) : undefined;
+    return obj;
+  },
+  fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(_: I): GenesisState {
+    const message = createBaseGenesisState();
+    return message;
+  },
+  fromAmino(_: GenesisStateAmino): GenesisState {
+    const message = createBaseGenesisState();
+    return message;
+  },
+  toAmino(_: GenesisState): GenesisStateAmino {
+    const obj: any = {};
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
@@ -99,60 +82,4 @@ export const GenesisState = {
     };
   }
 };
-function createBaseParams(): Params {
-  return {};
-}
-export const Params = {
-  typeUrl: "/liftedinit.manifest.v1.Params",
-  aminoType: "manifest/params",
-  encode(_: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): Params {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseParams();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial<I extends Exact<DeepPartial<Params>, I>>(_: I): Params {
-    const message = createBaseParams();
-    return message;
-  },
-  fromAmino(_: ParamsAmino): Params {
-    const message = createBaseParams();
-    return message;
-  },
-  toAmino(_: Params): ParamsAmino {
-    const obj: any = {};
-    return obj;
-  },
-  fromAminoMsg(object: ParamsAminoMsg): Params {
-    return Params.fromAmino(object.value);
-  },
-  toAminoMsg(message: Params): ParamsAminoMsg {
-    return {
-      type: "manifest/params",
-      value: Params.toAmino(message)
-    };
-  },
-  fromProtoMsg(message: ParamsProtoMsg): Params {
-    return Params.decode(message.value);
-  },
-  toProto(message: Params): Uint8Array {
-    return Params.encode(message).finish();
-  },
-  toProtoMsg(message: Params): ParamsProtoMsg {
-    return {
-      typeUrl: "/liftedinit.manifest.v1.Params",
-      value: Params.encode(message).finish()
-    };
-  }
-};
+GlobalDecoderRegistry.register(GenesisState.typeUrl, GenesisState);

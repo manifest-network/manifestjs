@@ -1,6 +1,8 @@
 import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { JsonSafe } from "../../../json-safe";
 import { DeepPartial, Exact } from "../../../helpers";
+import { GlobalDecoderRegistry } from "../../../registry";
 /**
  * SendAuthorization allows the grantee to spend up to spend_limit coins from
  * the granter's account.
@@ -63,6 +65,15 @@ function createBaseSendAuthorization(): SendAuthorization {
 export const SendAuthorization = {
   typeUrl: "/cosmos.bank.v1beta1.SendAuthorization",
   aminoType: "cosmos-sdk/SendAuthorization",
+  is(o: any): o is SendAuthorization {
+    return o && (o.$typeUrl === SendAuthorization.typeUrl || Array.isArray(o.spendLimit) && (!o.spendLimit.length || Coin.is(o.spendLimit[0])) && Array.isArray(o.allowList) && (!o.allowList.length || typeof o.allowList[0] === "string"));
+  },
+  isSDK(o: any): o is SendAuthorizationSDKType {
+    return o && (o.$typeUrl === SendAuthorization.typeUrl || Array.isArray(o.spend_limit) && (!o.spend_limit.length || Coin.isSDK(o.spend_limit[0])) && Array.isArray(o.allow_list) && (!o.allow_list.length || typeof o.allow_list[0] === "string"));
+  },
+  isAmino(o: any): o is SendAuthorizationAmino {
+    return o && (o.$typeUrl === SendAuthorization.typeUrl || Array.isArray(o.spend_limit) && (!o.spend_limit.length || Coin.isAmino(o.spend_limit[0])) && Array.isArray(o.allow_list) && (!o.allow_list.length || typeof o.allow_list[0] === "string"));
+  },
   encode(message: SendAuthorization, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.spendLimit) {
       Coin.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -91,6 +102,26 @@ export const SendAuthorization = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): SendAuthorization {
+    return {
+      spendLimit: Array.isArray(object?.spendLimit) ? object.spendLimit.map((e: any) => Coin.fromJSON(e)) : [],
+      allowList: Array.isArray(object?.allowList) ? object.allowList.map((e: any) => String(e)) : []
+    };
+  },
+  toJSON(message: SendAuthorization): JsonSafe<SendAuthorization> {
+    const obj: any = {};
+    if (message.spendLimit) {
+      obj.spendLimit = message.spendLimit.map(e => e ? Coin.toJSON(e) : undefined);
+    } else {
+      obj.spendLimit = [];
+    }
+    if (message.allowList) {
+      obj.allowList = message.allowList.map(e => e);
+    } else {
+      obj.allowList = [];
+    }
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<SendAuthorization>, I>>(object: I): SendAuthorization {
     const message = createBaseSendAuthorization();
@@ -140,3 +171,5 @@ export const SendAuthorization = {
     };
   }
 };
+GlobalDecoderRegistry.register(SendAuthorization.typeUrl, SendAuthorization);
+GlobalDecoderRegistry.registerAminoProtoMapping(SendAuthorization.aminoType, SendAuthorization.typeUrl);

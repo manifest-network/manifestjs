@@ -1,6 +1,8 @@
 import { Validator, ValidatorAmino, ValidatorSDKType } from "./validator";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial, Exact } from "../../../helpers";
+import { JsonSafe } from "../../../json-safe";
+import { DeepPartial, Exact, isSet } from "../../../helpers";
+import { GlobalDecoderRegistry } from "../../../registry";
 /** GenesisState defines the poa module's genesis state. */
 export interface GenesisState {
   vals: Validator[];
@@ -48,6 +50,15 @@ function createBaseGenesisState(): GenesisState {
 }
 export const GenesisState = {
   typeUrl: "/strangelove_ventures.poa.v1.GenesisState",
+  is(o: any): o is GenesisState {
+    return o && (o.$typeUrl === GenesisState.typeUrl || Array.isArray(o.vals) && (!o.vals.length || Validator.is(o.vals[0])));
+  },
+  isSDK(o: any): o is GenesisStateSDKType {
+    return o && (o.$typeUrl === GenesisState.typeUrl || Array.isArray(o.vals) && (!o.vals.length || Validator.isSDK(o.vals[0])));
+  },
+  isAmino(o: any): o is GenesisStateAmino {
+    return o && (o.$typeUrl === GenesisState.typeUrl || Array.isArray(o.vals) && (!o.vals.length || Validator.isAmino(o.vals[0])));
+  },
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.vals) {
       Validator.encode(v!, writer.uint32(18).fork()).ldelim();
@@ -70,6 +81,20 @@ export const GenesisState = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): GenesisState {
+    return {
+      vals: Array.isArray(object?.vals) ? object.vals.map((e: any) => Validator.fromJSON(e)) : []
+    };
+  },
+  toJSON(message: GenesisState): JsonSafe<GenesisState> {
+    const obj: any = {};
+    if (message.vals) {
+      obj.vals = message.vals.map(e => e ? Validator.toJSON(e) : undefined);
+    } else {
+      obj.vals = [];
+    }
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(object: I): GenesisState {
     const message = createBaseGenesisState();
@@ -106,6 +131,7 @@ export const GenesisState = {
     };
   }
 };
+GlobalDecoderRegistry.register(GenesisState.typeUrl, GenesisState);
 function createBasePowerCache(): PowerCache {
   return {
     power: BigInt(0)
@@ -114,6 +140,15 @@ function createBasePowerCache(): PowerCache {
 export const PowerCache = {
   typeUrl: "/strangelove_ventures.poa.v1.PowerCache",
   aminoType: "poa/PowerCache",
+  is(o: any): o is PowerCache {
+    return o && (o.$typeUrl === PowerCache.typeUrl || typeof o.power === "bigint");
+  },
+  isSDK(o: any): o is PowerCacheSDKType {
+    return o && (o.$typeUrl === PowerCache.typeUrl || typeof o.power === "bigint");
+  },
+  isAmino(o: any): o is PowerCacheAmino {
+    return o && (o.$typeUrl === PowerCache.typeUrl || typeof o.power === "bigint");
+  },
   encode(message: PowerCache, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.power !== BigInt(0)) {
       writer.uint32(8).uint64(message.power);
@@ -136,6 +171,16 @@ export const PowerCache = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): PowerCache {
+    return {
+      power: isSet(object.power) ? BigInt(object.power.toString()) : BigInt(0)
+    };
+  },
+  toJSON(message: PowerCache): JsonSafe<PowerCache> {
+    const obj: any = {};
+    message.power !== undefined && (obj.power = (message.power || BigInt(0)).toString());
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<PowerCache>, I>>(object: I): PowerCache {
     const message = createBasePowerCache();
@@ -176,3 +221,5 @@ export const PowerCache = {
     };
   }
 };
+GlobalDecoderRegistry.register(PowerCache.typeUrl, PowerCache);
+GlobalDecoderRegistry.registerAminoProtoMapping(PowerCache.aminoType, PowerCache.typeUrl);

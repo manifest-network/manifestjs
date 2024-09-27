@@ -2,9 +2,10 @@ import { Description, DescriptionAmino, DescriptionSDKType, CommissionRates, Com
 import { Any, AnyProtoMsg, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
 import { StakingParams, StakingParamsAmino, StakingParamsSDKType } from "./params";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial, Exact } from "../../../helpers";
+import { isSet, DeepPartial, Exact } from "../../../helpers";
+import { JsonSafe } from "../../../json-safe";
+import { GlobalDecoderRegistry } from "../../../registry";
 import { encodePubkey, decodePubkey } from "@cosmjs/proto-signing";
-import { Pubkey } from "@cosmjs/amino";
 /** SetPower sets the new power of the validator and accepts new validators into the set. */
 export interface MsgSetPower {
   sender: string;
@@ -263,6 +264,15 @@ function createBaseMsgSetPower(): MsgSetPower {
 export const MsgSetPower = {
   typeUrl: "/strangelove_ventures.poa.v1.MsgSetPower",
   aminoType: "poa/MsgSetPower",
+  is(o: any): o is MsgSetPower {
+    return o && (o.$typeUrl === MsgSetPower.typeUrl || typeof o.sender === "string" && typeof o.validatorAddress === "string" && typeof o.power === "bigint" && typeof o.unsafe === "boolean");
+  },
+  isSDK(o: any): o is MsgSetPowerSDKType {
+    return o && (o.$typeUrl === MsgSetPower.typeUrl || typeof o.sender === "string" && typeof o.validator_address === "string" && typeof o.power === "bigint" && typeof o.unsafe === "boolean");
+  },
+  isAmino(o: any): o is MsgSetPowerAmino {
+    return o && (o.$typeUrl === MsgSetPower.typeUrl || typeof o.sender === "string" && typeof o.validator_address === "string" && typeof o.power === "bigint" && typeof o.unsafe === "boolean");
+  },
   encode(message: MsgSetPower, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
@@ -303,6 +313,22 @@ export const MsgSetPower = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgSetPower {
+    return {
+      sender: isSet(object.sender) ? String(object.sender) : "",
+      validatorAddress: isSet(object.validatorAddress) ? String(object.validatorAddress) : "",
+      power: isSet(object.power) ? BigInt(object.power.toString()) : BigInt(0),
+      unsafe: isSet(object.unsafe) ? Boolean(object.unsafe) : false
+    };
+  },
+  toJSON(message: MsgSetPower): JsonSafe<MsgSetPower> {
+    const obj: any = {};
+    message.sender !== undefined && (obj.sender = message.sender);
+    message.validatorAddress !== undefined && (obj.validatorAddress = message.validatorAddress);
+    message.power !== undefined && (obj.power = (message.power || BigInt(0)).toString());
+    message.unsafe !== undefined && (obj.unsafe = message.unsafe);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgSetPower>, I>>(object: I): MsgSetPower {
     const message = createBaseMsgSetPower();
@@ -358,11 +384,22 @@ export const MsgSetPower = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgSetPower.typeUrl, MsgSetPower);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgSetPower.aminoType, MsgSetPower.typeUrl);
 function createBaseMsgSetPowerResponse(): MsgSetPowerResponse {
   return {};
 }
 export const MsgSetPowerResponse = {
   typeUrl: "/strangelove_ventures.poa.v1.MsgSetPowerResponse",
+  is(o: any): o is MsgSetPowerResponse {
+    return o && o.$typeUrl === MsgSetPowerResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgSetPowerResponseSDKType {
+    return o && o.$typeUrl === MsgSetPowerResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgSetPowerResponseAmino {
+    return o && o.$typeUrl === MsgSetPowerResponse.typeUrl;
+  },
   encode(_: MsgSetPowerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -379,6 +416,13 @@ export const MsgSetPowerResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgSetPowerResponse {
+    return {};
+  },
+  toJSON(_: MsgSetPowerResponse): JsonSafe<MsgSetPowerResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgSetPowerResponse>, I>>(_: I): MsgSetPowerResponse {
     const message = createBaseMsgSetPowerResponse();
@@ -408,6 +452,7 @@ export const MsgSetPowerResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgSetPowerResponse.typeUrl, MsgSetPowerResponse);
 function createBaseMsgRemoveValidator(): MsgRemoveValidator {
   return {
     sender: "",
@@ -417,6 +462,15 @@ function createBaseMsgRemoveValidator(): MsgRemoveValidator {
 export const MsgRemoveValidator = {
   typeUrl: "/strangelove_ventures.poa.v1.MsgRemoveValidator",
   aminoType: "poa/MsgRemoveValidator",
+  is(o: any): o is MsgRemoveValidator {
+    return o && (o.$typeUrl === MsgRemoveValidator.typeUrl || typeof o.sender === "string" && typeof o.validatorAddress === "string");
+  },
+  isSDK(o: any): o is MsgRemoveValidatorSDKType {
+    return o && (o.$typeUrl === MsgRemoveValidator.typeUrl || typeof o.sender === "string" && typeof o.validator_address === "string");
+  },
+  isAmino(o: any): o is MsgRemoveValidatorAmino {
+    return o && (o.$typeUrl === MsgRemoveValidator.typeUrl || typeof o.sender === "string" && typeof o.validator_address === "string");
+  },
   encode(message: MsgRemoveValidator, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
@@ -445,6 +499,18 @@ export const MsgRemoveValidator = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgRemoveValidator {
+    return {
+      sender: isSet(object.sender) ? String(object.sender) : "",
+      validatorAddress: isSet(object.validatorAddress) ? String(object.validatorAddress) : ""
+    };
+  },
+  toJSON(message: MsgRemoveValidator): JsonSafe<MsgRemoveValidator> {
+    const obj: any = {};
+    message.sender !== undefined && (obj.sender = message.sender);
+    message.validatorAddress !== undefined && (obj.validatorAddress = message.validatorAddress);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgRemoveValidator>, I>>(object: I): MsgRemoveValidator {
     const message = createBaseMsgRemoveValidator();
@@ -490,11 +556,22 @@ export const MsgRemoveValidator = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgRemoveValidator.typeUrl, MsgRemoveValidator);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgRemoveValidator.aminoType, MsgRemoveValidator.typeUrl);
 function createBaseMsgRemoveValidatorResponse(): MsgRemoveValidatorResponse {
   return {};
 }
 export const MsgRemoveValidatorResponse = {
   typeUrl: "/strangelove_ventures.poa.v1.MsgRemoveValidatorResponse",
+  is(o: any): o is MsgRemoveValidatorResponse {
+    return o && o.$typeUrl === MsgRemoveValidatorResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgRemoveValidatorResponseSDKType {
+    return o && o.$typeUrl === MsgRemoveValidatorResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgRemoveValidatorResponseAmino {
+    return o && o.$typeUrl === MsgRemoveValidatorResponse.typeUrl;
+  },
   encode(_: MsgRemoveValidatorResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -511,6 +588,13 @@ export const MsgRemoveValidatorResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgRemoveValidatorResponse {
+    return {};
+  },
+  toJSON(_: MsgRemoveValidatorResponse): JsonSafe<MsgRemoveValidatorResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgRemoveValidatorResponse>, I>>(_: I): MsgRemoveValidatorResponse {
     const message = createBaseMsgRemoveValidatorResponse();
@@ -540,6 +624,7 @@ export const MsgRemoveValidatorResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgRemoveValidatorResponse.typeUrl, MsgRemoveValidatorResponse);
 function createBaseMsgRemovePending(): MsgRemovePending {
   return {
     sender: "",
@@ -549,6 +634,15 @@ function createBaseMsgRemovePending(): MsgRemovePending {
 export const MsgRemovePending = {
   typeUrl: "/strangelove_ventures.poa.v1.MsgRemovePending",
   aminoType: "poa/MsgRemovePending",
+  is(o: any): o is MsgRemovePending {
+    return o && (o.$typeUrl === MsgRemovePending.typeUrl || typeof o.sender === "string" && typeof o.validatorAddress === "string");
+  },
+  isSDK(o: any): o is MsgRemovePendingSDKType {
+    return o && (o.$typeUrl === MsgRemovePending.typeUrl || typeof o.sender === "string" && typeof o.validator_address === "string");
+  },
+  isAmino(o: any): o is MsgRemovePendingAmino {
+    return o && (o.$typeUrl === MsgRemovePending.typeUrl || typeof o.sender === "string" && typeof o.validator_address === "string");
+  },
   encode(message: MsgRemovePending, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
@@ -577,6 +671,18 @@ export const MsgRemovePending = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgRemovePending {
+    return {
+      sender: isSet(object.sender) ? String(object.sender) : "",
+      validatorAddress: isSet(object.validatorAddress) ? String(object.validatorAddress) : ""
+    };
+  },
+  toJSON(message: MsgRemovePending): JsonSafe<MsgRemovePending> {
+    const obj: any = {};
+    message.sender !== undefined && (obj.sender = message.sender);
+    message.validatorAddress !== undefined && (obj.validatorAddress = message.validatorAddress);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgRemovePending>, I>>(object: I): MsgRemovePending {
     const message = createBaseMsgRemovePending();
@@ -622,11 +728,22 @@ export const MsgRemovePending = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgRemovePending.typeUrl, MsgRemovePending);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgRemovePending.aminoType, MsgRemovePending.typeUrl);
 function createBaseMsgRemovePendingResponse(): MsgRemovePendingResponse {
   return {};
 }
 export const MsgRemovePendingResponse = {
   typeUrl: "/strangelove_ventures.poa.v1.MsgRemovePendingResponse",
+  is(o: any): o is MsgRemovePendingResponse {
+    return o && o.$typeUrl === MsgRemovePendingResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgRemovePendingResponseSDKType {
+    return o && o.$typeUrl === MsgRemovePendingResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgRemovePendingResponseAmino {
+    return o && o.$typeUrl === MsgRemovePendingResponse.typeUrl;
+  },
   encode(_: MsgRemovePendingResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -643,6 +760,13 @@ export const MsgRemovePendingResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgRemovePendingResponse {
+    return {};
+  },
+  toJSON(_: MsgRemovePendingResponse): JsonSafe<MsgRemovePendingResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgRemovePendingResponse>, I>>(_: I): MsgRemovePendingResponse {
     const message = createBaseMsgRemovePendingResponse();
@@ -672,6 +796,7 @@ export const MsgRemovePendingResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgRemovePendingResponse.typeUrl, MsgRemovePendingResponse);
 function createBaseMsgUpdateStakingParams(): MsgUpdateStakingParams {
   return {
     sender: "",
@@ -681,6 +806,15 @@ function createBaseMsgUpdateStakingParams(): MsgUpdateStakingParams {
 export const MsgUpdateStakingParams = {
   typeUrl: "/strangelove_ventures.poa.v1.MsgUpdateStakingParams",
   aminoType: "poa/MsgUpdateStakingParams",
+  is(o: any): o is MsgUpdateStakingParams {
+    return o && (o.$typeUrl === MsgUpdateStakingParams.typeUrl || typeof o.sender === "string" && StakingParams.is(o.params));
+  },
+  isSDK(o: any): o is MsgUpdateStakingParamsSDKType {
+    return o && (o.$typeUrl === MsgUpdateStakingParams.typeUrl || typeof o.sender === "string" && StakingParams.isSDK(o.params));
+  },
+  isAmino(o: any): o is MsgUpdateStakingParamsAmino {
+    return o && (o.$typeUrl === MsgUpdateStakingParams.typeUrl || typeof o.sender === "string" && StakingParams.isAmino(o.params));
+  },
   encode(message: MsgUpdateStakingParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
@@ -709,6 +843,18 @@ export const MsgUpdateStakingParams = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgUpdateStakingParams {
+    return {
+      sender: isSet(object.sender) ? String(object.sender) : "",
+      params: isSet(object.params) ? StakingParams.fromJSON(object.params) : undefined
+    };
+  },
+  toJSON(message: MsgUpdateStakingParams): JsonSafe<MsgUpdateStakingParams> {
+    const obj: any = {};
+    message.sender !== undefined && (obj.sender = message.sender);
+    message.params !== undefined && (obj.params = message.params ? StakingParams.toJSON(message.params) : undefined);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgUpdateStakingParams>, I>>(object: I): MsgUpdateStakingParams {
     const message = createBaseMsgUpdateStakingParams();
@@ -754,11 +900,22 @@ export const MsgUpdateStakingParams = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgUpdateStakingParams.typeUrl, MsgUpdateStakingParams);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgUpdateStakingParams.aminoType, MsgUpdateStakingParams.typeUrl);
 function createBaseMsgUpdateStakingParamsResponse(): MsgUpdateStakingParamsResponse {
   return {};
 }
 export const MsgUpdateStakingParamsResponse = {
   typeUrl: "/strangelove_ventures.poa.v1.MsgUpdateStakingParamsResponse",
+  is(o: any): o is MsgUpdateStakingParamsResponse {
+    return o && o.$typeUrl === MsgUpdateStakingParamsResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgUpdateStakingParamsResponseSDKType {
+    return o && o.$typeUrl === MsgUpdateStakingParamsResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgUpdateStakingParamsResponseAmino {
+    return o && o.$typeUrl === MsgUpdateStakingParamsResponse.typeUrl;
+  },
   encode(_: MsgUpdateStakingParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -775,6 +932,13 @@ export const MsgUpdateStakingParamsResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgUpdateStakingParamsResponse {
+    return {};
+  },
+  toJSON(_: MsgUpdateStakingParamsResponse): JsonSafe<MsgUpdateStakingParamsResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgUpdateStakingParamsResponse>, I>>(_: I): MsgUpdateStakingParamsResponse {
     const message = createBaseMsgUpdateStakingParamsResponse();
@@ -804,6 +968,7 @@ export const MsgUpdateStakingParamsResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgUpdateStakingParamsResponse.typeUrl, MsgUpdateStakingParamsResponse);
 function createBaseMsgCreateValidator(): MsgCreateValidator {
   return {
     description: Description.fromPartial({}),
@@ -817,6 +982,15 @@ function createBaseMsgCreateValidator(): MsgCreateValidator {
 export const MsgCreateValidator = {
   typeUrl: "/strangelove_ventures.poa.v1.MsgCreateValidator",
   aminoType: "poa/MsgCreateValidator",
+  is(o: any): o is MsgCreateValidator {
+    return o && (o.$typeUrl === MsgCreateValidator.typeUrl || Description.is(o.description) && CommissionRates.is(o.commission) && typeof o.minSelfDelegation === "string" && typeof o.delegatorAddress === "string" && typeof o.validatorAddress === "string");
+  },
+  isSDK(o: any): o is MsgCreateValidatorSDKType {
+    return o && (o.$typeUrl === MsgCreateValidator.typeUrl || Description.isSDK(o.description) && CommissionRates.isSDK(o.commission) && typeof o.min_self_delegation === "string" && typeof o.delegator_address === "string" && typeof o.validator_address === "string");
+  },
+  isAmino(o: any): o is MsgCreateValidatorAmino {
+    return o && (o.$typeUrl === MsgCreateValidator.typeUrl || Description.isAmino(o.description) && CommissionRates.isAmino(o.commission) && typeof o.min_self_delegation === "string" && typeof o.delegator_address === "string" && typeof o.validator_address === "string");
+  },
   encode(message: MsgCreateValidator, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.description !== undefined) {
       Description.encode(message.description, writer.uint32(10).fork()).ldelim();
@@ -834,7 +1008,7 @@ export const MsgCreateValidator = {
       writer.uint32(42).string(message.validatorAddress);
     }
     if (message.pubkey !== undefined) {
-      Any.encode(message.pubkey as Any, writer.uint32(50).fork()).ldelim();
+      Any.encode(GlobalDecoderRegistry.wrapAny(message.pubkey), writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -861,7 +1035,7 @@ export const MsgCreateValidator = {
           message.validatorAddress = reader.string();
           break;
         case 6:
-          message.pubkey = Cosmos_cryptoPubKey_InterfaceDecoder(reader) as Any;
+          message.pubkey = GlobalDecoderRegistry.unwrapAny(reader);
           break;
         default:
           reader.skipType(tag & 7);
@@ -870,6 +1044,26 @@ export const MsgCreateValidator = {
     }
     return message;
   },
+  fromJSON(object: any): MsgCreateValidator {
+    return {
+      description: isSet(object.description) ? Description.fromJSON(object.description) : undefined,
+      commission: isSet(object.commission) ? CommissionRates.fromJSON(object.commission) : undefined,
+      minSelfDelegation: isSet(object.minSelfDelegation) ? String(object.minSelfDelegation) : "",
+      delegatorAddress: isSet(object.delegatorAddress) ? String(object.delegatorAddress) : "",
+      validatorAddress: isSet(object.validatorAddress) ? String(object.validatorAddress) : "",
+      pubkey: isSet(object.pubkey) ? GlobalDecoderRegistry.fromJSON(object.pubkey) : undefined
+    };
+  },
+  toJSON(message: MsgCreateValidator): JsonSafe<MsgCreateValidator> {
+    const obj: any = {};
+    message.description !== undefined && (obj.description = message.description ? Description.toJSON(message.description) : undefined);
+    message.commission !== undefined && (obj.commission = message.commission ? CommissionRates.toJSON(message.commission) : undefined);
+    message.minSelfDelegation !== undefined && (obj.minSelfDelegation = message.minSelfDelegation);
+    message.delegatorAddress !== undefined && (obj.delegatorAddress = message.delegatorAddress);
+    message.validatorAddress !== undefined && (obj.validatorAddress = message.validatorAddress);
+    message.pubkey !== undefined && (obj.pubkey = message.pubkey ? GlobalDecoderRegistry.toJSON(message.pubkey) : undefined);
+    return obj;
+  },
   fromPartial<I extends Exact<DeepPartial<MsgCreateValidator>, I>>(object: I): MsgCreateValidator {
     const message = createBaseMsgCreateValidator();
     message.description = object.description !== undefined && object.description !== null ? Description.fromPartial(object.description) : undefined;
@@ -877,7 +1071,7 @@ export const MsgCreateValidator = {
     message.minSelfDelegation = object.minSelfDelegation ?? "";
     message.delegatorAddress = object.delegatorAddress ?? "";
     message.validatorAddress = object.validatorAddress ?? "";
-    message.pubkey = object.pubkey !== undefined && object.pubkey !== null ? Any.fromPartial(object.pubkey) : undefined;
+    message.pubkey = object.pubkey !== undefined && object.pubkey !== null ? GlobalDecoderRegistry.fromPartial(object.pubkey) : undefined;
     return message;
   },
   fromAmino(object: MsgCreateValidatorAmino): MsgCreateValidator {
@@ -934,11 +1128,22 @@ export const MsgCreateValidator = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgCreateValidator.typeUrl, MsgCreateValidator);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgCreateValidator.aminoType, MsgCreateValidator.typeUrl);
 function createBaseMsgCreateValidatorResponse(): MsgCreateValidatorResponse {
   return {};
 }
 export const MsgCreateValidatorResponse = {
   typeUrl: "/strangelove_ventures.poa.v1.MsgCreateValidatorResponse",
+  is(o: any): o is MsgCreateValidatorResponse {
+    return o && o.$typeUrl === MsgCreateValidatorResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgCreateValidatorResponseSDKType {
+    return o && o.$typeUrl === MsgCreateValidatorResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgCreateValidatorResponseAmino {
+    return o && o.$typeUrl === MsgCreateValidatorResponse.typeUrl;
+  },
   encode(_: MsgCreateValidatorResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -955,6 +1160,13 @@ export const MsgCreateValidatorResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgCreateValidatorResponse {
+    return {};
+  },
+  toJSON(_: MsgCreateValidatorResponse): JsonSafe<MsgCreateValidatorResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgCreateValidatorResponse>, I>>(_: I): MsgCreateValidatorResponse {
     const message = createBaseMsgCreateValidatorResponse();
@@ -984,17 +1196,4 @@ export const MsgCreateValidatorResponse = {
     };
   }
 };
-export const Cosmos_cryptoPubKey_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
-  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-  const data = Any.decode(reader, reader.uint32());
-  switch (data.typeUrl) {
-    default:
-      return data;
-  }
-};
-export const Cosmos_cryptoPubKey_FromAmino = (content: AnyAmino): Any => {
-  return encodePubkey(content);
-};
-export const Cosmos_cryptoPubKey_ToAmino = (content: Any): Pubkey | null => {
-  return decodePubkey(content);
-};
+GlobalDecoderRegistry.register(MsgCreateValidatorResponse.typeUrl, MsgCreateValidatorResponse);

@@ -1,5 +1,7 @@
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial, Exact } from "../../../helpers";
+import { isSet, DeepPartial, Exact } from "../../../helpers";
+import { JsonSafe } from "../../../json-safe";
+import { GlobalDecoderRegistry } from "../../../registry";
 /** ModuleDescriptor describes an app module. */
 export interface ModuleDescriptor {
   /**
@@ -212,6 +214,15 @@ function createBaseModuleDescriptor(): ModuleDescriptor {
 export const ModuleDescriptor = {
   typeUrl: "/cosmos.app.v1alpha1.ModuleDescriptor",
   aminoType: "cosmos-sdk/ModuleDescriptor",
+  is(o: any): o is ModuleDescriptor {
+    return o && (o.$typeUrl === ModuleDescriptor.typeUrl || typeof o.goImport === "string" && Array.isArray(o.usePackage) && (!o.usePackage.length || PackageReference.is(o.usePackage[0])) && Array.isArray(o.canMigrateFrom) && (!o.canMigrateFrom.length || MigrateFromInfo.is(o.canMigrateFrom[0])));
+  },
+  isSDK(o: any): o is ModuleDescriptorSDKType {
+    return o && (o.$typeUrl === ModuleDescriptor.typeUrl || typeof o.go_import === "string" && Array.isArray(o.use_package) && (!o.use_package.length || PackageReference.isSDK(o.use_package[0])) && Array.isArray(o.can_migrate_from) && (!o.can_migrate_from.length || MigrateFromInfo.isSDK(o.can_migrate_from[0])));
+  },
+  isAmino(o: any): o is ModuleDescriptorAmino {
+    return o && (o.$typeUrl === ModuleDescriptor.typeUrl || typeof o.go_import === "string" && Array.isArray(o.use_package) && (!o.use_package.length || PackageReference.isAmino(o.use_package[0])) && Array.isArray(o.can_migrate_from) && (!o.can_migrate_from.length || MigrateFromInfo.isAmino(o.can_migrate_from[0])));
+  },
   encode(message: ModuleDescriptor, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.goImport !== "") {
       writer.uint32(10).string(message.goImport);
@@ -246,6 +257,28 @@ export const ModuleDescriptor = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): ModuleDescriptor {
+    return {
+      goImport: isSet(object.goImport) ? String(object.goImport) : "",
+      usePackage: Array.isArray(object?.usePackage) ? object.usePackage.map((e: any) => PackageReference.fromJSON(e)) : [],
+      canMigrateFrom: Array.isArray(object?.canMigrateFrom) ? object.canMigrateFrom.map((e: any) => MigrateFromInfo.fromJSON(e)) : []
+    };
+  },
+  toJSON(message: ModuleDescriptor): JsonSafe<ModuleDescriptor> {
+    const obj: any = {};
+    message.goImport !== undefined && (obj.goImport = message.goImport);
+    if (message.usePackage) {
+      obj.usePackage = message.usePackage.map(e => e ? PackageReference.toJSON(e) : undefined);
+    } else {
+      obj.usePackage = [];
+    }
+    if (message.canMigrateFrom) {
+      obj.canMigrateFrom = message.canMigrateFrom.map(e => e ? MigrateFromInfo.toJSON(e) : undefined);
+    } else {
+      obj.canMigrateFrom = [];
+    }
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<ModuleDescriptor>, I>>(object: I): ModuleDescriptor {
     const message = createBaseModuleDescriptor();
@@ -300,6 +333,8 @@ export const ModuleDescriptor = {
     };
   }
 };
+GlobalDecoderRegistry.register(ModuleDescriptor.typeUrl, ModuleDescriptor);
+GlobalDecoderRegistry.registerAminoProtoMapping(ModuleDescriptor.aminoType, ModuleDescriptor.typeUrl);
 function createBasePackageReference(): PackageReference {
   return {
     name: "",
@@ -309,6 +344,15 @@ function createBasePackageReference(): PackageReference {
 export const PackageReference = {
   typeUrl: "/cosmos.app.v1alpha1.PackageReference",
   aminoType: "cosmos-sdk/PackageReference",
+  is(o: any): o is PackageReference {
+    return o && (o.$typeUrl === PackageReference.typeUrl || typeof o.name === "string" && typeof o.revision === "number");
+  },
+  isSDK(o: any): o is PackageReferenceSDKType {
+    return o && (o.$typeUrl === PackageReference.typeUrl || typeof o.name === "string" && typeof o.revision === "number");
+  },
+  isAmino(o: any): o is PackageReferenceAmino {
+    return o && (o.$typeUrl === PackageReference.typeUrl || typeof o.name === "string" && typeof o.revision === "number");
+  },
   encode(message: PackageReference, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -337,6 +381,18 @@ export const PackageReference = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): PackageReference {
+    return {
+      name: isSet(object.name) ? String(object.name) : "",
+      revision: isSet(object.revision) ? Number(object.revision) : 0
+    };
+  },
+  toJSON(message: PackageReference): JsonSafe<PackageReference> {
+    const obj: any = {};
+    message.name !== undefined && (obj.name = message.name);
+    message.revision !== undefined && (obj.revision = Math.round(message.revision));
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<PackageReference>, I>>(object: I): PackageReference {
     const message = createBasePackageReference();
@@ -382,6 +438,8 @@ export const PackageReference = {
     };
   }
 };
+GlobalDecoderRegistry.register(PackageReference.typeUrl, PackageReference);
+GlobalDecoderRegistry.registerAminoProtoMapping(PackageReference.aminoType, PackageReference.typeUrl);
 function createBaseMigrateFromInfo(): MigrateFromInfo {
   return {
     module: ""
@@ -390,6 +448,15 @@ function createBaseMigrateFromInfo(): MigrateFromInfo {
 export const MigrateFromInfo = {
   typeUrl: "/cosmos.app.v1alpha1.MigrateFromInfo",
   aminoType: "cosmos-sdk/MigrateFromInfo",
+  is(o: any): o is MigrateFromInfo {
+    return o && (o.$typeUrl === MigrateFromInfo.typeUrl || typeof o.module === "string");
+  },
+  isSDK(o: any): o is MigrateFromInfoSDKType {
+    return o && (o.$typeUrl === MigrateFromInfo.typeUrl || typeof o.module === "string");
+  },
+  isAmino(o: any): o is MigrateFromInfoAmino {
+    return o && (o.$typeUrl === MigrateFromInfo.typeUrl || typeof o.module === "string");
+  },
   encode(message: MigrateFromInfo, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.module !== "") {
       writer.uint32(10).string(message.module);
@@ -412,6 +479,16 @@ export const MigrateFromInfo = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MigrateFromInfo {
+    return {
+      module: isSet(object.module) ? String(object.module) : ""
+    };
+  },
+  toJSON(message: MigrateFromInfo): JsonSafe<MigrateFromInfo> {
+    const obj: any = {};
+    message.module !== undefined && (obj.module = message.module);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MigrateFromInfo>, I>>(object: I): MigrateFromInfo {
     const message = createBaseMigrateFromInfo();
@@ -452,3 +529,5 @@ export const MigrateFromInfo = {
     };
   }
 };
+GlobalDecoderRegistry.register(MigrateFromInfo.typeUrl, MigrateFromInfo);
+GlobalDecoderRegistry.registerAminoProtoMapping(MigrateFromInfo.aminoType, MigrateFromInfo.typeUrl);

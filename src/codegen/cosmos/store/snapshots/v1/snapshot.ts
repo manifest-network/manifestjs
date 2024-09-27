@@ -1,5 +1,7 @@
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../../helpers";
+import { isSet, bytesFromBase64, base64FromBytes, DeepPartial, Exact } from "../../../../helpers";
+import { JsonSafe } from "../../../../json-safe";
+import { GlobalDecoderRegistry } from "../../../../registry";
 /** Snapshot contains Tendermint state sync snapshot info. */
 export interface Snapshot {
   height: bigint;
@@ -251,6 +253,15 @@ function createBaseSnapshot(): Snapshot {
 export const Snapshot = {
   typeUrl: "/cosmos.store.snapshots.v1.Snapshot",
   aminoType: "cosmos-sdk/Snapshot",
+  is(o: any): o is Snapshot {
+    return o && (o.$typeUrl === Snapshot.typeUrl || typeof o.height === "bigint" && typeof o.format === "number" && typeof o.chunks === "number" && (o.hash instanceof Uint8Array || typeof o.hash === "string") && Metadata.is(o.metadata));
+  },
+  isSDK(o: any): o is SnapshotSDKType {
+    return o && (o.$typeUrl === Snapshot.typeUrl || typeof o.height === "bigint" && typeof o.format === "number" && typeof o.chunks === "number" && (o.hash instanceof Uint8Array || typeof o.hash === "string") && Metadata.isSDK(o.metadata));
+  },
+  isAmino(o: any): o is SnapshotAmino {
+    return o && (o.$typeUrl === Snapshot.typeUrl || typeof o.height === "bigint" && typeof o.format === "number" && typeof o.chunks === "number" && (o.hash instanceof Uint8Array || typeof o.hash === "string") && Metadata.isAmino(o.metadata));
+  },
   encode(message: Snapshot, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.height !== BigInt(0)) {
       writer.uint32(8).uint64(message.height);
@@ -297,6 +308,24 @@ export const Snapshot = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): Snapshot {
+    return {
+      height: isSet(object.height) ? BigInt(object.height.toString()) : BigInt(0),
+      format: isSet(object.format) ? Number(object.format) : 0,
+      chunks: isSet(object.chunks) ? Number(object.chunks) : 0,
+      hash: isSet(object.hash) ? bytesFromBase64(object.hash) : new Uint8Array(),
+      metadata: isSet(object.metadata) ? Metadata.fromJSON(object.metadata) : undefined
+    };
+  },
+  toJSON(message: Snapshot): JsonSafe<Snapshot> {
+    const obj: any = {};
+    message.height !== undefined && (obj.height = (message.height || BigInt(0)).toString());
+    message.format !== undefined && (obj.format = Math.round(message.format));
+    message.chunks !== undefined && (obj.chunks = Math.round(message.chunks));
+    message.hash !== undefined && (obj.hash = base64FromBytes(message.hash !== undefined ? message.hash : new Uint8Array()));
+    message.metadata !== undefined && (obj.metadata = message.metadata ? Metadata.toJSON(message.metadata) : undefined);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<Snapshot>, I>>(object: I): Snapshot {
     const message = createBaseSnapshot();
@@ -357,6 +386,8 @@ export const Snapshot = {
     };
   }
 };
+GlobalDecoderRegistry.register(Snapshot.typeUrl, Snapshot);
+GlobalDecoderRegistry.registerAminoProtoMapping(Snapshot.aminoType, Snapshot.typeUrl);
 function createBaseMetadata(): Metadata {
   return {
     chunkHashes: []
@@ -365,6 +396,15 @@ function createBaseMetadata(): Metadata {
 export const Metadata = {
   typeUrl: "/cosmos.store.snapshots.v1.Metadata",
   aminoType: "cosmos-sdk/Metadata",
+  is(o: any): o is Metadata {
+    return o && (o.$typeUrl === Metadata.typeUrl || Array.isArray(o.chunkHashes) && (!o.chunkHashes.length || o.chunkHashes[0] instanceof Uint8Array || typeof o.chunkHashes[0] === "string"));
+  },
+  isSDK(o: any): o is MetadataSDKType {
+    return o && (o.$typeUrl === Metadata.typeUrl || Array.isArray(o.chunk_hashes) && (!o.chunk_hashes.length || o.chunk_hashes[0] instanceof Uint8Array || typeof o.chunk_hashes[0] === "string"));
+  },
+  isAmino(o: any): o is MetadataAmino {
+    return o && (o.$typeUrl === Metadata.typeUrl || Array.isArray(o.chunk_hashes) && (!o.chunk_hashes.length || o.chunk_hashes[0] instanceof Uint8Array || typeof o.chunk_hashes[0] === "string"));
+  },
   encode(message: Metadata, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.chunkHashes) {
       writer.uint32(10).bytes(v!);
@@ -387,6 +427,20 @@ export const Metadata = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): Metadata {
+    return {
+      chunkHashes: Array.isArray(object?.chunkHashes) ? object.chunkHashes.map((e: any) => bytesFromBase64(e)) : []
+    };
+  },
+  toJSON(message: Metadata): JsonSafe<Metadata> {
+    const obj: any = {};
+    if (message.chunkHashes) {
+      obj.chunkHashes = message.chunkHashes.map(e => base64FromBytes(e !== undefined ? e : new Uint8Array()));
+    } else {
+      obj.chunkHashes = [];
+    }
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<Metadata>, I>>(object: I): Metadata {
     const message = createBaseMetadata();
@@ -429,6 +483,8 @@ export const Metadata = {
     };
   }
 };
+GlobalDecoderRegistry.register(Metadata.typeUrl, Metadata);
+GlobalDecoderRegistry.registerAminoProtoMapping(Metadata.aminoType, Metadata.typeUrl);
 function createBaseSnapshotItem(): SnapshotItem {
   return {
     store: undefined,
@@ -440,6 +496,15 @@ function createBaseSnapshotItem(): SnapshotItem {
 export const SnapshotItem = {
   typeUrl: "/cosmos.store.snapshots.v1.SnapshotItem",
   aminoType: "cosmos-sdk/SnapshotItem",
+  is(o: any): o is SnapshotItem {
+    return o && o.$typeUrl === SnapshotItem.typeUrl;
+  },
+  isSDK(o: any): o is SnapshotItemSDKType {
+    return o && o.$typeUrl === SnapshotItem.typeUrl;
+  },
+  isAmino(o: any): o is SnapshotItemAmino {
+    return o && o.$typeUrl === SnapshotItem.typeUrl;
+  },
   encode(message: SnapshotItem, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.store !== undefined) {
       SnapshotStoreItem.encode(message.store, writer.uint32(10).fork()).ldelim();
@@ -480,6 +545,22 @@ export const SnapshotItem = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): SnapshotItem {
+    return {
+      store: isSet(object.store) ? SnapshotStoreItem.fromJSON(object.store) : undefined,
+      iavl: isSet(object.iavl) ? SnapshotIAVLItem.fromJSON(object.iavl) : undefined,
+      extension: isSet(object.extension) ? SnapshotExtensionMeta.fromJSON(object.extension) : undefined,
+      extensionPayload: isSet(object.extensionPayload) ? SnapshotExtensionPayload.fromJSON(object.extensionPayload) : undefined
+    };
+  },
+  toJSON(message: SnapshotItem): JsonSafe<SnapshotItem> {
+    const obj: any = {};
+    message.store !== undefined && (obj.store = message.store ? SnapshotStoreItem.toJSON(message.store) : undefined);
+    message.iavl !== undefined && (obj.iavl = message.iavl ? SnapshotIAVLItem.toJSON(message.iavl) : undefined);
+    message.extension !== undefined && (obj.extension = message.extension ? SnapshotExtensionMeta.toJSON(message.extension) : undefined);
+    message.extensionPayload !== undefined && (obj.extensionPayload = message.extensionPayload ? SnapshotExtensionPayload.toJSON(message.extensionPayload) : undefined);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<SnapshotItem>, I>>(object: I): SnapshotItem {
     const message = createBaseSnapshotItem();
@@ -535,6 +616,8 @@ export const SnapshotItem = {
     };
   }
 };
+GlobalDecoderRegistry.register(SnapshotItem.typeUrl, SnapshotItem);
+GlobalDecoderRegistry.registerAminoProtoMapping(SnapshotItem.aminoType, SnapshotItem.typeUrl);
 function createBaseSnapshotStoreItem(): SnapshotStoreItem {
   return {
     name: ""
@@ -543,6 +626,15 @@ function createBaseSnapshotStoreItem(): SnapshotStoreItem {
 export const SnapshotStoreItem = {
   typeUrl: "/cosmos.store.snapshots.v1.SnapshotStoreItem",
   aminoType: "cosmos-sdk/SnapshotStoreItem",
+  is(o: any): o is SnapshotStoreItem {
+    return o && (o.$typeUrl === SnapshotStoreItem.typeUrl || typeof o.name === "string");
+  },
+  isSDK(o: any): o is SnapshotStoreItemSDKType {
+    return o && (o.$typeUrl === SnapshotStoreItem.typeUrl || typeof o.name === "string");
+  },
+  isAmino(o: any): o is SnapshotStoreItemAmino {
+    return o && (o.$typeUrl === SnapshotStoreItem.typeUrl || typeof o.name === "string");
+  },
   encode(message: SnapshotStoreItem, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -565,6 +657,16 @@ export const SnapshotStoreItem = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): SnapshotStoreItem {
+    return {
+      name: isSet(object.name) ? String(object.name) : ""
+    };
+  },
+  toJSON(message: SnapshotStoreItem): JsonSafe<SnapshotStoreItem> {
+    const obj: any = {};
+    message.name !== undefined && (obj.name = message.name);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<SnapshotStoreItem>, I>>(object: I): SnapshotStoreItem {
     const message = createBaseSnapshotStoreItem();
@@ -605,6 +707,8 @@ export const SnapshotStoreItem = {
     };
   }
 };
+GlobalDecoderRegistry.register(SnapshotStoreItem.typeUrl, SnapshotStoreItem);
+GlobalDecoderRegistry.registerAminoProtoMapping(SnapshotStoreItem.aminoType, SnapshotStoreItem.typeUrl);
 function createBaseSnapshotIAVLItem(): SnapshotIAVLItem {
   return {
     key: new Uint8Array(),
@@ -616,6 +720,15 @@ function createBaseSnapshotIAVLItem(): SnapshotIAVLItem {
 export const SnapshotIAVLItem = {
   typeUrl: "/cosmos.store.snapshots.v1.SnapshotIAVLItem",
   aminoType: "cosmos-sdk/SnapshotIAVLItem",
+  is(o: any): o is SnapshotIAVLItem {
+    return o && (o.$typeUrl === SnapshotIAVLItem.typeUrl || (o.key instanceof Uint8Array || typeof o.key === "string") && (o.value instanceof Uint8Array || typeof o.value === "string") && typeof o.version === "bigint" && typeof o.height === "number");
+  },
+  isSDK(o: any): o is SnapshotIAVLItemSDKType {
+    return o && (o.$typeUrl === SnapshotIAVLItem.typeUrl || (o.key instanceof Uint8Array || typeof o.key === "string") && (o.value instanceof Uint8Array || typeof o.value === "string") && typeof o.version === "bigint" && typeof o.height === "number");
+  },
+  isAmino(o: any): o is SnapshotIAVLItemAmino {
+    return o && (o.$typeUrl === SnapshotIAVLItem.typeUrl || (o.key instanceof Uint8Array || typeof o.key === "string") && (o.value instanceof Uint8Array || typeof o.value === "string") && typeof o.version === "bigint" && typeof o.height === "number");
+  },
   encode(message: SnapshotIAVLItem, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
@@ -656,6 +769,22 @@ export const SnapshotIAVLItem = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): SnapshotIAVLItem {
+    return {
+      key: isSet(object.key) ? bytesFromBase64(object.key) : new Uint8Array(),
+      value: isSet(object.value) ? bytesFromBase64(object.value) : new Uint8Array(),
+      version: isSet(object.version) ? BigInt(object.version.toString()) : BigInt(0),
+      height: isSet(object.height) ? Number(object.height) : 0
+    };
+  },
+  toJSON(message: SnapshotIAVLItem): JsonSafe<SnapshotIAVLItem> {
+    const obj: any = {};
+    message.key !== undefined && (obj.key = base64FromBytes(message.key !== undefined ? message.key : new Uint8Array()));
+    message.value !== undefined && (obj.value = base64FromBytes(message.value !== undefined ? message.value : new Uint8Array()));
+    message.version !== undefined && (obj.version = (message.version || BigInt(0)).toString());
+    message.height !== undefined && (obj.height = Math.round(message.height));
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<SnapshotIAVLItem>, I>>(object: I): SnapshotIAVLItem {
     const message = createBaseSnapshotIAVLItem();
@@ -711,6 +840,8 @@ export const SnapshotIAVLItem = {
     };
   }
 };
+GlobalDecoderRegistry.register(SnapshotIAVLItem.typeUrl, SnapshotIAVLItem);
+GlobalDecoderRegistry.registerAminoProtoMapping(SnapshotIAVLItem.aminoType, SnapshotIAVLItem.typeUrl);
 function createBaseSnapshotExtensionMeta(): SnapshotExtensionMeta {
   return {
     name: "",
@@ -720,6 +851,15 @@ function createBaseSnapshotExtensionMeta(): SnapshotExtensionMeta {
 export const SnapshotExtensionMeta = {
   typeUrl: "/cosmos.store.snapshots.v1.SnapshotExtensionMeta",
   aminoType: "cosmos-sdk/SnapshotExtensionMeta",
+  is(o: any): o is SnapshotExtensionMeta {
+    return o && (o.$typeUrl === SnapshotExtensionMeta.typeUrl || typeof o.name === "string" && typeof o.format === "number");
+  },
+  isSDK(o: any): o is SnapshotExtensionMetaSDKType {
+    return o && (o.$typeUrl === SnapshotExtensionMeta.typeUrl || typeof o.name === "string" && typeof o.format === "number");
+  },
+  isAmino(o: any): o is SnapshotExtensionMetaAmino {
+    return o && (o.$typeUrl === SnapshotExtensionMeta.typeUrl || typeof o.name === "string" && typeof o.format === "number");
+  },
   encode(message: SnapshotExtensionMeta, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
@@ -748,6 +888,18 @@ export const SnapshotExtensionMeta = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): SnapshotExtensionMeta {
+    return {
+      name: isSet(object.name) ? String(object.name) : "",
+      format: isSet(object.format) ? Number(object.format) : 0
+    };
+  },
+  toJSON(message: SnapshotExtensionMeta): JsonSafe<SnapshotExtensionMeta> {
+    const obj: any = {};
+    message.name !== undefined && (obj.name = message.name);
+    message.format !== undefined && (obj.format = Math.round(message.format));
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<SnapshotExtensionMeta>, I>>(object: I): SnapshotExtensionMeta {
     const message = createBaseSnapshotExtensionMeta();
@@ -793,6 +945,8 @@ export const SnapshotExtensionMeta = {
     };
   }
 };
+GlobalDecoderRegistry.register(SnapshotExtensionMeta.typeUrl, SnapshotExtensionMeta);
+GlobalDecoderRegistry.registerAminoProtoMapping(SnapshotExtensionMeta.aminoType, SnapshotExtensionMeta.typeUrl);
 function createBaseSnapshotExtensionPayload(): SnapshotExtensionPayload {
   return {
     payload: new Uint8Array()
@@ -801,6 +955,15 @@ function createBaseSnapshotExtensionPayload(): SnapshotExtensionPayload {
 export const SnapshotExtensionPayload = {
   typeUrl: "/cosmos.store.snapshots.v1.SnapshotExtensionPayload",
   aminoType: "cosmos-sdk/SnapshotExtensionPayload",
+  is(o: any): o is SnapshotExtensionPayload {
+    return o && (o.$typeUrl === SnapshotExtensionPayload.typeUrl || o.payload instanceof Uint8Array || typeof o.payload === "string");
+  },
+  isSDK(o: any): o is SnapshotExtensionPayloadSDKType {
+    return o && (o.$typeUrl === SnapshotExtensionPayload.typeUrl || o.payload instanceof Uint8Array || typeof o.payload === "string");
+  },
+  isAmino(o: any): o is SnapshotExtensionPayloadAmino {
+    return o && (o.$typeUrl === SnapshotExtensionPayload.typeUrl || o.payload instanceof Uint8Array || typeof o.payload === "string");
+  },
   encode(message: SnapshotExtensionPayload, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.payload.length !== 0) {
       writer.uint32(10).bytes(message.payload);
@@ -823,6 +986,16 @@ export const SnapshotExtensionPayload = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): SnapshotExtensionPayload {
+    return {
+      payload: isSet(object.payload) ? bytesFromBase64(object.payload) : new Uint8Array()
+    };
+  },
+  toJSON(message: SnapshotExtensionPayload): JsonSafe<SnapshotExtensionPayload> {
+    const obj: any = {};
+    message.payload !== undefined && (obj.payload = base64FromBytes(message.payload !== undefined ? message.payload : new Uint8Array()));
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<SnapshotExtensionPayload>, I>>(object: I): SnapshotExtensionPayload {
     const message = createBaseSnapshotExtensionPayload();
@@ -863,3 +1036,5 @@ export const SnapshotExtensionPayload = {
     };
   }
 };
+GlobalDecoderRegistry.register(SnapshotExtensionPayload.typeUrl, SnapshotExtensionPayload);
+GlobalDecoderRegistry.registerAminoProtoMapping(SnapshotExtensionPayload.aminoType, SnapshotExtensionPayload.typeUrl);

@@ -1,94 +1,110 @@
-import { Rpc } from "../../../helpers";
-import { BinaryReader } from "../../../binary";
-import { MsgCreateValidator, MsgCreateValidatorResponse, MsgEditValidator, MsgEditValidatorResponse, MsgDelegate, MsgDelegateResponse, MsgBeginRedelegate, MsgBeginRedelegateResponse, MsgUndelegate, MsgUndelegateResponse, MsgCancelUnbondingDelegation, MsgCancelUnbondingDelegationResponse, MsgUpdateParams, MsgUpdateParamsResponse } from "./tx";
+import { DeliverTxResponse, StdFee, TxRpc } from "../../../types";
+import { MsgCreateValidator, MsgEditValidator, MsgDelegate, MsgBeginRedelegate, MsgUndelegate, MsgCancelUnbondingDelegation, MsgUpdateParams } from "./tx";
 /** Msg defines the staking Msg service. */
 export interface Msg {
   /** CreateValidator defines a method for creating a new validator. */
-  createValidator(request: MsgCreateValidator): Promise<MsgCreateValidatorResponse>;
+  createValidator(signerAddress: string, message: MsgCreateValidator, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /** EditValidator defines a method for editing an existing validator. */
-  editValidator(request: MsgEditValidator): Promise<MsgEditValidatorResponse>;
+  editValidator(signerAddress: string, message: MsgEditValidator, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /**
    * Delegate defines a method for performing a delegation of coins
    * from a delegator to a validator.
    */
-  delegate(request: MsgDelegate): Promise<MsgDelegateResponse>;
+  delegate(signerAddress: string, message: MsgDelegate, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /**
    * BeginRedelegate defines a method for performing a redelegation
    * of coins from a delegator and source validator to a destination validator.
    */
-  beginRedelegate(request: MsgBeginRedelegate): Promise<MsgBeginRedelegateResponse>;
+  beginRedelegate(signerAddress: string, message: MsgBeginRedelegate, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /**
    * Undelegate defines a method for performing an undelegation from a
    * delegate and a validator.
    */
-  undelegate(request: MsgUndelegate): Promise<MsgUndelegateResponse>;
+  undelegate(signerAddress: string, message: MsgUndelegate, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /**
    * CancelUnbondingDelegation defines a method for performing canceling the unbonding delegation
    * and delegate back to previous validator.
    * 
    * Since: cosmos-sdk 0.46
    */
-  cancelUnbondingDelegation(request: MsgCancelUnbondingDelegation): Promise<MsgCancelUnbondingDelegationResponse>;
+  cancelUnbondingDelegation(signerAddress: string, message: MsgCancelUnbondingDelegation, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /**
    * UpdateParams defines an operation for updating the x/staking module
    * parameters.
    * Since: cosmos-sdk 0.47
    */
-  updateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
+  updateParams(signerAddress: string, message: MsgUpdateParams, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
 }
 export class MsgClientImpl implements Msg {
-  private readonly rpc: Rpc;
-  constructor(rpc: Rpc) {
+  private readonly rpc: TxRpc;
+  constructor(rpc: TxRpc) {
     this.rpc = rpc;
   }
   /* CreateValidator defines a method for creating a new validator. */
-  createValidator = async (request: MsgCreateValidator): Promise<MsgCreateValidatorResponse> => {
-    const data = MsgCreateValidator.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "CreateValidator", data);
-    return promise.then(data => MsgCreateValidatorResponse.decode(new BinaryReader(data)));
+  createValidator = async (signerAddress: string, message: MsgCreateValidator, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgCreateValidator.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* EditValidator defines a method for editing an existing validator. */
-  editValidator = async (request: MsgEditValidator): Promise<MsgEditValidatorResponse> => {
-    const data = MsgEditValidator.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "EditValidator", data);
-    return promise.then(data => MsgEditValidatorResponse.decode(new BinaryReader(data)));
+  editValidator = async (signerAddress: string, message: MsgEditValidator, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgEditValidator.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* Delegate defines a method for performing a delegation of coins
    from a delegator to a validator. */
-  delegate = async (request: MsgDelegate): Promise<MsgDelegateResponse> => {
-    const data = MsgDelegate.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "Delegate", data);
-    return promise.then(data => MsgDelegateResponse.decode(new BinaryReader(data)));
+  delegate = async (signerAddress: string, message: MsgDelegate, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgDelegate.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* BeginRedelegate defines a method for performing a redelegation
    of coins from a delegator and source validator to a destination validator. */
-  beginRedelegate = async (request: MsgBeginRedelegate): Promise<MsgBeginRedelegateResponse> => {
-    const data = MsgBeginRedelegate.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "BeginRedelegate", data);
-    return promise.then(data => MsgBeginRedelegateResponse.decode(new BinaryReader(data)));
+  beginRedelegate = async (signerAddress: string, message: MsgBeginRedelegate, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgBeginRedelegate.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* Undelegate defines a method for performing an undelegation from a
    delegate and a validator. */
-  undelegate = async (request: MsgUndelegate): Promise<MsgUndelegateResponse> => {
-    const data = MsgUndelegate.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "Undelegate", data);
-    return promise.then(data => MsgUndelegateResponse.decode(new BinaryReader(data)));
+  undelegate = async (signerAddress: string, message: MsgUndelegate, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgUndelegate.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* CancelUnbondingDelegation defines a method for performing canceling the unbonding delegation
    and delegate back to previous validator.
   
    Since: cosmos-sdk 0.46 */
-  cancelUnbondingDelegation = async (request: MsgCancelUnbondingDelegation): Promise<MsgCancelUnbondingDelegationResponse> => {
-    const data = MsgCancelUnbondingDelegation.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "CancelUnbondingDelegation", data);
-    return promise.then(data => MsgCancelUnbondingDelegationResponse.decode(new BinaryReader(data)));
+  cancelUnbondingDelegation = async (signerAddress: string, message: MsgCancelUnbondingDelegation, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgCancelUnbondingDelegation.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* UpdateParams defines an operation for updating the x/staking module
    parameters.
    Since: cosmos-sdk 0.47 */
-  updateParams = async (request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> => {
-    const data = MsgUpdateParams.encode(request).finish();
-    const promise = this.rpc.request("cosmos.staking.v1beta1.Msg", "UpdateParams", data);
-    return promise.then(data => MsgUpdateParamsResponse.decode(new BinaryReader(data)));
+  updateParams = async (signerAddress: string, message: MsgUpdateParams, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgUpdateParams.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
 }
+export const createClientImpl = (rpc: TxRpc) => {
+  return new MsgClientImpl(rpc);
+};

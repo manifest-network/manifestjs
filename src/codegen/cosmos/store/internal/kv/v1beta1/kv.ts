@@ -1,5 +1,7 @@
 import { BinaryReader, BinaryWriter } from "../../../../../binary";
-import { DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../../../helpers";
+import { JsonSafe } from "../../../../../json-safe";
+import { DeepPartial, Exact, isSet, bytesFromBase64, base64FromBytes } from "../../../../../helpers";
+import { GlobalDecoderRegistry } from "../../../../../registry";
 /** Pairs defines a repeated slice of Pair objects. */
 export interface Pairs {
   pairs: Pair[];
@@ -51,6 +53,15 @@ function createBasePairs(): Pairs {
 export const Pairs = {
   typeUrl: "/cosmos.store.internal.kv.v1beta1.Pairs",
   aminoType: "cosmos-sdk/Pairs",
+  is(o: any): o is Pairs {
+    return o && (o.$typeUrl === Pairs.typeUrl || Array.isArray(o.pairs) && (!o.pairs.length || Pair.is(o.pairs[0])));
+  },
+  isSDK(o: any): o is PairsSDKType {
+    return o && (o.$typeUrl === Pairs.typeUrl || Array.isArray(o.pairs) && (!o.pairs.length || Pair.isSDK(o.pairs[0])));
+  },
+  isAmino(o: any): o is PairsAmino {
+    return o && (o.$typeUrl === Pairs.typeUrl || Array.isArray(o.pairs) && (!o.pairs.length || Pair.isAmino(o.pairs[0])));
+  },
   encode(message: Pairs, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.pairs) {
       Pair.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -73,6 +84,20 @@ export const Pairs = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): Pairs {
+    return {
+      pairs: Array.isArray(object?.pairs) ? object.pairs.map((e: any) => Pair.fromJSON(e)) : []
+    };
+  },
+  toJSON(message: Pairs): JsonSafe<Pairs> {
+    const obj: any = {};
+    if (message.pairs) {
+      obj.pairs = message.pairs.map(e => e ? Pair.toJSON(e) : undefined);
+    } else {
+      obj.pairs = [];
+    }
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<Pairs>, I>>(object: I): Pairs {
     const message = createBasePairs();
@@ -115,6 +140,8 @@ export const Pairs = {
     };
   }
 };
+GlobalDecoderRegistry.register(Pairs.typeUrl, Pairs);
+GlobalDecoderRegistry.registerAminoProtoMapping(Pairs.aminoType, Pairs.typeUrl);
 function createBasePair(): Pair {
   return {
     key: new Uint8Array(),
@@ -124,6 +151,15 @@ function createBasePair(): Pair {
 export const Pair = {
   typeUrl: "/cosmos.store.internal.kv.v1beta1.Pair",
   aminoType: "cosmos-sdk/Pair",
+  is(o: any): o is Pair {
+    return o && (o.$typeUrl === Pair.typeUrl || (o.key instanceof Uint8Array || typeof o.key === "string") && (o.value instanceof Uint8Array || typeof o.value === "string"));
+  },
+  isSDK(o: any): o is PairSDKType {
+    return o && (o.$typeUrl === Pair.typeUrl || (o.key instanceof Uint8Array || typeof o.key === "string") && (o.value instanceof Uint8Array || typeof o.value === "string"));
+  },
+  isAmino(o: any): o is PairAmino {
+    return o && (o.$typeUrl === Pair.typeUrl || (o.key instanceof Uint8Array || typeof o.key === "string") && (o.value instanceof Uint8Array || typeof o.value === "string"));
+  },
   encode(message: Pair, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.key.length !== 0) {
       writer.uint32(10).bytes(message.key);
@@ -152,6 +188,18 @@ export const Pair = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): Pair {
+    return {
+      key: isSet(object.key) ? bytesFromBase64(object.key) : new Uint8Array(),
+      value: isSet(object.value) ? bytesFromBase64(object.value) : new Uint8Array()
+    };
+  },
+  toJSON(message: Pair): JsonSafe<Pair> {
+    const obj: any = {};
+    message.key !== undefined && (obj.key = base64FromBytes(message.key !== undefined ? message.key : new Uint8Array()));
+    message.value !== undefined && (obj.value = base64FromBytes(message.value !== undefined ? message.value : new Uint8Array()));
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<Pair>, I>>(object: I): Pair {
     const message = createBasePair();
@@ -197,3 +245,5 @@ export const Pair = {
     };
   }
 };
+GlobalDecoderRegistry.register(Pair.typeUrl, Pair);
+GlobalDecoderRegistry.registerAminoProtoMapping(Pair.aminoType, Pair.typeUrl);

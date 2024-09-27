@@ -1,44 +1,52 @@
-import { Rpc } from "../../../helpers";
-import { BinaryReader } from "../../../binary";
-import { MsgAuthorizeCircuitBreaker, MsgAuthorizeCircuitBreakerResponse, MsgTripCircuitBreaker, MsgTripCircuitBreakerResponse, MsgResetCircuitBreaker, MsgResetCircuitBreakerResponse } from "./tx";
+import { DeliverTxResponse, StdFee, TxRpc } from "../../../types";
+import { MsgAuthorizeCircuitBreaker, MsgTripCircuitBreaker, MsgResetCircuitBreaker } from "./tx";
 /** Msg defines the circuit Msg service. */
 export interface Msg {
   /**
    * AuthorizeCircuitBreaker allows a super-admin to grant (or revoke) another
    * account's circuit breaker permissions.
    */
-  authorizeCircuitBreaker(request: MsgAuthorizeCircuitBreaker): Promise<MsgAuthorizeCircuitBreakerResponse>;
+  authorizeCircuitBreaker(signerAddress: string, message: MsgAuthorizeCircuitBreaker, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /** TripCircuitBreaker pauses processing of Msg's in the state machine. */
-  tripCircuitBreaker(request: MsgTripCircuitBreaker): Promise<MsgTripCircuitBreakerResponse>;
+  tripCircuitBreaker(signerAddress: string, message: MsgTripCircuitBreaker, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /**
    * ResetCircuitBreaker resumes processing of Msg's in the state machine that
    * have been been paused using TripCircuitBreaker.
    */
-  resetCircuitBreaker(request: MsgResetCircuitBreaker): Promise<MsgResetCircuitBreakerResponse>;
+  resetCircuitBreaker(signerAddress: string, message: MsgResetCircuitBreaker, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
 }
 export class MsgClientImpl implements Msg {
-  private readonly rpc: Rpc;
-  constructor(rpc: Rpc) {
+  private readonly rpc: TxRpc;
+  constructor(rpc: TxRpc) {
     this.rpc = rpc;
   }
   /* AuthorizeCircuitBreaker allows a super-admin to grant (or revoke) another
    account's circuit breaker permissions. */
-  authorizeCircuitBreaker = async (request: MsgAuthorizeCircuitBreaker): Promise<MsgAuthorizeCircuitBreakerResponse> => {
-    const data = MsgAuthorizeCircuitBreaker.encode(request).finish();
-    const promise = this.rpc.request("cosmos.circuit.v1.Msg", "AuthorizeCircuitBreaker", data);
-    return promise.then(data => MsgAuthorizeCircuitBreakerResponse.decode(new BinaryReader(data)));
+  authorizeCircuitBreaker = async (signerAddress: string, message: MsgAuthorizeCircuitBreaker, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgAuthorizeCircuitBreaker.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* TripCircuitBreaker pauses processing of Msg's in the state machine. */
-  tripCircuitBreaker = async (request: MsgTripCircuitBreaker): Promise<MsgTripCircuitBreakerResponse> => {
-    const data = MsgTripCircuitBreaker.encode(request).finish();
-    const promise = this.rpc.request("cosmos.circuit.v1.Msg", "TripCircuitBreaker", data);
-    return promise.then(data => MsgTripCircuitBreakerResponse.decode(new BinaryReader(data)));
+  tripCircuitBreaker = async (signerAddress: string, message: MsgTripCircuitBreaker, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgTripCircuitBreaker.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* ResetCircuitBreaker resumes processing of Msg's in the state machine that
    have been been paused using TripCircuitBreaker. */
-  resetCircuitBreaker = async (request: MsgResetCircuitBreaker): Promise<MsgResetCircuitBreakerResponse> => {
-    const data = MsgResetCircuitBreaker.encode(request).finish();
-    const promise = this.rpc.request("cosmos.circuit.v1.Msg", "ResetCircuitBreaker", data);
-    return promise.then(data => MsgResetCircuitBreakerResponse.decode(new BinaryReader(data)));
+  resetCircuitBreaker = async (signerAddress: string, message: MsgResetCircuitBreaker, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgResetCircuitBreaker.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
 }
+export const createClientImpl = (rpc: TxRpc) => {
+  return new MsgClientImpl(rpc);
+};

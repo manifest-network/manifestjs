@@ -1,83 +1,8 @@
-import { Params, ParamsAmino, ParamsSDKType } from "./genesis";
 import { Coin, CoinAmino, CoinSDKType } from "../../../cosmos/base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial, Exact } from "../../../helpers";
-/**
- * MsgUpdateParams is the Msg/UpdateParams request type.
- * 
- * Since: cosmos-sdk 0.47
- */
-export interface MsgUpdateParams {
-  /** authority is the address of the controlling account. */
-  authority: string;
-  /**
-   * params defines the parameters to update.
-   * 
-   * NOTE: All parameters must be supplied.
-   */
-  params: Params;
-}
-export interface MsgUpdateParamsProtoMsg {
-  typeUrl: "/liftedinit.manifest.v1.MsgUpdateParams";
-  value: Uint8Array;
-}
-/**
- * MsgUpdateParams is the Msg/UpdateParams request type.
- * 
- * Since: cosmos-sdk 0.47
- */
-export interface MsgUpdateParamsAmino {
-  /** authority is the address of the controlling account. */
-  authority?: string;
-  /**
-   * params defines the parameters to update.
-   * 
-   * NOTE: All parameters must be supplied.
-   */
-  params?: ParamsAmino;
-}
-export interface MsgUpdateParamsAminoMsg {
-  type: "/liftedinit.manifest.v1.MsgUpdateParams";
-  value: MsgUpdateParamsAmino;
-}
-/**
- * MsgUpdateParams is the Msg/UpdateParams request type.
- * 
- * Since: cosmos-sdk 0.47
- */
-export interface MsgUpdateParamsSDKType {
-  authority: string;
-  params: ParamsSDKType;
-}
-/**
- * MsgUpdateParamsResponse defines the response structure for executing a
- * MsgUpdateParams message.
- * 
- * Since: cosmos-sdk 0.47
- */
-export interface MsgUpdateParamsResponse {}
-export interface MsgUpdateParamsResponseProtoMsg {
-  typeUrl: "/liftedinit.manifest.v1.MsgUpdateParamsResponse";
-  value: Uint8Array;
-}
-/**
- * MsgUpdateParamsResponse defines the response structure for executing a
- * MsgUpdateParams message.
- * 
- * Since: cosmos-sdk 0.47
- */
-export interface MsgUpdateParamsResponseAmino {}
-export interface MsgUpdateParamsResponseAminoMsg {
-  type: "/liftedinit.manifest.v1.MsgUpdateParamsResponse";
-  value: MsgUpdateParamsResponseAmino;
-}
-/**
- * MsgUpdateParamsResponse defines the response structure for executing a
- * MsgUpdateParams message.
- * 
- * Since: cosmos-sdk 0.47
- */
-export interface MsgUpdateParamsResponseSDKType {}
+import { isSet, DeepPartial, Exact } from "../../../helpers";
+import { JsonSafe } from "../../../json-safe";
+import { GlobalDecoderRegistry } from "../../../registry";
 /** MsgPayout is the Msg/Payout request type. */
 export interface MsgPayout {
   /** authority is the address of the controlling account. */
@@ -97,7 +22,7 @@ export interface MsgPayoutAmino {
   payout_pairs: PayoutPairAmino[];
 }
 export interface MsgPayoutAminoMsg {
-  type: "/liftedinit.manifest.v1.MsgPayout";
+  type: "lifted/manifest/MsgPayout";
   value: MsgPayoutAmino;
 }
 /** MsgPayout is the Msg/Payout request type. */
@@ -120,7 +45,7 @@ export interface PayoutPairAmino {
   coin: CoinAmino;
 }
 export interface PayoutPairAminoMsg {
-  type: "/liftedinit.manifest.v1.PayoutPair";
+  type: "lifted/manifest/payout-pair";
   value: PayoutPairAmino;
 }
 /** PayoutPair is the object that pairs an address with a coin to be paid out. */
@@ -128,19 +53,28 @@ export interface PayoutPairSDKType {
   address: string;
   coin: CoinSDKType;
 }
-/** MsgPayoutResponse defines the response structure for executing a MsgPayout message. */
+/**
+ * MsgPayoutResponse defines the response structure for executing a MsgPayout
+ * message.
+ */
 export interface MsgPayoutResponse {}
 export interface MsgPayoutResponseProtoMsg {
   typeUrl: "/liftedinit.manifest.v1.MsgPayoutResponse";
   value: Uint8Array;
 }
-/** MsgPayoutResponse defines the response structure for executing a MsgPayout message. */
+/**
+ * MsgPayoutResponse defines the response structure for executing a MsgPayout
+ * message.
+ */
 export interface MsgPayoutResponseAmino {}
 export interface MsgPayoutResponseAminoMsg {
   type: "/liftedinit.manifest.v1.MsgPayoutResponse";
   value: MsgPayoutResponseAmino;
 }
-/** MsgPayoutResponse defines the response structure for executing a MsgPayout message. */
+/**
+ * MsgPayoutResponse defines the response structure for executing a MsgPayout
+ * message.
+ */
 export interface MsgPayoutResponseSDKType {}
 /** MsgPayout is the Msg/BurnHeldBalance request type. */
 export interface MsgBurnHeldBalance {
@@ -161,7 +95,7 @@ export interface MsgBurnHeldBalanceAmino {
   burn_coins: CoinAmino[];
 }
 export interface MsgBurnHeldBalanceAminoMsg {
-  type: "/liftedinit.manifest.v1.MsgBurnHeldBalance";
+  type: "lifted/manifest/MsgBurnHeldBalance";
   value: MsgBurnHeldBalanceAmino;
 }
 /** MsgPayout is the Msg/BurnHeldBalance request type. */
@@ -169,145 +103,29 @@ export interface MsgBurnHeldBalanceSDKType {
   authority: string;
   burn_coins: CoinSDKType[];
 }
-/** MsgBurnHeldBalanceResponse defines the response structure for executing a MsgBurnHeldBalance message. */
+/**
+ * MsgBurnHeldBalanceResponse defines the response structure for executing a
+ * MsgBurnHeldBalance message.
+ */
 export interface MsgBurnHeldBalanceResponse {}
 export interface MsgBurnHeldBalanceResponseProtoMsg {
   typeUrl: "/liftedinit.manifest.v1.MsgBurnHeldBalanceResponse";
   value: Uint8Array;
 }
-/** MsgBurnHeldBalanceResponse defines the response structure for executing a MsgBurnHeldBalance message. */
+/**
+ * MsgBurnHeldBalanceResponse defines the response structure for executing a
+ * MsgBurnHeldBalance message.
+ */
 export interface MsgBurnHeldBalanceResponseAmino {}
 export interface MsgBurnHeldBalanceResponseAminoMsg {
   type: "/liftedinit.manifest.v1.MsgBurnHeldBalanceResponse";
   value: MsgBurnHeldBalanceResponseAmino;
 }
-/** MsgBurnHeldBalanceResponse defines the response structure for executing a MsgBurnHeldBalance message. */
+/**
+ * MsgBurnHeldBalanceResponse defines the response structure for executing a
+ * MsgBurnHeldBalance message.
+ */
 export interface MsgBurnHeldBalanceResponseSDKType {}
-function createBaseMsgUpdateParams(): MsgUpdateParams {
-  return {
-    authority: "",
-    params: Params.fromPartial({})
-  };
-}
-export const MsgUpdateParams = {
-  typeUrl: "/liftedinit.manifest.v1.MsgUpdateParams",
-  encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    if (message.authority !== "") {
-      writer.uint32(10).string(message.authority);
-    }
-    if (message.params !== undefined) {
-      Params.encode(message.params, writer.uint32(18).fork()).ldelim();
-    }
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgUpdateParams {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgUpdateParams();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.authority = reader.string();
-          break;
-        case 2:
-          message.params = Params.decode(reader, reader.uint32());
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(object: I): MsgUpdateParams {
-    const message = createBaseMsgUpdateParams();
-    message.authority = object.authority ?? "";
-    message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
-    return message;
-  },
-  fromAmino(object: MsgUpdateParamsAmino): MsgUpdateParams {
-    const message = createBaseMsgUpdateParams();
-    if (object.authority !== undefined && object.authority !== null) {
-      message.authority = object.authority;
-    }
-    if (object.params !== undefined && object.params !== null) {
-      message.params = Params.fromAmino(object.params);
-    }
-    return message;
-  },
-  toAmino(message: MsgUpdateParams): MsgUpdateParamsAmino {
-    const obj: any = {};
-    obj.authority = message.authority === "" ? undefined : message.authority;
-    obj.params = message.params ? Params.toAmino(message.params) : undefined;
-    return obj;
-  },
-  fromAminoMsg(object: MsgUpdateParamsAminoMsg): MsgUpdateParams {
-    return MsgUpdateParams.fromAmino(object.value);
-  },
-  fromProtoMsg(message: MsgUpdateParamsProtoMsg): MsgUpdateParams {
-    return MsgUpdateParams.decode(message.value);
-  },
-  toProto(message: MsgUpdateParams): Uint8Array {
-    return MsgUpdateParams.encode(message).finish();
-  },
-  toProtoMsg(message: MsgUpdateParams): MsgUpdateParamsProtoMsg {
-    return {
-      typeUrl: "/liftedinit.manifest.v1.MsgUpdateParams",
-      value: MsgUpdateParams.encode(message).finish()
-    };
-  }
-};
-function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
-  return {};
-}
-export const MsgUpdateParamsResponse = {
-  typeUrl: "/liftedinit.manifest.v1.MsgUpdateParamsResponse",
-  encode(_: MsgUpdateParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
-    return writer;
-  },
-  decode(input: BinaryReader | Uint8Array, length?: number): MsgUpdateParamsResponse {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgUpdateParamsResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-  fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(_: I): MsgUpdateParamsResponse {
-    const message = createBaseMsgUpdateParamsResponse();
-    return message;
-  },
-  fromAmino(_: MsgUpdateParamsResponseAmino): MsgUpdateParamsResponse {
-    const message = createBaseMsgUpdateParamsResponse();
-    return message;
-  },
-  toAmino(_: MsgUpdateParamsResponse): MsgUpdateParamsResponseAmino {
-    const obj: any = {};
-    return obj;
-  },
-  fromAminoMsg(object: MsgUpdateParamsResponseAminoMsg): MsgUpdateParamsResponse {
-    return MsgUpdateParamsResponse.fromAmino(object.value);
-  },
-  fromProtoMsg(message: MsgUpdateParamsResponseProtoMsg): MsgUpdateParamsResponse {
-    return MsgUpdateParamsResponse.decode(message.value);
-  },
-  toProto(message: MsgUpdateParamsResponse): Uint8Array {
-    return MsgUpdateParamsResponse.encode(message).finish();
-  },
-  toProtoMsg(message: MsgUpdateParamsResponse): MsgUpdateParamsResponseProtoMsg {
-    return {
-      typeUrl: "/liftedinit.manifest.v1.MsgUpdateParamsResponse",
-      value: MsgUpdateParamsResponse.encode(message).finish()
-    };
-  }
-};
 function createBaseMsgPayout(): MsgPayout {
   return {
     authority: "",
@@ -316,6 +134,16 @@ function createBaseMsgPayout(): MsgPayout {
 }
 export const MsgPayout = {
   typeUrl: "/liftedinit.manifest.v1.MsgPayout",
+  aminoType: "lifted/manifest/MsgPayout",
+  is(o: any): o is MsgPayout {
+    return o && (o.$typeUrl === MsgPayout.typeUrl || typeof o.authority === "string" && Array.isArray(o.payoutPairs) && (!o.payoutPairs.length || PayoutPair.is(o.payoutPairs[0])));
+  },
+  isSDK(o: any): o is MsgPayoutSDKType {
+    return o && (o.$typeUrl === MsgPayout.typeUrl || typeof o.authority === "string" && Array.isArray(o.payout_pairs) && (!o.payout_pairs.length || PayoutPair.isSDK(o.payout_pairs[0])));
+  },
+  isAmino(o: any): o is MsgPayoutAmino {
+    return o && (o.$typeUrl === MsgPayout.typeUrl || typeof o.authority === "string" && Array.isArray(o.payout_pairs) && (!o.payout_pairs.length || PayoutPair.isAmino(o.payout_pairs[0])));
+  },
   encode(message: MsgPayout, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -345,6 +173,22 @@ export const MsgPayout = {
     }
     return message;
   },
+  fromJSON(object: any): MsgPayout {
+    return {
+      authority: isSet(object.authority) ? String(object.authority) : "",
+      payoutPairs: Array.isArray(object?.payoutPairs) ? object.payoutPairs.map((e: any) => PayoutPair.fromJSON(e)) : []
+    };
+  },
+  toJSON(message: MsgPayout): JsonSafe<MsgPayout> {
+    const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
+    if (message.payoutPairs) {
+      obj.payoutPairs = message.payoutPairs.map(e => e ? PayoutPair.toJSON(e) : undefined);
+    } else {
+      obj.payoutPairs = [];
+    }
+    return obj;
+  },
   fromPartial<I extends Exact<DeepPartial<MsgPayout>, I>>(object: I): MsgPayout {
     const message = createBaseMsgPayout();
     message.authority = object.authority ?? "";
@@ -372,6 +216,12 @@ export const MsgPayout = {
   fromAminoMsg(object: MsgPayoutAminoMsg): MsgPayout {
     return MsgPayout.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgPayout): MsgPayoutAminoMsg {
+    return {
+      type: "lifted/manifest/MsgPayout",
+      value: MsgPayout.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgPayoutProtoMsg): MsgPayout {
     return MsgPayout.decode(message.value);
   },
@@ -385,6 +235,8 @@ export const MsgPayout = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgPayout.typeUrl, MsgPayout);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgPayout.aminoType, MsgPayout.typeUrl);
 function createBasePayoutPair(): PayoutPair {
   return {
     address: "",
@@ -393,6 +245,16 @@ function createBasePayoutPair(): PayoutPair {
 }
 export const PayoutPair = {
   typeUrl: "/liftedinit.manifest.v1.PayoutPair",
+  aminoType: "lifted/manifest/payout-pair",
+  is(o: any): o is PayoutPair {
+    return o && (o.$typeUrl === PayoutPair.typeUrl || typeof o.address === "string" && Coin.is(o.coin));
+  },
+  isSDK(o: any): o is PayoutPairSDKType {
+    return o && (o.$typeUrl === PayoutPair.typeUrl || typeof o.address === "string" && Coin.isSDK(o.coin));
+  },
+  isAmino(o: any): o is PayoutPairAmino {
+    return o && (o.$typeUrl === PayoutPair.typeUrl || typeof o.address === "string" && Coin.isAmino(o.coin));
+  },
   encode(message: PayoutPair, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address !== "") {
       writer.uint32(10).string(message.address);
@@ -422,6 +284,18 @@ export const PayoutPair = {
     }
     return message;
   },
+  fromJSON(object: any): PayoutPair {
+    return {
+      address: isSet(object.address) ? String(object.address) : "",
+      coin: isSet(object.coin) ? Coin.fromJSON(object.coin) : undefined
+    };
+  },
+  toJSON(message: PayoutPair): JsonSafe<PayoutPair> {
+    const obj: any = {};
+    message.address !== undefined && (obj.address = message.address);
+    message.coin !== undefined && (obj.coin = message.coin ? Coin.toJSON(message.coin) : undefined);
+    return obj;
+  },
   fromPartial<I extends Exact<DeepPartial<PayoutPair>, I>>(object: I): PayoutPair {
     const message = createBasePayoutPair();
     message.address = object.address ?? "";
@@ -447,6 +321,12 @@ export const PayoutPair = {
   fromAminoMsg(object: PayoutPairAminoMsg): PayoutPair {
     return PayoutPair.fromAmino(object.value);
   },
+  toAminoMsg(message: PayoutPair): PayoutPairAminoMsg {
+    return {
+      type: "lifted/manifest/payout-pair",
+      value: PayoutPair.toAmino(message)
+    };
+  },
   fromProtoMsg(message: PayoutPairProtoMsg): PayoutPair {
     return PayoutPair.decode(message.value);
   },
@@ -460,11 +340,22 @@ export const PayoutPair = {
     };
   }
 };
+GlobalDecoderRegistry.register(PayoutPair.typeUrl, PayoutPair);
+GlobalDecoderRegistry.registerAminoProtoMapping(PayoutPair.aminoType, PayoutPair.typeUrl);
 function createBaseMsgPayoutResponse(): MsgPayoutResponse {
   return {};
 }
 export const MsgPayoutResponse = {
   typeUrl: "/liftedinit.manifest.v1.MsgPayoutResponse",
+  is(o: any): o is MsgPayoutResponse {
+    return o && o.$typeUrl === MsgPayoutResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgPayoutResponseSDKType {
+    return o && o.$typeUrl === MsgPayoutResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgPayoutResponseAmino {
+    return o && o.$typeUrl === MsgPayoutResponse.typeUrl;
+  },
   encode(_: MsgPayoutResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -481,6 +372,13 @@ export const MsgPayoutResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgPayoutResponse {
+    return {};
+  },
+  toJSON(_: MsgPayoutResponse): JsonSafe<MsgPayoutResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgPayoutResponse>, I>>(_: I): MsgPayoutResponse {
     const message = createBaseMsgPayoutResponse();
@@ -510,6 +408,7 @@ export const MsgPayoutResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgPayoutResponse.typeUrl, MsgPayoutResponse);
 function createBaseMsgBurnHeldBalance(): MsgBurnHeldBalance {
   return {
     authority: "",
@@ -518,6 +417,16 @@ function createBaseMsgBurnHeldBalance(): MsgBurnHeldBalance {
 }
 export const MsgBurnHeldBalance = {
   typeUrl: "/liftedinit.manifest.v1.MsgBurnHeldBalance",
+  aminoType: "lifted/manifest/MsgBurnHeldBalance",
+  is(o: any): o is MsgBurnHeldBalance {
+    return o && (o.$typeUrl === MsgBurnHeldBalance.typeUrl || typeof o.authority === "string" && Array.isArray(o.burnCoins) && (!o.burnCoins.length || Coin.is(o.burnCoins[0])));
+  },
+  isSDK(o: any): o is MsgBurnHeldBalanceSDKType {
+    return o && (o.$typeUrl === MsgBurnHeldBalance.typeUrl || typeof o.authority === "string" && Array.isArray(o.burn_coins) && (!o.burn_coins.length || Coin.isSDK(o.burn_coins[0])));
+  },
+  isAmino(o: any): o is MsgBurnHeldBalanceAmino {
+    return o && (o.$typeUrl === MsgBurnHeldBalance.typeUrl || typeof o.authority === "string" && Array.isArray(o.burn_coins) && (!o.burn_coins.length || Coin.isAmino(o.burn_coins[0])));
+  },
   encode(message: MsgBurnHeldBalance, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -547,6 +456,22 @@ export const MsgBurnHeldBalance = {
     }
     return message;
   },
+  fromJSON(object: any): MsgBurnHeldBalance {
+    return {
+      authority: isSet(object.authority) ? String(object.authority) : "",
+      burnCoins: Array.isArray(object?.burnCoins) ? object.burnCoins.map((e: any) => Coin.fromJSON(e)) : []
+    };
+  },
+  toJSON(message: MsgBurnHeldBalance): JsonSafe<MsgBurnHeldBalance> {
+    const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
+    if (message.burnCoins) {
+      obj.burnCoins = message.burnCoins.map(e => e ? Coin.toJSON(e) : undefined);
+    } else {
+      obj.burnCoins = [];
+    }
+    return obj;
+  },
   fromPartial<I extends Exact<DeepPartial<MsgBurnHeldBalance>, I>>(object: I): MsgBurnHeldBalance {
     const message = createBaseMsgBurnHeldBalance();
     message.authority = object.authority ?? "";
@@ -574,6 +499,12 @@ export const MsgBurnHeldBalance = {
   fromAminoMsg(object: MsgBurnHeldBalanceAminoMsg): MsgBurnHeldBalance {
     return MsgBurnHeldBalance.fromAmino(object.value);
   },
+  toAminoMsg(message: MsgBurnHeldBalance): MsgBurnHeldBalanceAminoMsg {
+    return {
+      type: "lifted/manifest/MsgBurnHeldBalance",
+      value: MsgBurnHeldBalance.toAmino(message)
+    };
+  },
   fromProtoMsg(message: MsgBurnHeldBalanceProtoMsg): MsgBurnHeldBalance {
     return MsgBurnHeldBalance.decode(message.value);
   },
@@ -587,11 +518,22 @@ export const MsgBurnHeldBalance = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgBurnHeldBalance.typeUrl, MsgBurnHeldBalance);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgBurnHeldBalance.aminoType, MsgBurnHeldBalance.typeUrl);
 function createBaseMsgBurnHeldBalanceResponse(): MsgBurnHeldBalanceResponse {
   return {};
 }
 export const MsgBurnHeldBalanceResponse = {
   typeUrl: "/liftedinit.manifest.v1.MsgBurnHeldBalanceResponse",
+  is(o: any): o is MsgBurnHeldBalanceResponse {
+    return o && o.$typeUrl === MsgBurnHeldBalanceResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgBurnHeldBalanceResponseSDKType {
+    return o && o.$typeUrl === MsgBurnHeldBalanceResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgBurnHeldBalanceResponseAmino {
+    return o && o.$typeUrl === MsgBurnHeldBalanceResponse.typeUrl;
+  },
   encode(_: MsgBurnHeldBalanceResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -608,6 +550,13 @@ export const MsgBurnHeldBalanceResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgBurnHeldBalanceResponse {
+    return {};
+  },
+  toJSON(_: MsgBurnHeldBalanceResponse): JsonSafe<MsgBurnHeldBalanceResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgBurnHeldBalanceResponse>, I>>(_: I): MsgBurnHeldBalanceResponse {
     const message = createBaseMsgBurnHeldBalanceResponse();
@@ -637,3 +586,4 @@ export const MsgBurnHeldBalanceResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgBurnHeldBalanceResponse.typeUrl, MsgBurnHeldBalanceResponse);

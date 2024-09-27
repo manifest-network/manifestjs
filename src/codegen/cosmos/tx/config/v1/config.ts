@@ -1,5 +1,7 @@
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial, Exact } from "../../../../helpers";
+import { isSet, DeepPartial, Exact } from "../../../../helpers";
+import { JsonSafe } from "../../../../json-safe";
+import { GlobalDecoderRegistry } from "../../../../registry";
 /** Config is the config object of the x/auth/tx package. */
 export interface Config {
   /**
@@ -48,6 +50,15 @@ function createBaseConfig(): Config {
 export const Config = {
   typeUrl: "/cosmos.tx.config.v1.Config",
   aminoType: "cosmos-sdk/Config",
+  is(o: any): o is Config {
+    return o && (o.$typeUrl === Config.typeUrl || typeof o.skipAnteHandler === "boolean" && typeof o.skipPostHandler === "boolean");
+  },
+  isSDK(o: any): o is ConfigSDKType {
+    return o && (o.$typeUrl === Config.typeUrl || typeof o.skip_ante_handler === "boolean" && typeof o.skip_post_handler === "boolean");
+  },
+  isAmino(o: any): o is ConfigAmino {
+    return o && (o.$typeUrl === Config.typeUrl || typeof o.skip_ante_handler === "boolean" && typeof o.skip_post_handler === "boolean");
+  },
   encode(message: Config, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.skipAnteHandler === true) {
       writer.uint32(8).bool(message.skipAnteHandler);
@@ -76,6 +87,18 @@ export const Config = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): Config {
+    return {
+      skipAnteHandler: isSet(object.skipAnteHandler) ? Boolean(object.skipAnteHandler) : false,
+      skipPostHandler: isSet(object.skipPostHandler) ? Boolean(object.skipPostHandler) : false
+    };
+  },
+  toJSON(message: Config): JsonSafe<Config> {
+    const obj: any = {};
+    message.skipAnteHandler !== undefined && (obj.skipAnteHandler = message.skipAnteHandler);
+    message.skipPostHandler !== undefined && (obj.skipPostHandler = message.skipPostHandler);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<Config>, I>>(object: I): Config {
     const message = createBaseConfig();
@@ -121,3 +144,5 @@ export const Config = {
     };
   }
 };
+GlobalDecoderRegistry.register(Config.typeUrl, Config);
+GlobalDecoderRegistry.registerAminoProtoMapping(Config.aminoType, Config.typeUrl);

@@ -1,7 +1,9 @@
 import { Coin, CoinAmino, CoinSDKType } from "../../../cosmos/base/v1beta1/coin";
 import { Metadata, MetadataAmino, MetadataSDKType, Params, ParamsAmino, ParamsSDKType } from "../../../cosmos/bank/v1beta1/bank";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial, Exact } from "../../../helpers";
+import { isSet, DeepPartial, Exact } from "../../../helpers";
+import { JsonSafe } from "../../../json-safe";
+import { GlobalDecoderRegistry } from "../../../registry";
 /**
  * MsgCreateDenom defines the message structure for the CreateDenom gRPC service
  * method. It allows an account to create a new denom. It requires a sender
@@ -106,7 +108,7 @@ export interface MsgMintProtoMsg {
 export interface MsgMintAmino {
   sender?: string;
   amount?: CoinAmino;
-  mintToAddress?: string;
+  mintToAddress: string;
 }
 export interface MsgMintAminoMsg {
   type: "osmosis/tokenfactory/mint";
@@ -152,7 +154,7 @@ export interface MsgBurnProtoMsg {
 export interface MsgBurnAmino {
   sender?: string;
   amount?: CoinAmino;
-  burnFromAddress?: string;
+  burnFromAddress: string;
 }
 export interface MsgBurnAminoMsg {
   type: "osmosis/tokenfactory/burn";
@@ -413,6 +415,15 @@ function createBaseMsgCreateDenom(): MsgCreateDenom {
 export const MsgCreateDenom = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgCreateDenom",
   aminoType: "osmosis/tokenfactory/create-denom",
+  is(o: any): o is MsgCreateDenom {
+    return o && (o.$typeUrl === MsgCreateDenom.typeUrl || typeof o.sender === "string" && typeof o.subdenom === "string");
+  },
+  isSDK(o: any): o is MsgCreateDenomSDKType {
+    return o && (o.$typeUrl === MsgCreateDenom.typeUrl || typeof o.sender === "string" && typeof o.subdenom === "string");
+  },
+  isAmino(o: any): o is MsgCreateDenomAmino {
+    return o && (o.$typeUrl === MsgCreateDenom.typeUrl || typeof o.sender === "string" && typeof o.subdenom === "string");
+  },
   encode(message: MsgCreateDenom, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
@@ -441,6 +452,18 @@ export const MsgCreateDenom = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgCreateDenom {
+    return {
+      sender: isSet(object.sender) ? String(object.sender) : "",
+      subdenom: isSet(object.subdenom) ? String(object.subdenom) : ""
+    };
+  },
+  toJSON(message: MsgCreateDenom): JsonSafe<MsgCreateDenom> {
+    const obj: any = {};
+    message.sender !== undefined && (obj.sender = message.sender);
+    message.subdenom !== undefined && (obj.subdenom = message.subdenom);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgCreateDenom>, I>>(object: I): MsgCreateDenom {
     const message = createBaseMsgCreateDenom();
@@ -486,6 +509,8 @@ export const MsgCreateDenom = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgCreateDenom.typeUrl, MsgCreateDenom);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgCreateDenom.aminoType, MsgCreateDenom.typeUrl);
 function createBaseMsgCreateDenomResponse(): MsgCreateDenomResponse {
   return {
     newTokenDenom: ""
@@ -494,6 +519,15 @@ function createBaseMsgCreateDenomResponse(): MsgCreateDenomResponse {
 export const MsgCreateDenomResponse = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgCreateDenomResponse",
   aminoType: "osmosis/tokenfactory/create-denom-response",
+  is(o: any): o is MsgCreateDenomResponse {
+    return o && (o.$typeUrl === MsgCreateDenomResponse.typeUrl || typeof o.newTokenDenom === "string");
+  },
+  isSDK(o: any): o is MsgCreateDenomResponseSDKType {
+    return o && (o.$typeUrl === MsgCreateDenomResponse.typeUrl || typeof o.new_token_denom === "string");
+  },
+  isAmino(o: any): o is MsgCreateDenomResponseAmino {
+    return o && (o.$typeUrl === MsgCreateDenomResponse.typeUrl || typeof o.new_token_denom === "string");
+  },
   encode(message: MsgCreateDenomResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.newTokenDenom !== "") {
       writer.uint32(10).string(message.newTokenDenom);
@@ -516,6 +550,16 @@ export const MsgCreateDenomResponse = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgCreateDenomResponse {
+    return {
+      newTokenDenom: isSet(object.newTokenDenom) ? String(object.newTokenDenom) : ""
+    };
+  },
+  toJSON(message: MsgCreateDenomResponse): JsonSafe<MsgCreateDenomResponse> {
+    const obj: any = {};
+    message.newTokenDenom !== undefined && (obj.newTokenDenom = message.newTokenDenom);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgCreateDenomResponse>, I>>(object: I): MsgCreateDenomResponse {
     const message = createBaseMsgCreateDenomResponse();
@@ -556,6 +600,8 @@ export const MsgCreateDenomResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgCreateDenomResponse.typeUrl, MsgCreateDenomResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgCreateDenomResponse.aminoType, MsgCreateDenomResponse.typeUrl);
 function createBaseMsgMint(): MsgMint {
   return {
     sender: "",
@@ -566,6 +612,15 @@ function createBaseMsgMint(): MsgMint {
 export const MsgMint = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgMint",
   aminoType: "osmosis/tokenfactory/mint",
+  is(o: any): o is MsgMint {
+    return o && (o.$typeUrl === MsgMint.typeUrl || typeof o.sender === "string" && Coin.is(o.amount) && typeof o.mintToAddress === "string");
+  },
+  isSDK(o: any): o is MsgMintSDKType {
+    return o && (o.$typeUrl === MsgMint.typeUrl || typeof o.sender === "string" && Coin.isSDK(o.amount) && typeof o.mintToAddress === "string");
+  },
+  isAmino(o: any): o is MsgMintAmino {
+    return o && (o.$typeUrl === MsgMint.typeUrl || typeof o.sender === "string" && Coin.isAmino(o.amount) && typeof o.mintToAddress === "string");
+  },
   encode(message: MsgMint, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
@@ -601,6 +656,20 @@ export const MsgMint = {
     }
     return message;
   },
+  fromJSON(object: any): MsgMint {
+    return {
+      sender: isSet(object.sender) ? String(object.sender) : "",
+      amount: isSet(object.amount) ? Coin.fromJSON(object.amount) : undefined,
+      mintToAddress: isSet(object.mintToAddress) ? String(object.mintToAddress) : ""
+    };
+  },
+  toJSON(message: MsgMint): JsonSafe<MsgMint> {
+    const obj: any = {};
+    message.sender !== undefined && (obj.sender = message.sender);
+    message.amount !== undefined && (obj.amount = message.amount ? Coin.toJSON(message.amount) : undefined);
+    message.mintToAddress !== undefined && (obj.mintToAddress = message.mintToAddress);
+    return obj;
+  },
   fromPartial<I extends Exact<DeepPartial<MsgMint>, I>>(object: I): MsgMint {
     const message = createBaseMsgMint();
     message.sender = object.sender ?? "";
@@ -625,7 +694,7 @@ export const MsgMint = {
     const obj: any = {};
     obj.sender = message.sender === "" ? undefined : message.sender;
     obj.amount = message.amount ? Coin.toAmino(message.amount) : undefined;
-    obj.mintToAddress = message.mintToAddress === "" ? undefined : message.mintToAddress;
+    obj.mintToAddress = message.mintToAddress ?? "";
     return obj;
   },
   fromAminoMsg(object: MsgMintAminoMsg): MsgMint {
@@ -650,12 +719,23 @@ export const MsgMint = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgMint.typeUrl, MsgMint);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgMint.aminoType, MsgMint.typeUrl);
 function createBaseMsgMintResponse(): MsgMintResponse {
   return {};
 }
 export const MsgMintResponse = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgMintResponse",
   aminoType: "osmosis/tokenfactory/mint-response",
+  is(o: any): o is MsgMintResponse {
+    return o && o.$typeUrl === MsgMintResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgMintResponseSDKType {
+    return o && o.$typeUrl === MsgMintResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgMintResponseAmino {
+    return o && o.$typeUrl === MsgMintResponse.typeUrl;
+  },
   encode(_: MsgMintResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -672,6 +752,13 @@ export const MsgMintResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgMintResponse {
+    return {};
+  },
+  toJSON(_: MsgMintResponse): JsonSafe<MsgMintResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgMintResponse>, I>>(_: I): MsgMintResponse {
     const message = createBaseMsgMintResponse();
@@ -707,6 +794,8 @@ export const MsgMintResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgMintResponse.typeUrl, MsgMintResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgMintResponse.aminoType, MsgMintResponse.typeUrl);
 function createBaseMsgBurn(): MsgBurn {
   return {
     sender: "",
@@ -717,6 +806,15 @@ function createBaseMsgBurn(): MsgBurn {
 export const MsgBurn = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgBurn",
   aminoType: "osmosis/tokenfactory/burn",
+  is(o: any): o is MsgBurn {
+    return o && (o.$typeUrl === MsgBurn.typeUrl || typeof o.sender === "string" && Coin.is(o.amount) && typeof o.burnFromAddress === "string");
+  },
+  isSDK(o: any): o is MsgBurnSDKType {
+    return o && (o.$typeUrl === MsgBurn.typeUrl || typeof o.sender === "string" && Coin.isSDK(o.amount) && typeof o.burnFromAddress === "string");
+  },
+  isAmino(o: any): o is MsgBurnAmino {
+    return o && (o.$typeUrl === MsgBurn.typeUrl || typeof o.sender === "string" && Coin.isAmino(o.amount) && typeof o.burnFromAddress === "string");
+  },
   encode(message: MsgBurn, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
@@ -752,6 +850,20 @@ export const MsgBurn = {
     }
     return message;
   },
+  fromJSON(object: any): MsgBurn {
+    return {
+      sender: isSet(object.sender) ? String(object.sender) : "",
+      amount: isSet(object.amount) ? Coin.fromJSON(object.amount) : undefined,
+      burnFromAddress: isSet(object.burnFromAddress) ? String(object.burnFromAddress) : ""
+    };
+  },
+  toJSON(message: MsgBurn): JsonSafe<MsgBurn> {
+    const obj: any = {};
+    message.sender !== undefined && (obj.sender = message.sender);
+    message.amount !== undefined && (obj.amount = message.amount ? Coin.toJSON(message.amount) : undefined);
+    message.burnFromAddress !== undefined && (obj.burnFromAddress = message.burnFromAddress);
+    return obj;
+  },
   fromPartial<I extends Exact<DeepPartial<MsgBurn>, I>>(object: I): MsgBurn {
     const message = createBaseMsgBurn();
     message.sender = object.sender ?? "";
@@ -776,7 +888,7 @@ export const MsgBurn = {
     const obj: any = {};
     obj.sender = message.sender === "" ? undefined : message.sender;
     obj.amount = message.amount ? Coin.toAmino(message.amount) : undefined;
-    obj.burnFromAddress = message.burnFromAddress === "" ? undefined : message.burnFromAddress;
+    obj.burnFromAddress = message.burnFromAddress ?? "";
     return obj;
   },
   fromAminoMsg(object: MsgBurnAminoMsg): MsgBurn {
@@ -801,12 +913,23 @@ export const MsgBurn = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgBurn.typeUrl, MsgBurn);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgBurn.aminoType, MsgBurn.typeUrl);
 function createBaseMsgBurnResponse(): MsgBurnResponse {
   return {};
 }
 export const MsgBurnResponse = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgBurnResponse",
   aminoType: "osmosis/tokenfactory/burn-response",
+  is(o: any): o is MsgBurnResponse {
+    return o && o.$typeUrl === MsgBurnResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgBurnResponseSDKType {
+    return o && o.$typeUrl === MsgBurnResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgBurnResponseAmino {
+    return o && o.$typeUrl === MsgBurnResponse.typeUrl;
+  },
   encode(_: MsgBurnResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -823,6 +946,13 @@ export const MsgBurnResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgBurnResponse {
+    return {};
+  },
+  toJSON(_: MsgBurnResponse): JsonSafe<MsgBurnResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgBurnResponse>, I>>(_: I): MsgBurnResponse {
     const message = createBaseMsgBurnResponse();
@@ -858,6 +988,8 @@ export const MsgBurnResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgBurnResponse.typeUrl, MsgBurnResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgBurnResponse.aminoType, MsgBurnResponse.typeUrl);
 function createBaseMsgChangeAdmin(): MsgChangeAdmin {
   return {
     sender: "",
@@ -868,6 +1000,15 @@ function createBaseMsgChangeAdmin(): MsgChangeAdmin {
 export const MsgChangeAdmin = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgChangeAdmin",
   aminoType: "osmosis/tokenfactory/change-admin",
+  is(o: any): o is MsgChangeAdmin {
+    return o && (o.$typeUrl === MsgChangeAdmin.typeUrl || typeof o.sender === "string" && typeof o.denom === "string" && typeof o.newAdmin === "string");
+  },
+  isSDK(o: any): o is MsgChangeAdminSDKType {
+    return o && (o.$typeUrl === MsgChangeAdmin.typeUrl || typeof o.sender === "string" && typeof o.denom === "string" && typeof o.new_admin === "string");
+  },
+  isAmino(o: any): o is MsgChangeAdminAmino {
+    return o && (o.$typeUrl === MsgChangeAdmin.typeUrl || typeof o.sender === "string" && typeof o.denom === "string" && typeof o.new_admin === "string");
+  },
   encode(message: MsgChangeAdmin, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
@@ -902,6 +1043,20 @@ export const MsgChangeAdmin = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgChangeAdmin {
+    return {
+      sender: isSet(object.sender) ? String(object.sender) : "",
+      denom: isSet(object.denom) ? String(object.denom) : "",
+      newAdmin: isSet(object.newAdmin) ? String(object.newAdmin) : ""
+    };
+  },
+  toJSON(message: MsgChangeAdmin): JsonSafe<MsgChangeAdmin> {
+    const obj: any = {};
+    message.sender !== undefined && (obj.sender = message.sender);
+    message.denom !== undefined && (obj.denom = message.denom);
+    message.newAdmin !== undefined && (obj.newAdmin = message.newAdmin);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgChangeAdmin>, I>>(object: I): MsgChangeAdmin {
     const message = createBaseMsgChangeAdmin();
@@ -952,12 +1107,23 @@ export const MsgChangeAdmin = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgChangeAdmin.typeUrl, MsgChangeAdmin);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgChangeAdmin.aminoType, MsgChangeAdmin.typeUrl);
 function createBaseMsgChangeAdminResponse(): MsgChangeAdminResponse {
   return {};
 }
 export const MsgChangeAdminResponse = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgChangeAdminResponse",
   aminoType: "osmosis/tokenfactory/change-admin-response",
+  is(o: any): o is MsgChangeAdminResponse {
+    return o && o.$typeUrl === MsgChangeAdminResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgChangeAdminResponseSDKType {
+    return o && o.$typeUrl === MsgChangeAdminResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgChangeAdminResponseAmino {
+    return o && o.$typeUrl === MsgChangeAdminResponse.typeUrl;
+  },
   encode(_: MsgChangeAdminResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -974,6 +1140,13 @@ export const MsgChangeAdminResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgChangeAdminResponse {
+    return {};
+  },
+  toJSON(_: MsgChangeAdminResponse): JsonSafe<MsgChangeAdminResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgChangeAdminResponse>, I>>(_: I): MsgChangeAdminResponse {
     const message = createBaseMsgChangeAdminResponse();
@@ -1009,6 +1182,8 @@ export const MsgChangeAdminResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgChangeAdminResponse.typeUrl, MsgChangeAdminResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgChangeAdminResponse.aminoType, MsgChangeAdminResponse.typeUrl);
 function createBaseMsgSetDenomMetadata(): MsgSetDenomMetadata {
   return {
     sender: "",
@@ -1018,6 +1193,15 @@ function createBaseMsgSetDenomMetadata(): MsgSetDenomMetadata {
 export const MsgSetDenomMetadata = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgSetDenomMetadata",
   aminoType: "osmosis/tokenfactory/set-denom-metadata",
+  is(o: any): o is MsgSetDenomMetadata {
+    return o && (o.$typeUrl === MsgSetDenomMetadata.typeUrl || typeof o.sender === "string" && Metadata.is(o.metadata));
+  },
+  isSDK(o: any): o is MsgSetDenomMetadataSDKType {
+    return o && (o.$typeUrl === MsgSetDenomMetadata.typeUrl || typeof o.sender === "string" && Metadata.isSDK(o.metadata));
+  },
+  isAmino(o: any): o is MsgSetDenomMetadataAmino {
+    return o && (o.$typeUrl === MsgSetDenomMetadata.typeUrl || typeof o.sender === "string" && Metadata.isAmino(o.metadata));
+  },
   encode(message: MsgSetDenomMetadata, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
@@ -1046,6 +1230,18 @@ export const MsgSetDenomMetadata = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgSetDenomMetadata {
+    return {
+      sender: isSet(object.sender) ? String(object.sender) : "",
+      metadata: isSet(object.metadata) ? Metadata.fromJSON(object.metadata) : undefined
+    };
+  },
+  toJSON(message: MsgSetDenomMetadata): JsonSafe<MsgSetDenomMetadata> {
+    const obj: any = {};
+    message.sender !== undefined && (obj.sender = message.sender);
+    message.metadata !== undefined && (obj.metadata = message.metadata ? Metadata.toJSON(message.metadata) : undefined);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgSetDenomMetadata>, I>>(object: I): MsgSetDenomMetadata {
     const message = createBaseMsgSetDenomMetadata();
@@ -1091,12 +1287,23 @@ export const MsgSetDenomMetadata = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgSetDenomMetadata.typeUrl, MsgSetDenomMetadata);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgSetDenomMetadata.aminoType, MsgSetDenomMetadata.typeUrl);
 function createBaseMsgSetDenomMetadataResponse(): MsgSetDenomMetadataResponse {
   return {};
 }
 export const MsgSetDenomMetadataResponse = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgSetDenomMetadataResponse",
   aminoType: "osmosis/tokenfactory/set-denom-metadata-response",
+  is(o: any): o is MsgSetDenomMetadataResponse {
+    return o && o.$typeUrl === MsgSetDenomMetadataResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgSetDenomMetadataResponseSDKType {
+    return o && o.$typeUrl === MsgSetDenomMetadataResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgSetDenomMetadataResponseAmino {
+    return o && o.$typeUrl === MsgSetDenomMetadataResponse.typeUrl;
+  },
   encode(_: MsgSetDenomMetadataResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1113,6 +1320,13 @@ export const MsgSetDenomMetadataResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgSetDenomMetadataResponse {
+    return {};
+  },
+  toJSON(_: MsgSetDenomMetadataResponse): JsonSafe<MsgSetDenomMetadataResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgSetDenomMetadataResponse>, I>>(_: I): MsgSetDenomMetadataResponse {
     const message = createBaseMsgSetDenomMetadataResponse();
@@ -1148,6 +1362,8 @@ export const MsgSetDenomMetadataResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgSetDenomMetadataResponse.typeUrl, MsgSetDenomMetadataResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgSetDenomMetadataResponse.aminoType, MsgSetDenomMetadataResponse.typeUrl);
 function createBaseMsgForceTransfer(): MsgForceTransfer {
   return {
     sender: "",
@@ -1159,6 +1375,15 @@ function createBaseMsgForceTransfer(): MsgForceTransfer {
 export const MsgForceTransfer = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgForceTransfer",
   aminoType: "osmosis/tokenfactory/force-transfer",
+  is(o: any): o is MsgForceTransfer {
+    return o && (o.$typeUrl === MsgForceTransfer.typeUrl || typeof o.sender === "string" && Coin.is(o.amount) && typeof o.transferFromAddress === "string" && typeof o.transferToAddress === "string");
+  },
+  isSDK(o: any): o is MsgForceTransferSDKType {
+    return o && (o.$typeUrl === MsgForceTransfer.typeUrl || typeof o.sender === "string" && Coin.isSDK(o.amount) && typeof o.transferFromAddress === "string" && typeof o.transferToAddress === "string");
+  },
+  isAmino(o: any): o is MsgForceTransferAmino {
+    return o && (o.$typeUrl === MsgForceTransfer.typeUrl || typeof o.sender === "string" && Coin.isAmino(o.amount) && typeof o.transferFromAddress === "string" && typeof o.transferToAddress === "string");
+  },
   encode(message: MsgForceTransfer, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
       writer.uint32(10).string(message.sender);
@@ -1199,6 +1424,22 @@ export const MsgForceTransfer = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgForceTransfer {
+    return {
+      sender: isSet(object.sender) ? String(object.sender) : "",
+      amount: isSet(object.amount) ? Coin.fromJSON(object.amount) : undefined,
+      transferFromAddress: isSet(object.transferFromAddress) ? String(object.transferFromAddress) : "",
+      transferToAddress: isSet(object.transferToAddress) ? String(object.transferToAddress) : ""
+    };
+  },
+  toJSON(message: MsgForceTransfer): JsonSafe<MsgForceTransfer> {
+    const obj: any = {};
+    message.sender !== undefined && (obj.sender = message.sender);
+    message.amount !== undefined && (obj.amount = message.amount ? Coin.toJSON(message.amount) : undefined);
+    message.transferFromAddress !== undefined && (obj.transferFromAddress = message.transferFromAddress);
+    message.transferToAddress !== undefined && (obj.transferToAddress = message.transferToAddress);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgForceTransfer>, I>>(object: I): MsgForceTransfer {
     const message = createBaseMsgForceTransfer();
@@ -1254,12 +1495,23 @@ export const MsgForceTransfer = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgForceTransfer.typeUrl, MsgForceTransfer);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgForceTransfer.aminoType, MsgForceTransfer.typeUrl);
 function createBaseMsgForceTransferResponse(): MsgForceTransferResponse {
   return {};
 }
 export const MsgForceTransferResponse = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgForceTransferResponse",
   aminoType: "osmosis/tokenfactory/force-transfer-response",
+  is(o: any): o is MsgForceTransferResponse {
+    return o && o.$typeUrl === MsgForceTransferResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgForceTransferResponseSDKType {
+    return o && o.$typeUrl === MsgForceTransferResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgForceTransferResponseAmino {
+    return o && o.$typeUrl === MsgForceTransferResponse.typeUrl;
+  },
   encode(_: MsgForceTransferResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1276,6 +1528,13 @@ export const MsgForceTransferResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgForceTransferResponse {
+    return {};
+  },
+  toJSON(_: MsgForceTransferResponse): JsonSafe<MsgForceTransferResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgForceTransferResponse>, I>>(_: I): MsgForceTransferResponse {
     const message = createBaseMsgForceTransferResponse();
@@ -1311,6 +1570,8 @@ export const MsgForceTransferResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgForceTransferResponse.typeUrl, MsgForceTransferResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgForceTransferResponse.aminoType, MsgForceTransferResponse.typeUrl);
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return {
     authority: "",
@@ -1320,6 +1581,15 @@ function createBaseMsgUpdateParams(): MsgUpdateParams {
 export const MsgUpdateParams = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgUpdateParams",
   aminoType: "osmosis/tokenfactory/update-params",
+  is(o: any): o is MsgUpdateParams {
+    return o && (o.$typeUrl === MsgUpdateParams.typeUrl || typeof o.authority === "string" && Params.is(o.params));
+  },
+  isSDK(o: any): o is MsgUpdateParamsSDKType {
+    return o && (o.$typeUrl === MsgUpdateParams.typeUrl || typeof o.authority === "string" && Params.isSDK(o.params));
+  },
+  isAmino(o: any): o is MsgUpdateParamsAmino {
+    return o && (o.$typeUrl === MsgUpdateParams.typeUrl || typeof o.authority === "string" && Params.isAmino(o.params));
+  },
   encode(message: MsgUpdateParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -1348,6 +1618,18 @@ export const MsgUpdateParams = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): MsgUpdateParams {
+    return {
+      authority: isSet(object.authority) ? String(object.authority) : "",
+      params: isSet(object.params) ? Params.fromJSON(object.params) : undefined
+    };
+  },
+  toJSON(message: MsgUpdateParams): JsonSafe<MsgUpdateParams> {
+    const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
+    message.params !== undefined && (obj.params = message.params ? Params.toJSON(message.params) : undefined);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgUpdateParams>, I>>(object: I): MsgUpdateParams {
     const message = createBaseMsgUpdateParams();
@@ -1393,12 +1675,23 @@ export const MsgUpdateParams = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgUpdateParams.typeUrl, MsgUpdateParams);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgUpdateParams.aminoType, MsgUpdateParams.typeUrl);
 function createBaseMsgUpdateParamsResponse(): MsgUpdateParamsResponse {
   return {};
 }
 export const MsgUpdateParamsResponse = {
   typeUrl: "/osmosis.tokenfactory.v1beta1.MsgUpdateParamsResponse",
   aminoType: "osmosis/tokenfactory/update-params-response",
+  is(o: any): o is MsgUpdateParamsResponse {
+    return o && o.$typeUrl === MsgUpdateParamsResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgUpdateParamsResponseSDKType {
+    return o && o.$typeUrl === MsgUpdateParamsResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgUpdateParamsResponseAmino {
+    return o && o.$typeUrl === MsgUpdateParamsResponse.typeUrl;
+  },
   encode(_: MsgUpdateParamsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -1415,6 +1708,13 @@ export const MsgUpdateParamsResponse = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): MsgUpdateParamsResponse {
+    return {};
+  },
+  toJSON(_: MsgUpdateParamsResponse): JsonSafe<MsgUpdateParamsResponse> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgUpdateParamsResponse>, I>>(_: I): MsgUpdateParamsResponse {
     const message = createBaseMsgUpdateParamsResponse();
@@ -1450,3 +1750,5 @@ export const MsgUpdateParamsResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(MsgUpdateParamsResponse.typeUrl, MsgUpdateParamsResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgUpdateParamsResponse.aminoType, MsgUpdateParamsResponse.typeUrl);

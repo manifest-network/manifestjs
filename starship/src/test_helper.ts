@@ -1,31 +1,23 @@
-import { createProtobufRpcClient, QueryClient } from "@cosmjs/stargate";
-import { QueryClientImpl } from "../../src/codegen/strangelove_ventures/poa/v1/query.rpc.Query";
-import { DirectSecp256k1HdWallet, encodePubkey } from "@cosmjs/proto-signing";
-import { Secp256k1HdWallet, encodeEd25519Pubkey } from "@cosmjs/amino";
-import { fromBase64 } from "@cosmjs/encoding"
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
+import { Secp256k1HdWallet } from "@cosmjs/amino";
 import { useChain } from "starshipjs";
-import {
-  MsgBurnHeldBalance,
-  MsgPayout,
-} from "../../src/codegen/liftedinit/manifest/v1/tx";
-import {
-  MsgCreateValidator,
-  MsgRemovePending,
-  MsgRemoveValidator,
-  MsgSetPower,
-} from "../../src/codegen/strangelove_ventures/poa/v1/tx";
-import {
-  CommissionRates,
-  Description,
-} from "../../src/codegen/strangelove_ventures/poa/v1/validator";
+import {assertIsDeliverTxSuccess, SigningStargateClient} from "@cosmjs/stargate";
+import {createRPCQueryClient} from "../../src/codegen/strangelove_ventures/rpc.query";
+import {Any} from "../../src/codegen/google/protobuf/any";
+import {MessageComposer as GroupMessageComposer} from "../../src/codegen/cosmos/group/v1/tx.registry";
+import {Exec, MsgSubmitProposalResponse} from "../../src/codegen/cosmos/group/v1/tx";
+import {VoteOption} from "../../src/codegen/cosmos/group/v1/types";
 
 // This is the POA_ADMIN_ADDRESS mnemonic as defined in the config.yaml file
 export const poaAdminMnemonic =
   "razor dog gown public private couple ecology paper flee connect local robot diamond stay rude join sound win ribbon soup kidney glass robot vehicle";
+export const POA_ADDRESS = "manifest1qjtcxl86z0zua2egcsz4ncff2gzlcndzrtglqv";
+export const POA_GROUP_ADDRESS = "manifest1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfmy9qj"
 // test1 key as defined in https://github.com/cosmology-tech/starship/blob/main/starship/charts/devnet/configs/keys.json
 export const test1Mnemonic =
   "opinion knife other balcony surge more bamboo canoe romance ask argue teach anxiety adjust spike mystery wolf alone torch tail six decide wash alley";
 export const test1Val = {
+  mnemonic: test1Mnemonic,
   address: "manifestvaloper1pss7nxeh3f9md2vuxku8q99femnwdjtcjhuxjm",
   pubkey: "qS4C8i2q1orM463qxf5QA8iAwdZ+Aix7Xm+sJqr1kg4=",
 };
@@ -37,29 +29,10 @@ export const test2Mnemonic =
 export const test3Mnemonic =
   "middle weather hip ghost quick oxygen awful library broken chicken tackle animal crunch appear fee indoor fitness enough orphan trend tackle faint eyebrow all";
 export const test3Val = {
+  mnemonic: test3Mnemonic,
   address: "manifestvaloper1pn45c2jdwfwrwva0cknfdlnfst28ucpus9qfk4",
   pubkey: "cWa/RsXD2eidssyLnc8UwZY2468DldmWBTCx2/d7L+c=",
 };
-
-// QueryClient extension for the POA module
-export function setupPoaExtension(base: QueryClient) {
-  const rpcClient = createProtobufRpcClient(base);
-  const queryService = new QueryClientImpl(rpcClient);
-
-  return {
-    poa: {
-      poaAuthority: async () => {
-        return await queryService.poaAuthority();
-      },
-      consensusPower: async (valAddr: string) => {
-        return await queryService.consensusPower({ validatorAddress: valAddr });
-      },
-      pendingValidators: async () => {
-        return await queryService.pendingValidators();
-      },
-    },
-  };
-}
 
 export const createProtoWallet = (mnemonic: string, prefix: string) =>
   DirectSecp256k1HdWallet.fromMnemonic(mnemonic, { prefix });
@@ -77,129 +50,111 @@ export async function initChain(chainId: string) {
   return { denom, prefix, rpcEndpoint, creditFromFaucet };
 }
 
-// MANIFEST
-export const createMsgPayout = (
-  authority: string,
-  payoutPairs: { address: string; coin: { denom: string; amount: string } }[]
+export function uint8ArrayToHexString(uint8Array: Uint8Array): string {
+  return Array.from(uint8Array)
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+export const checkPoaAdminIs = async (
+  rpcEndpoint: string,
+  poaAdminAddress: string,
 ) => {
-  return {
-    typeUrl: MsgPayout.typeUrl,
-    value: MsgPayout.fromPartial({ authority, payoutPairs }),
-  };
-};
+  const client = await createRPCQueryClient({rpcEndpoint});
+  const account = await client.strangelove_ventures.poa.v1.poaAuthority();
+  expect(account.authority).toEqual(poaAdminAddress);
+}
 
-export const createPayoutPair = (
-  address: string,
-  denom: string,
-  amount: number
+export const waitForNBlocks = async (
+  client: SigningStargateClient,
+  numBlocks: number
 ) => {
-  return { address, coin: { denom, amount: amount.toString() } };
+  const height = await client.getHeight();
+  let currentHeight = height;
+  while (currentHeight < height + numBlocks) {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    currentHeight = await client.getHeight();
+  }
 };
 
-export const createBurnMsg = (
-  authority: string,
-  amount: number,
-  denom: string
+const submitGroupProposal = async (
+  signer: string,
+  client: SigningStargateClient,
+  title: string,
+  summary: string,
+  proposers: string[],
+  messages: Any[],
+  fee: { amount: { denom: string; amount: string }[]; gas: string }
 ) => {
-  return {
-    typeUrl: MsgBurnHeldBalance.typeUrl,
-    value: MsgBurnHeldBalance.fromPartial({
-      authority,
-      burnCoins: [{ amount: amount.toString(), denom }],
-    }),
-  };
-};
+  const submitMsg = GroupMessageComposer.fromPartial.submitProposal({
+    groupPolicyAddress: POA_GROUP_ADDRESS,
+    title,
+    summary,
+    proposers,
+    exec: Exec.EXEC_UNSPECIFIED,
+    messages,
+    metadata: ""
+  })
+  const result = await client.signAndBroadcast(signer, [submitMsg], fee);
+  assertIsDeliverTxSuccess(result);
+  expect(result.code).toEqual(0);
 
-// POA
-const createDescription = (
-  moniker: string,
-  identity: string,
-  website: string,
-  securityContact: string,
-  details: string
+  expect(result.msgResponses.length).toEqual(1);
+  const encodedResponse = result.msgResponses[0];
+
+  const submitResponse = MsgSubmitProposalResponse.decode(encodedResponse.value)
+  return submitResponse.proposalId;
+}
+
+const voteGroupProposal = async (
+  signer: string,
+  client: SigningStargateClient,
+  proposalId: bigint,
+  option: VoteOption,
+  fee: { amount: { denom: string; amount: string }[]; gas: string }
 ) => {
-  return {
-    moniker,
-    identity,
-    website,
-    securityContact,
-    details,
-  };
-};
+  const voteMsg = GroupMessageComposer.fromPartial.vote({
+    proposalId,
+    voter: signer,
+    option,
+    metadata: "",
+    exec: Exec.EXEC_UNSPECIFIED
+  })
+  const result = await client.signAndBroadcast(signer, [voteMsg], fee);
+  assertIsDeliverTxSuccess(result);
+  expect(result.code).toEqual(0);
+}
 
-export const createDefaultDescription = () => {
-  return createDescription(
-    "moniker",
-    "identity",
-    "website",
-    "securityContact",
-    "details"
-  );
-};
-
-const createCommissionRates = (
-  rate: string,
-  maxRate: string,
-  maxChangeRate: string
+const execGroupProposal = async (
+  signer: string,
+  client: SigningStargateClient,
+  proposalId: bigint,
+  fee: { amount: { denom: string; amount: string }[]; gas: string }
 ) => {
-  return { rate, maxRate, maxChangeRate };
-};
+  const execMsg = GroupMessageComposer.fromPartial.exec({
+    proposalId,
+    executor: signer
+  })
+  const result = await client.signAndBroadcast(signer, [execMsg], fee);
+  assertIsDeliverTxSuccess(result);
+  expect(result.code).toEqual(0);
+}
 
-export const createDefaultCommissionRates = () => {
-  // The values here must be integers for the AMINO encoding to work properly
-  // E.g., 1000000000000000000 == 1.0
-  return createCommissionRates("0", "0", "0");
-};
-
-export const createMsgCreateValidator = (
-  validatorAddress: string,
-  description: Description,
-  commission: CommissionRates,
-  pubkey: string
+export const submitVoteExecGroupProposal = async (
+  signer: string,
+  client: SigningStargateClient,
+  title: string,
+  summary: string,
+  proposers: string[],
+  messages: Any[],
+  fee: { amount: { denom: string; amount: string }[]; gas: string },
+  timeout: number = 5000
 ) => {
-  return {
-    typeUrl: MsgCreateValidator.typeUrl,
-    value: {
-      description,
-      commission,
-      minSelfDelegation: "1",
-      delegatorAddress: undefined,
-      validatorAddress,
-      pubkey: encodePubkey(encodeEd25519Pubkey(fromBase64(pubkey))),
-    },
-  };
-};
+  const proposalId = await submitGroupProposal(signer, client, title, summary, proposers, messages, fee);
+  await voteGroupProposal(signer, client, proposalId, VoteOption.VOTE_OPTION_YES, fee);
 
-export const createMsgSetPower = (
-  sender: string,
-  validatorAddress: string,
-  power: bigint,
-  unsafe: boolean
-) => {
-  return {
-    typeUrl: MsgSetPower.typeUrl,
-    value: MsgSetPower.fromPartial({ sender, validatorAddress, power, unsafe }),
-  };
-};
+  // Wait for the proposal to be processed
+  await new Promise(resolve => setTimeout(resolve, timeout));
 
-export const createMsgRemoveValidator = (
-  sender: string,
-  validatorAddress: string
-) => {
-  return {
-    typeUrl: MsgRemoveValidator.typeUrl,
-    value: MsgRemoveValidator.fromPartial({ sender, validatorAddress }),
-  };
-};
-
-export const createMsgRemovePendingValidator = (
-  sender: string,
-  validatorAddress: string
-) => {
-  return {
-    typeUrl: MsgRemovePending.typeUrl,
-    value: MsgRemovePending.fromPartial({ sender, validatorAddress }),
-  };
-};
-
-export const BONDED = "BOND_STATUS_BONDED";
+  await execGroupProposal(signer, client, proposalId, fee);
+}

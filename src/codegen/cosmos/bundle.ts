@@ -154,9 +154,9 @@ import * as _208 from "./mint/v1beta1/tx.rpc.msg";
 import * as _209 from "./staking/v1beta1/tx.rpc.msg";
 import * as _210 from "./upgrade/v1beta1/tx.rpc.msg";
 import * as _211 from "./vesting/v1beta1/tx.rpc.msg";
-import * as _247 from "./lcd";
-import * as _248 from "./rpc.query";
-import * as _249 from "./rpc.tx";
+import * as _246 from "./lcd";
+import * as _247 from "./rpc.query";
+import * as _248 from "./rpc.tx";
 export namespace cosmos {
   export namespace app {
     export namespace runtime {
@@ -467,8 +467,8 @@ export namespace cosmos {
     };
   }
   export const ClientFactory = {
+    ..._246,
     ..._247,
-    ..._248,
-    ..._249
+    ..._248
   };
 }
