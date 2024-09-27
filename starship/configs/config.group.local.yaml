@@ -5,7 +5,7 @@ chains:
   - id: manifest-ledger-beta
     name: custom
 #    image: ghcr.io/liftedinit/manifest-ledger:v0.0.1-alpha.15
-    image: manifest-ledger:v0.0.1-alpha.15-dev.3
+    image: manifest-ledger:v0.0.1-alpha.16.dev.2
     home: /root/.manifest
     binary: manifestd
     prefix: manifest
@@ -81,6 +81,10 @@ chains:
         distribution:
           params:
             community_tax: "0"
+        tokenfactory:
+          params:
+            denom_creation_fee: []
+            denom_creation_gas_consume: 10000
     ports:
       rest: 1317
       rpc: 26657

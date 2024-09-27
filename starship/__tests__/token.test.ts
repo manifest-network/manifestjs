@@ -1,10 +1,15 @@
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import { assertIsDeliverTxSuccess, StargateClient } from "@cosmjs/stargate";
-import {ConfigContext, generateMnemonic, useChain, useRegistry} from "starshipjs";
+import {
+  ConfigContext,
+  generateMnemonic,
+  useChain,
+  useRegistry,
+} from "starshipjs";
 
 import { MsgTransfer } from "../../src/codegen/ibc/applications/transfer/v1/tx";
 import path from "path";
-import {getSigningLiftedinitClient, ibc} from "../../src/codegen";
+import { getSigningLiftedinitClient, ibc } from "../../src/codegen";
 
 describe("Token transfers", () => {
   let wallet, address;
@@ -12,7 +17,12 @@ describe("Token transfers", () => {
   const denom = "umfx";
 
   beforeAll(async () => {
-    const configFile = path.join(__dirname, "..", "configs", "config.local.yaml");
+    const configFile = path.join(
+      __dirname,
+      "..",
+      "configs",
+      "config.group.local.yaml"
+    );
     ConfigContext.setConfigFile(configFile);
     ConfigContext.setRegistry(await useRegistry(configFile));
 

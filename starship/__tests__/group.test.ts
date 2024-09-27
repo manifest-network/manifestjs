@@ -1,11 +1,11 @@
 import { OfflineSigner } from "@cosmjs/proto-signing";
-import {ConfigContext, generateMnemonic, useRegistry} from "starshipjs";
+import { ConfigContext, generateMnemonic, useRegistry } from "starshipjs";
 import {
   checkPoaAdminIs,
   createAminoWallet,
   createProtoWallet,
-  initChain, POA_ADDRESS,
-  poaAdminMnemonic,
+  initChain,
+  POA_GROUP_ADDRESS,
   // @ts-ignore
 } from "../src/test_helper";
 import { assertIsDeliverTxSuccess } from "@cosmjs/stargate";
@@ -21,7 +21,7 @@ import {
 import { Duration } from "../../src/codegen/google/protobuf/duration";
 import { createRPCQueryClient } from "../../src/codegen/cosmos/rpc.query";
 import path from "path";
-import {getSigningCosmosTxRpc} from "../../src/codegen";
+import { getSigningCosmosTxRpc } from "../../src/codegen";
 
 const inits = [
   {
@@ -34,11 +34,10 @@ const inits = [
   },
 ];
 
+// Test Group module endpoints with both proto and amino signing.
 describe.each(inits)("$description", ({ description, createWallets }) => {
-  let poaWallet: OfflineSigner,
-    test1Wallet: OfflineSigner,
+  let test1Wallet: OfflineSigner,
     test2Wallet: OfflineSigner,
-    poaAddress: string,
     t1Addr: string,
     t2Addr: string,
     rpcEndpoint: string,
@@ -47,25 +46,27 @@ describe.each(inits)("$description", ({ description, createWallets }) => {
   const denom = "umfx";
 
   beforeAll(async () => {
-    const configFile = path.join(__dirname, "..", "configs", "config.local.yaml");
+    const configFile = path.join(
+      __dirname,
+      "..",
+      "configs",
+      "config.group.local.yaml"
+    );
     ConfigContext.setConfigFile(configFile);
     ConfigContext.setRegistry(await useRegistry(configFile));
 
     const chainData = await initChain("manifest-ledger-beta");
     rpcEndpoint = chainData.rpcEndpoint;
 
-    await checkPoaAdminIs(rpcEndpoint, POA_ADDRESS);
+    await checkPoaAdminIs(rpcEndpoint, POA_GROUP_ADDRESS);
 
-    poaWallet = await createWallets(poaAdminMnemonic, chainData.prefix);
     test1Wallet = await createWallets(generateMnemonic(), chainData.prefix);
     test2Wallet = await createWallets(generateMnemonic(), chainData.prefix);
     fee = { amount: [{ denom, amount: "100000" }], gas: "550000" };
 
-    poaAddress = (await poaWallet.getAccounts())[0].address;
     t1Addr = (await test1Wallet.getAccounts())[0].address;
     t2Addr = (await test2Wallet.getAccounts())[0].address;
 
-    await chainData.creditFromFaucet(poaAddress, denom);
     await chainData.creditFromFaucet(t1Addr, denom);
     await chainData.creditFromFaucet(t2Addr, denom);
   });

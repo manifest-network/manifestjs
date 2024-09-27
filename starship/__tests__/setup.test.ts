@@ -7,7 +7,12 @@ describe("Test clients", () => {
   let client;
 
   beforeAll(async () => {
-    const configFile = path.join(__dirname, "..", "configs", "config.local.yaml");
+    const configFile = path.join(
+      __dirname,
+      "..",
+      "configs",
+      "config.group.local.yaml"
+    );
     ConfigContext.setConfigFile(configFile);
     ConfigContext.setRegistry(await useRegistry(configFile));
 

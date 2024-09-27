@@ -2,21 +2,22 @@ import {
   checkPoaAdminIs,
   createAminoWallet,
   createProtoWallet,
-  initChain, POA_ADDRESS,
-  poaAdminMnemonic,
+  generateRandomString,
+  initChain,
+  POA_GROUP_ADDRESS,
   // @ts-ignore
 } from "../src/test_helper";
 import { OfflineSigner } from "@cosmjs/proto-signing";
 import { MessageComposer } from "../../src/codegen/osmosis/tokenfactory/v1beta1/tx.registry";
 import { assertIsDeliverTxSuccess } from "@cosmjs/stargate";
 import { createRPCQueryClient } from "../../src/codegen/osmosis/rpc.query";
-import {ConfigContext, generateMnemonic, useRegistry} from "starshipjs";
+import { ConfigContext, generateMnemonic, useRegistry } from "starshipjs";
 import {
   DenomUnit,
   Metadata,
 } from "../../src/codegen/cosmos/bank/v1beta1/bank";
 import path from "path";
-import {getSigningOsmosisClient} from "../../src/codegen";
+import { getSigningOsmosisClient } from "../../src/codegen";
 
 const inits = [
   {
@@ -29,48 +30,44 @@ const inits = [
   },
 ];
 
-function generateRandomString(length: number): string {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    result += characters[randomIndex];
-  }
-  return result;
-}
-
+// Test TokenFactory module endpoints with both proto and amino signing.
 describe.each(inits)("$description", ({ createWallets }) => {
-  let poaWallet: OfflineSigner,
-    t1Wallet: OfflineSigner,
-    poaAddr: string,
+  let t1Wallet: OfflineSigner,
+    t2Wallet: OfflineSigner,
     t1Addr: string,
+    t2Addr: string,
     rpcEndpoint: string,
     subdenom: string,
     fee: { amount: { denom: string; amount: string }[]; gas: string };
   const denom = "umfx";
 
   beforeAll(async () => {
-    const configFile = path.join(__dirname, "..", "configs", "config.local.yaml");
+    const configFile = path.join(
+      __dirname,
+      "..",
+      "configs",
+      "config.group.local.yaml"
+    );
     ConfigContext.setConfigFile(configFile);
     ConfigContext.setRegistry(await useRegistry(configFile));
 
     const chainData = await initChain("manifest-ledger-beta");
     rpcEndpoint = chainData.rpcEndpoint;
 
-    await checkPoaAdminIs(rpcEndpoint, POA_ADDRESS);
+    await checkPoaAdminIs(rpcEndpoint, POA_GROUP_ADDRESS);
 
-    poaWallet = await createWallets(poaAdminMnemonic, chainData.prefix);
     t1Wallet = await createWallets(generateMnemonic(), chainData.prefix);
+    t2Wallet = await createWallets(generateMnemonic(), chainData.prefix);
 
     fee = { amount: [{ denom, amount: "100000" }], gas: "55000000" };
 
     subdenom = "u" + generateRandomString(5);
 
-    poaAddr = (await poaWallet.getAccounts())[0].address;
     t1Addr = (await t1Wallet.getAccounts())[0].address;
+    t2Addr = (await t2Wallet.getAccounts())[0].address;
 
-    await chainData.creditFromFaucet(poaAddr);
     await chainData.creditFromFaucet(t1Addr);
+    await chainData.creditFromFaucet(t2Addr);
   });
 
   test("create denom", async () => {
@@ -241,7 +238,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
 
     const msg = MessageComposer.fromPartial.changeAdmin({
       sender: t1Addr,
-      newAdmin: poaAddr,
+      newAdmin: t2Addr,
       denom,
     });
 
@@ -258,6 +255,6 @@ describe.each(inits)("$description", ({ createWallets }) => {
       await queryClient.osmosis.tokenfactory.v1beta1.denomAuthorityMetadata({
         denom,
       });
-    expect(admin.authorityMetadata.admin).toBe(poaAddr);
+    expect(admin.authorityMetadata.admin).toBe(t2Addr);
   });
 });
