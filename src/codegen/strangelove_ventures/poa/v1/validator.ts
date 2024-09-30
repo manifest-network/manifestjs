@@ -1,10 +1,11 @@
 import { Timestamp } from "../../../google/protobuf/timestamp";
 import { Any, AnyProtoMsg, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial, Exact, toTimestamp, fromTimestamp } from "../../../helpers";
+import { JsonSafe } from "../../../json-safe";
+import { DeepPartial, Exact, isSet, toTimestamp, fromTimestamp } from "../../../helpers";
+import { GlobalDecoderRegistry } from "../../../registry";
 import { Decimal } from "@cosmjs/math";
 import { encodePubkey, decodePubkey } from "@cosmjs/proto-signing";
-import { Pubkey } from "@cosmjs/amino";
 /** BondStatus is the status of a validator. */
 export enum BondStatus {
   /** BOND_STATUS_UNSPECIFIED - UNSPECIFIED defines an invalid validator status. */
@@ -380,6 +381,15 @@ function createBaseValidators(): Validators {
 export const Validators = {
   typeUrl: "/strangelove_ventures.poa.v1.Validators",
   aminoType: "poa/Validators",
+  is(o: any): o is Validators {
+    return o && (o.$typeUrl === Validators.typeUrl || Array.isArray(o.validators) && (!o.validators.length || Validator.is(o.validators[0])));
+  },
+  isSDK(o: any): o is ValidatorsSDKType {
+    return o && (o.$typeUrl === Validators.typeUrl || Array.isArray(o.validators) && (!o.validators.length || Validator.isSDK(o.validators[0])));
+  },
+  isAmino(o: any): o is ValidatorsAmino {
+    return o && (o.$typeUrl === Validators.typeUrl || Array.isArray(o.validators) && (!o.validators.length || Validator.isAmino(o.validators[0])));
+  },
   encode(message: Validators, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.validators) {
       Validator.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -402,6 +412,20 @@ export const Validators = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): Validators {
+    return {
+      validators: Array.isArray(object?.validators) ? object.validators.map((e: any) => Validator.fromJSON(e)) : []
+    };
+  },
+  toJSON(message: Validators): JsonSafe<Validators> {
+    const obj: any = {};
+    if (message.validators) {
+      obj.validators = message.validators.map(e => e ? Validator.toJSON(e) : undefined);
+    } else {
+      obj.validators = [];
+    }
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<Validators>, I>>(object: I): Validators {
     const message = createBaseValidators();
@@ -444,6 +468,8 @@ export const Validators = {
     };
   }
 };
+GlobalDecoderRegistry.register(Validators.typeUrl, Validators);
+GlobalDecoderRegistry.registerAminoProtoMapping(Validators.aminoType, Validators.typeUrl);
 function createBaseDescription(): Description {
   return {
     moniker: "",
@@ -455,6 +481,15 @@ function createBaseDescription(): Description {
 }
 export const Description = {
   typeUrl: "/strangelove_ventures.poa.v1.Description",
+  is(o: any): o is Description {
+    return o && (o.$typeUrl === Description.typeUrl || typeof o.moniker === "string" && typeof o.identity === "string" && typeof o.website === "string" && typeof o.securityContact === "string" && typeof o.details === "string");
+  },
+  isSDK(o: any): o is DescriptionSDKType {
+    return o && (o.$typeUrl === Description.typeUrl || typeof o.moniker === "string" && typeof o.identity === "string" && typeof o.website === "string" && typeof o.security_contact === "string" && typeof o.details === "string");
+  },
+  isAmino(o: any): o is DescriptionAmino {
+    return o && (o.$typeUrl === Description.typeUrl || typeof o.moniker === "string" && typeof o.identity === "string" && typeof o.website === "string" && typeof o.security_contact === "string" && typeof o.details === "string");
+  },
   encode(message: Description, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.moniker !== "") {
       writer.uint32(10).string(message.moniker);
@@ -501,6 +536,24 @@ export const Description = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): Description {
+    return {
+      moniker: isSet(object.moniker) ? String(object.moniker) : "",
+      identity: isSet(object.identity) ? String(object.identity) : "",
+      website: isSet(object.website) ? String(object.website) : "",
+      securityContact: isSet(object.securityContact) ? String(object.securityContact) : "",
+      details: isSet(object.details) ? String(object.details) : ""
+    };
+  },
+  toJSON(message: Description): JsonSafe<Description> {
+    const obj: any = {};
+    message.moniker !== undefined && (obj.moniker = message.moniker);
+    message.identity !== undefined && (obj.identity = message.identity);
+    message.website !== undefined && (obj.website = message.website);
+    message.securityContact !== undefined && (obj.securityContact = message.securityContact);
+    message.details !== undefined && (obj.details = message.details);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<Description>, I>>(object: I): Description {
     const message = createBaseDescription();
@@ -555,6 +608,7 @@ export const Description = {
     };
   }
 };
+GlobalDecoderRegistry.register(Description.typeUrl, Description);
 function createBaseCommissionRates(): CommissionRates {
   return {
     rate: "",
@@ -564,6 +618,15 @@ function createBaseCommissionRates(): CommissionRates {
 }
 export const CommissionRates = {
   typeUrl: "/strangelove_ventures.poa.v1.CommissionRates",
+  is(o: any): o is CommissionRates {
+    return o && (o.$typeUrl === CommissionRates.typeUrl || typeof o.rate === "string" && typeof o.maxRate === "string" && typeof o.maxChangeRate === "string");
+  },
+  isSDK(o: any): o is CommissionRatesSDKType {
+    return o && (o.$typeUrl === CommissionRates.typeUrl || typeof o.rate === "string" && typeof o.max_rate === "string" && typeof o.max_change_rate === "string");
+  },
+  isAmino(o: any): o is CommissionRatesAmino {
+    return o && (o.$typeUrl === CommissionRates.typeUrl || typeof o.rate === "string" && typeof o.max_rate === "string" && typeof o.max_change_rate === "string");
+  },
   encode(message: CommissionRates, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.rate !== "") {
       writer.uint32(10).string(Decimal.fromUserInput(message.rate, 18).atomics);
@@ -598,6 +661,20 @@ export const CommissionRates = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): CommissionRates {
+    return {
+      rate: isSet(object.rate) ? String(object.rate) : "",
+      maxRate: isSet(object.maxRate) ? String(object.maxRate) : "",
+      maxChangeRate: isSet(object.maxChangeRate) ? String(object.maxChangeRate) : ""
+    };
+  },
+  toJSON(message: CommissionRates): JsonSafe<CommissionRates> {
+    const obj: any = {};
+    message.rate !== undefined && (obj.rate = message.rate);
+    message.maxRate !== undefined && (obj.maxRate = message.maxRate);
+    message.maxChangeRate !== undefined && (obj.maxChangeRate = message.maxChangeRate);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<CommissionRates>, I>>(object: I): CommissionRates {
     const message = createBaseCommissionRates();
@@ -642,6 +719,7 @@ export const CommissionRates = {
     };
   }
 };
+GlobalDecoderRegistry.register(CommissionRates.typeUrl, CommissionRates);
 function createBaseCommission(): Commission {
   return {
     commissionRates: CommissionRates.fromPartial({}),
@@ -650,6 +728,15 @@ function createBaseCommission(): Commission {
 }
 export const Commission = {
   typeUrl: "/strangelove_ventures.poa.v1.Commission",
+  is(o: any): o is Commission {
+    return o && (o.$typeUrl === Commission.typeUrl || CommissionRates.is(o.commissionRates) && Timestamp.is(o.updateTime));
+  },
+  isSDK(o: any): o is CommissionSDKType {
+    return o && (o.$typeUrl === Commission.typeUrl || CommissionRates.isSDK(o.commission_rates) && Timestamp.isSDK(o.update_time));
+  },
+  isAmino(o: any): o is CommissionAmino {
+    return o && (o.$typeUrl === Commission.typeUrl || CommissionRates.isAmino(o.commission_rates) && Timestamp.isAmino(o.update_time));
+  },
   encode(message: Commission, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.commissionRates !== undefined) {
       CommissionRates.encode(message.commissionRates, writer.uint32(10).fork()).ldelim();
@@ -678,6 +765,18 @@ export const Commission = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): Commission {
+    return {
+      commissionRates: isSet(object.commissionRates) ? CommissionRates.fromJSON(object.commissionRates) : undefined,
+      updateTime: isSet(object.updateTime) ? new Date(object.updateTime) : undefined
+    };
+  },
+  toJSON(message: Commission): JsonSafe<Commission> {
+    const obj: any = {};
+    message.commissionRates !== undefined && (obj.commissionRates = message.commissionRates ? CommissionRates.toJSON(message.commissionRates) : undefined);
+    message.updateTime !== undefined && (obj.updateTime = message.updateTime.toISOString());
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<Commission>, I>>(object: I): Commission {
     const message = createBaseCommission();
@@ -717,6 +816,7 @@ export const Commission = {
     };
   }
 };
+GlobalDecoderRegistry.register(Commission.typeUrl, Commission);
 function createBaseValidator(): Validator {
   return {
     operatorAddress: "",
@@ -736,12 +836,21 @@ function createBaseValidator(): Validator {
 }
 export const Validator = {
   typeUrl: "/strangelove_ventures.poa.v1.Validator",
+  is(o: any): o is Validator {
+    return o && (o.$typeUrl === Validator.typeUrl || typeof o.operatorAddress === "string" && typeof o.jailed === "boolean" && isSet(o.status) && typeof o.tokens === "string" && typeof o.delegatorShares === "string" && Description.is(o.description) && typeof o.unbondingHeight === "bigint" && Timestamp.is(o.unbondingTime) && Commission.is(o.commission) && typeof o.minSelfDelegation === "string" && typeof o.unbondingOnHoldRefCount === "bigint" && Array.isArray(o.unbondingIds) && (!o.unbondingIds.length || typeof o.unbondingIds[0] === "bigint"));
+  },
+  isSDK(o: any): o is ValidatorSDKType {
+    return o && (o.$typeUrl === Validator.typeUrl || typeof o.operator_address === "string" && typeof o.jailed === "boolean" && isSet(o.status) && typeof o.tokens === "string" && typeof o.delegator_shares === "string" && Description.isSDK(o.description) && typeof o.unbonding_height === "bigint" && Timestamp.isSDK(o.unbonding_time) && Commission.isSDK(o.commission) && typeof o.min_self_delegation === "string" && typeof o.unbonding_on_hold_ref_count === "bigint" && Array.isArray(o.unbonding_ids) && (!o.unbonding_ids.length || typeof o.unbonding_ids[0] === "bigint"));
+  },
+  isAmino(o: any): o is ValidatorAmino {
+    return o && (o.$typeUrl === Validator.typeUrl || typeof o.operator_address === "string" && typeof o.jailed === "boolean" && isSet(o.status) && typeof o.tokens === "string" && typeof o.delegator_shares === "string" && Description.isAmino(o.description) && typeof o.unbonding_height === "bigint" && Timestamp.isAmino(o.unbonding_time) && Commission.isAmino(o.commission) && typeof o.min_self_delegation === "string" && typeof o.unbonding_on_hold_ref_count === "bigint" && Array.isArray(o.unbonding_ids) && (!o.unbonding_ids.length || typeof o.unbonding_ids[0] === "bigint"));
+  },
   encode(message: Validator, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.operatorAddress !== "") {
       writer.uint32(10).string(message.operatorAddress);
     }
     if (message.consensusPubkey !== undefined) {
-      Any.encode(message.consensusPubkey as Any, writer.uint32(18).fork()).ldelim();
+      Any.encode(GlobalDecoderRegistry.wrapAny(message.consensusPubkey), writer.uint32(18).fork()).ldelim();
     }
     if (message.jailed === true) {
       writer.uint32(24).bool(message.jailed);
@@ -791,7 +900,7 @@ export const Validator = {
           message.operatorAddress = reader.string();
           break;
         case 2:
-          message.consensusPubkey = Cosmos_cryptoPubKey_InterfaceDecoder(reader) as Any;
+          message.consensusPubkey = GlobalDecoderRegistry.unwrapAny(reader);
           break;
         case 3:
           message.jailed = reader.bool();
@@ -840,10 +949,48 @@ export const Validator = {
     }
     return message;
   },
+  fromJSON(object: any): Validator {
+    return {
+      operatorAddress: isSet(object.operatorAddress) ? String(object.operatorAddress) : "",
+      consensusPubkey: isSet(object.consensusPubkey) ? GlobalDecoderRegistry.fromJSON(object.consensusPubkey) : undefined,
+      jailed: isSet(object.jailed) ? Boolean(object.jailed) : false,
+      status: isSet(object.status) ? bondStatusFromJSON(object.status) : -1,
+      tokens: isSet(object.tokens) ? String(object.tokens) : "",
+      delegatorShares: isSet(object.delegatorShares) ? String(object.delegatorShares) : "",
+      description: isSet(object.description) ? Description.fromJSON(object.description) : undefined,
+      unbondingHeight: isSet(object.unbondingHeight) ? BigInt(object.unbondingHeight.toString()) : BigInt(0),
+      unbondingTime: isSet(object.unbondingTime) ? new Date(object.unbondingTime) : undefined,
+      commission: isSet(object.commission) ? Commission.fromJSON(object.commission) : undefined,
+      minSelfDelegation: isSet(object.minSelfDelegation) ? String(object.minSelfDelegation) : "",
+      unbondingOnHoldRefCount: isSet(object.unbondingOnHoldRefCount) ? BigInt(object.unbondingOnHoldRefCount.toString()) : BigInt(0),
+      unbondingIds: Array.isArray(object?.unbondingIds) ? object.unbondingIds.map((e: any) => BigInt(e.toString())) : []
+    };
+  },
+  toJSON(message: Validator): JsonSafe<Validator> {
+    const obj: any = {};
+    message.operatorAddress !== undefined && (obj.operatorAddress = message.operatorAddress);
+    message.consensusPubkey !== undefined && (obj.consensusPubkey = message.consensusPubkey ? GlobalDecoderRegistry.toJSON(message.consensusPubkey) : undefined);
+    message.jailed !== undefined && (obj.jailed = message.jailed);
+    message.status !== undefined && (obj.status = bondStatusToJSON(message.status));
+    message.tokens !== undefined && (obj.tokens = message.tokens);
+    message.delegatorShares !== undefined && (obj.delegatorShares = message.delegatorShares);
+    message.description !== undefined && (obj.description = message.description ? Description.toJSON(message.description) : undefined);
+    message.unbondingHeight !== undefined && (obj.unbondingHeight = (message.unbondingHeight || BigInt(0)).toString());
+    message.unbondingTime !== undefined && (obj.unbondingTime = message.unbondingTime.toISOString());
+    message.commission !== undefined && (obj.commission = message.commission ? Commission.toJSON(message.commission) : undefined);
+    message.minSelfDelegation !== undefined && (obj.minSelfDelegation = message.minSelfDelegation);
+    message.unbondingOnHoldRefCount !== undefined && (obj.unbondingOnHoldRefCount = (message.unbondingOnHoldRefCount || BigInt(0)).toString());
+    if (message.unbondingIds) {
+      obj.unbondingIds = message.unbondingIds.map(e => (e || BigInt(0)).toString());
+    } else {
+      obj.unbondingIds = [];
+    }
+    return obj;
+  },
   fromPartial<I extends Exact<DeepPartial<Validator>, I>>(object: I): Validator {
     const message = createBaseValidator();
     message.operatorAddress = object.operatorAddress ?? "";
-    message.consensusPubkey = object.consensusPubkey !== undefined && object.consensusPubkey !== null ? Any.fromPartial(object.consensusPubkey) : undefined;
+    message.consensusPubkey = object.consensusPubkey !== undefined && object.consensusPubkey !== null ? GlobalDecoderRegistry.fromPartial(object.consensusPubkey) : undefined;
     message.jailed = object.jailed ?? false;
     message.status = object.status ?? 0;
     message.tokens = object.tokens ?? "";
@@ -907,11 +1054,11 @@ export const Validator = {
     obj.tokens = message.tokens === "" ? undefined : message.tokens;
     obj.delegator_shares = message.delegatorShares === "" ? undefined : message.delegatorShares;
     obj.description = message.description ? Description.toAmino(message.description) : Description.toAmino(Description.fromPartial({}));
-    obj.unbonding_height = message.unbondingHeight !== BigInt(0) ? message.unbondingHeight.toString() : undefined;
+    obj.unbonding_height = message.unbondingHeight !== BigInt(0) ? (message.unbondingHeight?.toString)() : undefined;
     obj.unbonding_time = message.unbondingTime ? Timestamp.toAmino(toTimestamp(message.unbondingTime)) : new Date();
     obj.commission = message.commission ? Commission.toAmino(message.commission) : Commission.toAmino(Commission.fromPartial({}));
     obj.min_self_delegation = message.minSelfDelegation === "" ? undefined : message.minSelfDelegation;
-    obj.unbonding_on_hold_ref_count = message.unbondingOnHoldRefCount !== BigInt(0) ? message.unbondingOnHoldRefCount.toString() : undefined;
+    obj.unbonding_on_hold_ref_count = message.unbondingOnHoldRefCount !== BigInt(0) ? (message.unbondingOnHoldRefCount?.toString)() : undefined;
     if (message.unbondingIds) {
       obj.unbonding_ids = message.unbondingIds.map(e => e.toString());
     } else {
@@ -935,17 +1082,4 @@ export const Validator = {
     };
   }
 };
-export const Cosmos_cryptoPubKey_InterfaceDecoder = (input: BinaryReader | Uint8Array): Any => {
-  const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-  const data = Any.decode(reader, reader.uint32());
-  switch (data.typeUrl) {
-    default:
-      return data;
-  }
-};
-export const Cosmos_cryptoPubKey_FromAmino = (content: AnyAmino): Any => {
-  return encodePubkey(content);
-};
-export const Cosmos_cryptoPubKey_ToAmino = (content: Any): Pubkey | null => {
-  return decodePubkey(content);
-};
+GlobalDecoderRegistry.register(Validator.typeUrl, Validator);

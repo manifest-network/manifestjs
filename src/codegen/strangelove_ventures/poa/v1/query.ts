@@ -1,6 +1,8 @@
 import { Validator, ValidatorAmino, ValidatorSDKType } from "./validator";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { DeepPartial, Exact } from "../../../helpers";
+import { JsonSafe } from "../../../json-safe";
+import { DeepPartial, Exact, isSet } from "../../../helpers";
+import { GlobalDecoderRegistry } from "../../../registry";
 /** QueryPendingValidatorsRequest is the request type for the Query/PendingValidators RPC method. */
 export interface QueryPendingValidatorsRequest {}
 export interface QueryPendingValidatorsRequestProtoMsg {
@@ -122,6 +124,15 @@ function createBaseQueryPendingValidatorsRequest(): QueryPendingValidatorsReques
 }
 export const QueryPendingValidatorsRequest = {
   typeUrl: "/strangelove_ventures.poa.v1.QueryPendingValidatorsRequest",
+  is(o: any): o is QueryPendingValidatorsRequest {
+    return o && o.$typeUrl === QueryPendingValidatorsRequest.typeUrl;
+  },
+  isSDK(o: any): o is QueryPendingValidatorsRequestSDKType {
+    return o && o.$typeUrl === QueryPendingValidatorsRequest.typeUrl;
+  },
+  isAmino(o: any): o is QueryPendingValidatorsRequestAmino {
+    return o && o.$typeUrl === QueryPendingValidatorsRequest.typeUrl;
+  },
   encode(_: QueryPendingValidatorsRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -138,6 +149,13 @@ export const QueryPendingValidatorsRequest = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): QueryPendingValidatorsRequest {
+    return {};
+  },
+  toJSON(_: QueryPendingValidatorsRequest): JsonSafe<QueryPendingValidatorsRequest> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<QueryPendingValidatorsRequest>, I>>(_: I): QueryPendingValidatorsRequest {
     const message = createBaseQueryPendingValidatorsRequest();
@@ -167,6 +185,7 @@ export const QueryPendingValidatorsRequest = {
     };
   }
 };
+GlobalDecoderRegistry.register(QueryPendingValidatorsRequest.typeUrl, QueryPendingValidatorsRequest);
 function createBasePendingValidatorsResponse(): PendingValidatorsResponse {
   return {
     pending: []
@@ -174,6 +193,15 @@ function createBasePendingValidatorsResponse(): PendingValidatorsResponse {
 }
 export const PendingValidatorsResponse = {
   typeUrl: "/strangelove_ventures.poa.v1.PendingValidatorsResponse",
+  is(o: any): o is PendingValidatorsResponse {
+    return o && (o.$typeUrl === PendingValidatorsResponse.typeUrl || Array.isArray(o.pending) && (!o.pending.length || Validator.is(o.pending[0])));
+  },
+  isSDK(o: any): o is PendingValidatorsResponseSDKType {
+    return o && (o.$typeUrl === PendingValidatorsResponse.typeUrl || Array.isArray(o.pending) && (!o.pending.length || Validator.isSDK(o.pending[0])));
+  },
+  isAmino(o: any): o is PendingValidatorsResponseAmino {
+    return o && (o.$typeUrl === PendingValidatorsResponse.typeUrl || Array.isArray(o.pending) && (!o.pending.length || Validator.isAmino(o.pending[0])));
+  },
   encode(message: PendingValidatorsResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.pending) {
       Validator.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -196,6 +224,20 @@ export const PendingValidatorsResponse = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): PendingValidatorsResponse {
+    return {
+      pending: Array.isArray(object?.pending) ? object.pending.map((e: any) => Validator.fromJSON(e)) : []
+    };
+  },
+  toJSON(message: PendingValidatorsResponse): JsonSafe<PendingValidatorsResponse> {
+    const obj: any = {};
+    if (message.pending) {
+      obj.pending = message.pending.map(e => e ? Validator.toJSON(e) : undefined);
+    } else {
+      obj.pending = [];
+    }
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<PendingValidatorsResponse>, I>>(object: I): PendingValidatorsResponse {
     const message = createBasePendingValidatorsResponse();
@@ -232,6 +274,7 @@ export const PendingValidatorsResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(PendingValidatorsResponse.typeUrl, PendingValidatorsResponse);
 function createBaseQueryConsensusPowerRequest(): QueryConsensusPowerRequest {
   return {
     validatorAddress: ""
@@ -239,6 +282,15 @@ function createBaseQueryConsensusPowerRequest(): QueryConsensusPowerRequest {
 }
 export const QueryConsensusPowerRequest = {
   typeUrl: "/strangelove_ventures.poa.v1.QueryConsensusPowerRequest",
+  is(o: any): o is QueryConsensusPowerRequest {
+    return o && (o.$typeUrl === QueryConsensusPowerRequest.typeUrl || typeof o.validatorAddress === "string");
+  },
+  isSDK(o: any): o is QueryConsensusPowerRequestSDKType {
+    return o && (o.$typeUrl === QueryConsensusPowerRequest.typeUrl || typeof o.validator_address === "string");
+  },
+  isAmino(o: any): o is QueryConsensusPowerRequestAmino {
+    return o && (o.$typeUrl === QueryConsensusPowerRequest.typeUrl || typeof o.validator_address === "string");
+  },
   encode(message: QueryConsensusPowerRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.validatorAddress !== "") {
       writer.uint32(10).string(message.validatorAddress);
@@ -261,6 +313,16 @@ export const QueryConsensusPowerRequest = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): QueryConsensusPowerRequest {
+    return {
+      validatorAddress: isSet(object.validatorAddress) ? String(object.validatorAddress) : ""
+    };
+  },
+  toJSON(message: QueryConsensusPowerRequest): JsonSafe<QueryConsensusPowerRequest> {
+    const obj: any = {};
+    message.validatorAddress !== undefined && (obj.validatorAddress = message.validatorAddress);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<QueryConsensusPowerRequest>, I>>(object: I): QueryConsensusPowerRequest {
     const message = createBaseQueryConsensusPowerRequest();
@@ -295,6 +357,7 @@ export const QueryConsensusPowerRequest = {
     };
   }
 };
+GlobalDecoderRegistry.register(QueryConsensusPowerRequest.typeUrl, QueryConsensusPowerRequest);
 function createBaseQueryConsensusPowerResponse(): QueryConsensusPowerResponse {
   return {
     consensusPower: BigInt(0)
@@ -302,6 +365,15 @@ function createBaseQueryConsensusPowerResponse(): QueryConsensusPowerResponse {
 }
 export const QueryConsensusPowerResponse = {
   typeUrl: "/strangelove_ventures.poa.v1.QueryConsensusPowerResponse",
+  is(o: any): o is QueryConsensusPowerResponse {
+    return o && (o.$typeUrl === QueryConsensusPowerResponse.typeUrl || typeof o.consensusPower === "bigint");
+  },
+  isSDK(o: any): o is QueryConsensusPowerResponseSDKType {
+    return o && (o.$typeUrl === QueryConsensusPowerResponse.typeUrl || typeof o.consensus_power === "bigint");
+  },
+  isAmino(o: any): o is QueryConsensusPowerResponseAmino {
+    return o && (o.$typeUrl === QueryConsensusPowerResponse.typeUrl || typeof o.consensus_power === "bigint");
+  },
   encode(message: QueryConsensusPowerResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.consensusPower !== BigInt(0)) {
       writer.uint32(8).int64(message.consensusPower);
@@ -325,6 +397,16 @@ export const QueryConsensusPowerResponse = {
     }
     return message;
   },
+  fromJSON(object: any): QueryConsensusPowerResponse {
+    return {
+      consensusPower: isSet(object.consensusPower) ? BigInt(object.consensusPower.toString()) : BigInt(0)
+    };
+  },
+  toJSON(message: QueryConsensusPowerResponse): JsonSafe<QueryConsensusPowerResponse> {
+    const obj: any = {};
+    message.consensusPower !== undefined && (obj.consensusPower = (message.consensusPower || BigInt(0)).toString());
+    return obj;
+  },
   fromPartial<I extends Exact<DeepPartial<QueryConsensusPowerResponse>, I>>(object: I): QueryConsensusPowerResponse {
     const message = createBaseQueryConsensusPowerResponse();
     message.consensusPower = object.consensusPower !== undefined && object.consensusPower !== null ? BigInt(object.consensusPower.toString()) : BigInt(0);
@@ -339,7 +421,7 @@ export const QueryConsensusPowerResponse = {
   },
   toAmino(message: QueryConsensusPowerResponse): QueryConsensusPowerResponseAmino {
     const obj: any = {};
-    obj.consensus_power = message.consensusPower !== BigInt(0) ? message.consensusPower.toString() : undefined;
+    obj.consensus_power = message.consensusPower !== BigInt(0) ? (message.consensusPower?.toString)() : undefined;
     return obj;
   },
   fromAminoMsg(object: QueryConsensusPowerResponseAminoMsg): QueryConsensusPowerResponse {
@@ -358,11 +440,21 @@ export const QueryConsensusPowerResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(QueryConsensusPowerResponse.typeUrl, QueryConsensusPowerResponse);
 function createBaseQueryPoaAuthorityRequest(): QueryPoaAuthorityRequest {
   return {};
 }
 export const QueryPoaAuthorityRequest = {
   typeUrl: "/strangelove_ventures.poa.v1.QueryPoaAuthorityRequest",
+  is(o: any): o is QueryPoaAuthorityRequest {
+    return o && o.$typeUrl === QueryPoaAuthorityRequest.typeUrl;
+  },
+  isSDK(o: any): o is QueryPoaAuthorityRequestSDKType {
+    return o && o.$typeUrl === QueryPoaAuthorityRequest.typeUrl;
+  },
+  isAmino(o: any): o is QueryPoaAuthorityRequestAmino {
+    return o && o.$typeUrl === QueryPoaAuthorityRequest.typeUrl;
+  },
   encode(_: QueryPoaAuthorityRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     return writer;
   },
@@ -379,6 +471,13 @@ export const QueryPoaAuthorityRequest = {
       }
     }
     return message;
+  },
+  fromJSON(_: any): QueryPoaAuthorityRequest {
+    return {};
+  },
+  toJSON(_: QueryPoaAuthorityRequest): JsonSafe<QueryPoaAuthorityRequest> {
+    const obj: any = {};
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<QueryPoaAuthorityRequest>, I>>(_: I): QueryPoaAuthorityRequest {
     const message = createBaseQueryPoaAuthorityRequest();
@@ -408,6 +507,7 @@ export const QueryPoaAuthorityRequest = {
     };
   }
 };
+GlobalDecoderRegistry.register(QueryPoaAuthorityRequest.typeUrl, QueryPoaAuthorityRequest);
 function createBaseQueryPoaAuthorityResponse(): QueryPoaAuthorityResponse {
   return {
     authority: ""
@@ -415,6 +515,15 @@ function createBaseQueryPoaAuthorityResponse(): QueryPoaAuthorityResponse {
 }
 export const QueryPoaAuthorityResponse = {
   typeUrl: "/strangelove_ventures.poa.v1.QueryPoaAuthorityResponse",
+  is(o: any): o is QueryPoaAuthorityResponse {
+    return o && (o.$typeUrl === QueryPoaAuthorityResponse.typeUrl || typeof o.authority === "string");
+  },
+  isSDK(o: any): o is QueryPoaAuthorityResponseSDKType {
+    return o && (o.$typeUrl === QueryPoaAuthorityResponse.typeUrl || typeof o.authority === "string");
+  },
+  isAmino(o: any): o is QueryPoaAuthorityResponseAmino {
+    return o && (o.$typeUrl === QueryPoaAuthorityResponse.typeUrl || typeof o.authority === "string");
+  },
   encode(message: QueryPoaAuthorityResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
       writer.uint32(10).string(message.authority);
@@ -437,6 +546,16 @@ export const QueryPoaAuthorityResponse = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): QueryPoaAuthorityResponse {
+    return {
+      authority: isSet(object.authority) ? String(object.authority) : ""
+    };
+  },
+  toJSON(message: QueryPoaAuthorityResponse): JsonSafe<QueryPoaAuthorityResponse> {
+    const obj: any = {};
+    message.authority !== undefined && (obj.authority = message.authority);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<QueryPoaAuthorityResponse>, I>>(object: I): QueryPoaAuthorityResponse {
     const message = createBaseQueryPoaAuthorityResponse();
@@ -471,3 +590,4 @@ export const QueryPoaAuthorityResponse = {
     };
   }
 };
+GlobalDecoderRegistry.register(QueryPoaAuthorityResponse.typeUrl, QueryPoaAuthorityResponse);

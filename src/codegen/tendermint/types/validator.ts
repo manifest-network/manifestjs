@@ -1,6 +1,8 @@
 import { PublicKey, PublicKeyAmino, PublicKeySDKType } from "../crypto/keys";
 import { BinaryReader, BinaryWriter } from "../../binary";
-import { DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../helpers";
+import { isSet, DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../helpers";
+import { JsonSafe } from "../../json-safe";
+import { GlobalDecoderRegistry } from "../../registry";
 /** BlockIdFlag indicates which BlockID the signature is for */
 export enum BlockIDFlag {
   /** BLOCK_ID_FLAG_UNKNOWN - indicates an error condition */
@@ -127,6 +129,15 @@ function createBaseValidatorSet(): ValidatorSet {
 }
 export const ValidatorSet = {
   typeUrl: "/tendermint.types.ValidatorSet",
+  is(o: any): o is ValidatorSet {
+    return o && (o.$typeUrl === ValidatorSet.typeUrl || Array.isArray(o.validators) && (!o.validators.length || Validator.is(o.validators[0])) && typeof o.totalVotingPower === "bigint");
+  },
+  isSDK(o: any): o is ValidatorSetSDKType {
+    return o && (o.$typeUrl === ValidatorSet.typeUrl || Array.isArray(o.validators) && (!o.validators.length || Validator.isSDK(o.validators[0])) && typeof o.total_voting_power === "bigint");
+  },
+  isAmino(o: any): o is ValidatorSetAmino {
+    return o && (o.$typeUrl === ValidatorSet.typeUrl || Array.isArray(o.validators) && (!o.validators.length || Validator.isAmino(o.validators[0])) && typeof o.total_voting_power === "bigint");
+  },
   encode(message: ValidatorSet, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.validators) {
       Validator.encode(v!, writer.uint32(10).fork()).ldelim();
@@ -162,6 +173,24 @@ export const ValidatorSet = {
     }
     return message;
   },
+  fromJSON(object: any): ValidatorSet {
+    return {
+      validators: Array.isArray(object?.validators) ? object.validators.map((e: any) => Validator.fromJSON(e)) : [],
+      proposer: isSet(object.proposer) ? Validator.fromJSON(object.proposer) : undefined,
+      totalVotingPower: isSet(object.totalVotingPower) ? BigInt(object.totalVotingPower.toString()) : BigInt(0)
+    };
+  },
+  toJSON(message: ValidatorSet): JsonSafe<ValidatorSet> {
+    const obj: any = {};
+    if (message.validators) {
+      obj.validators = message.validators.map(e => e ? Validator.toJSON(e) : undefined);
+    } else {
+      obj.validators = [];
+    }
+    message.proposer !== undefined && (obj.proposer = message.proposer ? Validator.toJSON(message.proposer) : undefined);
+    message.totalVotingPower !== undefined && (obj.totalVotingPower = (message.totalVotingPower || BigInt(0)).toString());
+    return obj;
+  },
   fromPartial<I extends Exact<DeepPartial<ValidatorSet>, I>>(object: I): ValidatorSet {
     const message = createBaseValidatorSet();
     message.validators = object.validators?.map(e => Validator.fromPartial(e)) || [];
@@ -188,7 +217,7 @@ export const ValidatorSet = {
       obj.validators = message.validators;
     }
     obj.proposer = message.proposer ? Validator.toAmino(message.proposer) : undefined;
-    obj.total_voting_power = message.totalVotingPower !== BigInt(0) ? message.totalVotingPower.toString() : undefined;
+    obj.total_voting_power = message.totalVotingPower !== BigInt(0) ? (message.totalVotingPower?.toString)() : undefined;
     return obj;
   },
   fromAminoMsg(object: ValidatorSetAminoMsg): ValidatorSet {
@@ -207,6 +236,7 @@ export const ValidatorSet = {
     };
   }
 };
+GlobalDecoderRegistry.register(ValidatorSet.typeUrl, ValidatorSet);
 function createBaseValidator(): Validator {
   return {
     address: new Uint8Array(),
@@ -217,6 +247,15 @@ function createBaseValidator(): Validator {
 }
 export const Validator = {
   typeUrl: "/tendermint.types.Validator",
+  is(o: any): o is Validator {
+    return o && (o.$typeUrl === Validator.typeUrl || (o.address instanceof Uint8Array || typeof o.address === "string") && PublicKey.is(o.pubKey) && typeof o.votingPower === "bigint" && typeof o.proposerPriority === "bigint");
+  },
+  isSDK(o: any): o is ValidatorSDKType {
+    return o && (o.$typeUrl === Validator.typeUrl || (o.address instanceof Uint8Array || typeof o.address === "string") && PublicKey.isSDK(o.pub_key) && typeof o.voting_power === "bigint" && typeof o.proposer_priority === "bigint");
+  },
+  isAmino(o: any): o is ValidatorAmino {
+    return o && (o.$typeUrl === Validator.typeUrl || (o.address instanceof Uint8Array || typeof o.address === "string") && PublicKey.isAmino(o.pub_key) && typeof o.voting_power === "bigint" && typeof o.proposer_priority === "bigint");
+  },
   encode(message: Validator, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.address.length !== 0) {
       writer.uint32(10).bytes(message.address);
@@ -258,6 +297,22 @@ export const Validator = {
     }
     return message;
   },
+  fromJSON(object: any): Validator {
+    return {
+      address: isSet(object.address) ? bytesFromBase64(object.address) : new Uint8Array(),
+      pubKey: isSet(object.pubKey) ? PublicKey.fromJSON(object.pubKey) : undefined,
+      votingPower: isSet(object.votingPower) ? BigInt(object.votingPower.toString()) : BigInt(0),
+      proposerPriority: isSet(object.proposerPriority) ? BigInt(object.proposerPriority.toString()) : BigInt(0)
+    };
+  },
+  toJSON(message: Validator): JsonSafe<Validator> {
+    const obj: any = {};
+    message.address !== undefined && (obj.address = base64FromBytes(message.address !== undefined ? message.address : new Uint8Array()));
+    message.pubKey !== undefined && (obj.pubKey = message.pubKey ? PublicKey.toJSON(message.pubKey) : undefined);
+    message.votingPower !== undefined && (obj.votingPower = (message.votingPower || BigInt(0)).toString());
+    message.proposerPriority !== undefined && (obj.proposerPriority = (message.proposerPriority || BigInt(0)).toString());
+    return obj;
+  },
   fromPartial<I extends Exact<DeepPartial<Validator>, I>>(object: I): Validator {
     const message = createBaseValidator();
     message.address = object.address ?? new Uint8Array();
@@ -286,8 +341,8 @@ export const Validator = {
     const obj: any = {};
     obj.address = message.address ? base64FromBytes(message.address) : undefined;
     obj.pub_key = message.pubKey ? PublicKey.toAmino(message.pubKey) : undefined;
-    obj.voting_power = message.votingPower !== BigInt(0) ? message.votingPower.toString() : undefined;
-    obj.proposer_priority = message.proposerPriority !== BigInt(0) ? message.proposerPriority.toString() : undefined;
+    obj.voting_power = message.votingPower !== BigInt(0) ? (message.votingPower?.toString)() : undefined;
+    obj.proposer_priority = message.proposerPriority !== BigInt(0) ? (message.proposerPriority?.toString)() : undefined;
     return obj;
   },
   fromAminoMsg(object: ValidatorAminoMsg): Validator {
@@ -306,6 +361,7 @@ export const Validator = {
     };
   }
 };
+GlobalDecoderRegistry.register(Validator.typeUrl, Validator);
 function createBaseSimpleValidator(): SimpleValidator {
   return {
     pubKey: undefined,
@@ -314,6 +370,15 @@ function createBaseSimpleValidator(): SimpleValidator {
 }
 export const SimpleValidator = {
   typeUrl: "/tendermint.types.SimpleValidator",
+  is(o: any): o is SimpleValidator {
+    return o && (o.$typeUrl === SimpleValidator.typeUrl || typeof o.votingPower === "bigint");
+  },
+  isSDK(o: any): o is SimpleValidatorSDKType {
+    return o && (o.$typeUrl === SimpleValidator.typeUrl || typeof o.voting_power === "bigint");
+  },
+  isAmino(o: any): o is SimpleValidatorAmino {
+    return o && (o.$typeUrl === SimpleValidator.typeUrl || typeof o.voting_power === "bigint");
+  },
   encode(message: SimpleValidator, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.pubKey !== undefined) {
       PublicKey.encode(message.pubKey, writer.uint32(10).fork()).ldelim();
@@ -343,6 +408,18 @@ export const SimpleValidator = {
     }
     return message;
   },
+  fromJSON(object: any): SimpleValidator {
+    return {
+      pubKey: isSet(object.pubKey) ? PublicKey.fromJSON(object.pubKey) : undefined,
+      votingPower: isSet(object.votingPower) ? BigInt(object.votingPower.toString()) : BigInt(0)
+    };
+  },
+  toJSON(message: SimpleValidator): JsonSafe<SimpleValidator> {
+    const obj: any = {};
+    message.pubKey !== undefined && (obj.pubKey = message.pubKey ? PublicKey.toJSON(message.pubKey) : undefined);
+    message.votingPower !== undefined && (obj.votingPower = (message.votingPower || BigInt(0)).toString());
+    return obj;
+  },
   fromPartial<I extends Exact<DeepPartial<SimpleValidator>, I>>(object: I): SimpleValidator {
     const message = createBaseSimpleValidator();
     message.pubKey = object.pubKey !== undefined && object.pubKey !== null ? PublicKey.fromPartial(object.pubKey) : undefined;
@@ -362,7 +439,7 @@ export const SimpleValidator = {
   toAmino(message: SimpleValidator): SimpleValidatorAmino {
     const obj: any = {};
     obj.pub_key = message.pubKey ? PublicKey.toAmino(message.pubKey) : undefined;
-    obj.voting_power = message.votingPower !== BigInt(0) ? message.votingPower.toString() : undefined;
+    obj.voting_power = message.votingPower !== BigInt(0) ? (message.votingPower?.toString)() : undefined;
     return obj;
   },
   fromAminoMsg(object: SimpleValidatorAminoMsg): SimpleValidator {
@@ -381,3 +458,4 @@ export const SimpleValidator = {
     };
   }
 };
+GlobalDecoderRegistry.register(SimpleValidator.typeUrl, SimpleValidator);

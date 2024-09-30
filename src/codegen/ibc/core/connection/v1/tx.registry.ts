@@ -1,7 +1,8 @@
 //@ts-nocheck
-import { GeneratedType, Registry } from "@cosmjs/proto-signing";
+import { TelescopeGeneratedType } from "../../../../types";
+import { Registry } from "@cosmjs/proto-signing";
 import { MsgConnectionOpenInit, MsgConnectionOpenTry, MsgConnectionOpenAck, MsgConnectionOpenConfirm } from "./tx";
-export const registry: ReadonlyArray<[string, GeneratedType]> = [["/ibc.core.connection.v1.MsgConnectionOpenInit", MsgConnectionOpenInit], ["/ibc.core.connection.v1.MsgConnectionOpenTry", MsgConnectionOpenTry], ["/ibc.core.connection.v1.MsgConnectionOpenAck", MsgConnectionOpenAck], ["/ibc.core.connection.v1.MsgConnectionOpenConfirm", MsgConnectionOpenConfirm]];
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/ibc.core.connection.v1.MsgConnectionOpenInit", MsgConnectionOpenInit], ["/ibc.core.connection.v1.MsgConnectionOpenTry", MsgConnectionOpenTry], ["/ibc.core.connection.v1.MsgConnectionOpenAck", MsgConnectionOpenAck], ["/ibc.core.connection.v1.MsgConnectionOpenConfirm", MsgConnectionOpenConfirm]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -57,6 +58,58 @@ export const MessageComposer = {
       return {
         typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenConfirm",
         value
+      };
+    }
+  },
+  toJSON: {
+    connectionOpenInit(value: MsgConnectionOpenInit) {
+      return {
+        typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenInit",
+        value: MsgConnectionOpenInit.toJSON(value)
+      };
+    },
+    connectionOpenTry(value: MsgConnectionOpenTry) {
+      return {
+        typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenTry",
+        value: MsgConnectionOpenTry.toJSON(value)
+      };
+    },
+    connectionOpenAck(value: MsgConnectionOpenAck) {
+      return {
+        typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenAck",
+        value: MsgConnectionOpenAck.toJSON(value)
+      };
+    },
+    connectionOpenConfirm(value: MsgConnectionOpenConfirm) {
+      return {
+        typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenConfirm",
+        value: MsgConnectionOpenConfirm.toJSON(value)
+      };
+    }
+  },
+  fromJSON: {
+    connectionOpenInit(value: any) {
+      return {
+        typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenInit",
+        value: MsgConnectionOpenInit.fromJSON(value)
+      };
+    },
+    connectionOpenTry(value: any) {
+      return {
+        typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenTry",
+        value: MsgConnectionOpenTry.fromJSON(value)
+      };
+    },
+    connectionOpenAck(value: any) {
+      return {
+        typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenAck",
+        value: MsgConnectionOpenAck.fromJSON(value)
+      };
+    },
+    connectionOpenConfirm(value: any) {
+      return {
+        typeUrl: "/ibc.core.connection.v1.MsgConnectionOpenConfirm",
+        value: MsgConnectionOpenConfirm.fromJSON(value)
       };
     }
   },

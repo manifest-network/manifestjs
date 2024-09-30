@@ -1,17 +1,12 @@
-import { MsgUpdateParams, MsgPayout, MsgBurnHeldBalance } from "./tx";
+import { MsgPayout, MsgBurnHeldBalance } from "./tx";
 export const AminoConverter = {
-  "/liftedinit.manifest.v1.MsgUpdateParams": {
-    aminoType: "/liftedinit.manifest.v1.MsgUpdateParams",
-    toAmino: MsgUpdateParams.toAmino,
-    fromAmino: MsgUpdateParams.fromAmino
-  },
   "/liftedinit.manifest.v1.MsgPayout": {
-    aminoType: "/liftedinit.manifest.v1.MsgPayout",
+    aminoType: "lifted/manifest/MsgPayout",
     toAmino: MsgPayout.toAmino,
     fromAmino: MsgPayout.fromAmino
   },
   "/liftedinit.manifest.v1.MsgBurnHeldBalance": {
-    aminoType: "/liftedinit.manifest.v1.MsgBurnHeldBalance",
+    aminoType: "lifted/manifest/MsgBurnHeldBalance",
     toAmino: MsgBurnHeldBalance.toAmino,
     fromAmino: MsgBurnHeldBalance.fromAmino
   }

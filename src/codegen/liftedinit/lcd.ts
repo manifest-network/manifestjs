@@ -89,13 +89,6 @@ export const createLCDClient = async ({
           requestClient
         })
       }
-    },
-    liftedinit: {
-      manifest: {
-        v1: new (await import("./manifest/v1/query.lcd")).LCDQueryClient({
-          requestClient
-        })
-      }
     }
   };
 };

@@ -1,50 +1,58 @@
-import { Rpc } from "../../../helpers";
-import { BinaryReader } from "../../../binary";
-import { MsgGrantAllowance, MsgGrantAllowanceResponse, MsgRevokeAllowance, MsgRevokeAllowanceResponse, MsgPruneAllowances, MsgPruneAllowancesResponse } from "./tx";
+import { DeliverTxResponse, StdFee, TxRpc } from "../../../types";
+import { MsgGrantAllowance, MsgRevokeAllowance, MsgPruneAllowances } from "./tx";
 /** Msg defines the feegrant msg service. */
 export interface Msg {
   /**
    * GrantAllowance grants fee allowance to the grantee on the granter's
    * account with the provided expiration time.
    */
-  grantAllowance(request: MsgGrantAllowance): Promise<MsgGrantAllowanceResponse>;
+  grantAllowance(signerAddress: string, message: MsgGrantAllowance, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /**
    * RevokeAllowance revokes any fee allowance of granter's account that
    * has been granted to the grantee.
    */
-  revokeAllowance(request: MsgRevokeAllowance): Promise<MsgRevokeAllowanceResponse>;
+  revokeAllowance(signerAddress: string, message: MsgRevokeAllowance, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /**
    * PruneAllowances prunes expired fee allowances, currently up to 75 at a time.
    * 
    * Since cosmos-sdk 0.50
    */
-  pruneAllowances(request: MsgPruneAllowances): Promise<MsgPruneAllowancesResponse>;
+  pruneAllowances(signerAddress: string, message: MsgPruneAllowances, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
 }
 export class MsgClientImpl implements Msg {
-  private readonly rpc: Rpc;
-  constructor(rpc: Rpc) {
+  private readonly rpc: TxRpc;
+  constructor(rpc: TxRpc) {
     this.rpc = rpc;
   }
   /* GrantAllowance grants fee allowance to the grantee on the granter's
    account with the provided expiration time. */
-  grantAllowance = async (request: MsgGrantAllowance): Promise<MsgGrantAllowanceResponse> => {
-    const data = MsgGrantAllowance.encode(request).finish();
-    const promise = this.rpc.request("cosmos.feegrant.v1beta1.Msg", "GrantAllowance", data);
-    return promise.then(data => MsgGrantAllowanceResponse.decode(new BinaryReader(data)));
+  grantAllowance = async (signerAddress: string, message: MsgGrantAllowance, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgGrantAllowance.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* RevokeAllowance revokes any fee allowance of granter's account that
    has been granted to the grantee. */
-  revokeAllowance = async (request: MsgRevokeAllowance): Promise<MsgRevokeAllowanceResponse> => {
-    const data = MsgRevokeAllowance.encode(request).finish();
-    const promise = this.rpc.request("cosmos.feegrant.v1beta1.Msg", "RevokeAllowance", data);
-    return promise.then(data => MsgRevokeAllowanceResponse.decode(new BinaryReader(data)));
+  revokeAllowance = async (signerAddress: string, message: MsgRevokeAllowance, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgRevokeAllowance.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
   /* PruneAllowances prunes expired fee allowances, currently up to 75 at a time.
   
    Since cosmos-sdk 0.50 */
-  pruneAllowances = async (request: MsgPruneAllowances): Promise<MsgPruneAllowancesResponse> => {
-    const data = MsgPruneAllowances.encode(request).finish();
-    const promise = this.rpc.request("cosmos.feegrant.v1beta1.Msg", "PruneAllowances", data);
-    return promise.then(data => MsgPruneAllowancesResponse.decode(new BinaryReader(data)));
+  pruneAllowances = async (signerAddress: string, message: MsgPruneAllowances, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgPruneAllowances.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
 }
+export const createClientImpl = (rpc: TxRpc) => {
+  return new MsgClientImpl(rpc);
+};

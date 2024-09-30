@@ -1,7 +1,9 @@
 import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
 import { Plan, PlanAmino, PlanSDKType } from "../../../../cosmos/upgrade/v1beta1/upgrade";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { DeepPartial, Exact } from "../../../../helpers";
+import { isSet, DeepPartial, Exact } from "../../../../helpers";
+import { JsonSafe } from "../../../../json-safe";
+import { GlobalDecoderRegistry } from "../../../../registry";
 /**
  * IdentifiedClientState defines a client state with an additional client
  * identifier field.
@@ -317,6 +319,15 @@ function createBaseIdentifiedClientState(): IdentifiedClientState {
 export const IdentifiedClientState = {
   typeUrl: "/ibc.core.client.v1.IdentifiedClientState",
   aminoType: "cosmos-sdk/IdentifiedClientState",
+  is(o: any): o is IdentifiedClientState {
+    return o && (o.$typeUrl === IdentifiedClientState.typeUrl || typeof o.clientId === "string");
+  },
+  isSDK(o: any): o is IdentifiedClientStateSDKType {
+    return o && (o.$typeUrl === IdentifiedClientState.typeUrl || typeof o.client_id === "string");
+  },
+  isAmino(o: any): o is IdentifiedClientStateAmino {
+    return o && (o.$typeUrl === IdentifiedClientState.typeUrl || typeof o.client_id === "string");
+  },
   encode(message: IdentifiedClientState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -345,6 +356,18 @@ export const IdentifiedClientState = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): IdentifiedClientState {
+    return {
+      clientId: isSet(object.clientId) ? String(object.clientId) : "",
+      clientState: isSet(object.clientState) ? Any.fromJSON(object.clientState) : undefined
+    };
+  },
+  toJSON(message: IdentifiedClientState): JsonSafe<IdentifiedClientState> {
+    const obj: any = {};
+    message.clientId !== undefined && (obj.clientId = message.clientId);
+    message.clientState !== undefined && (obj.clientState = message.clientState ? Any.toJSON(message.clientState) : undefined);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<IdentifiedClientState>, I>>(object: I): IdentifiedClientState {
     const message = createBaseIdentifiedClientState();
@@ -390,6 +413,8 @@ export const IdentifiedClientState = {
     };
   }
 };
+GlobalDecoderRegistry.register(IdentifiedClientState.typeUrl, IdentifiedClientState);
+GlobalDecoderRegistry.registerAminoProtoMapping(IdentifiedClientState.aminoType, IdentifiedClientState.typeUrl);
 function createBaseConsensusStateWithHeight(): ConsensusStateWithHeight {
   return {
     height: Height.fromPartial({}),
@@ -399,6 +424,15 @@ function createBaseConsensusStateWithHeight(): ConsensusStateWithHeight {
 export const ConsensusStateWithHeight = {
   typeUrl: "/ibc.core.client.v1.ConsensusStateWithHeight",
   aminoType: "cosmos-sdk/ConsensusStateWithHeight",
+  is(o: any): o is ConsensusStateWithHeight {
+    return o && (o.$typeUrl === ConsensusStateWithHeight.typeUrl || Height.is(o.height));
+  },
+  isSDK(o: any): o is ConsensusStateWithHeightSDKType {
+    return o && (o.$typeUrl === ConsensusStateWithHeight.typeUrl || Height.isSDK(o.height));
+  },
+  isAmino(o: any): o is ConsensusStateWithHeightAmino {
+    return o && (o.$typeUrl === ConsensusStateWithHeight.typeUrl || Height.isAmino(o.height));
+  },
   encode(message: ConsensusStateWithHeight, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.height !== undefined) {
       Height.encode(message.height, writer.uint32(10).fork()).ldelim();
@@ -427,6 +461,18 @@ export const ConsensusStateWithHeight = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): ConsensusStateWithHeight {
+    return {
+      height: isSet(object.height) ? Height.fromJSON(object.height) : undefined,
+      consensusState: isSet(object.consensusState) ? Any.fromJSON(object.consensusState) : undefined
+    };
+  },
+  toJSON(message: ConsensusStateWithHeight): JsonSafe<ConsensusStateWithHeight> {
+    const obj: any = {};
+    message.height !== undefined && (obj.height = message.height ? Height.toJSON(message.height) : undefined);
+    message.consensusState !== undefined && (obj.consensusState = message.consensusState ? Any.toJSON(message.consensusState) : undefined);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<ConsensusStateWithHeight>, I>>(object: I): ConsensusStateWithHeight {
     const message = createBaseConsensusStateWithHeight();
@@ -472,6 +518,8 @@ export const ConsensusStateWithHeight = {
     };
   }
 };
+GlobalDecoderRegistry.register(ConsensusStateWithHeight.typeUrl, ConsensusStateWithHeight);
+GlobalDecoderRegistry.registerAminoProtoMapping(ConsensusStateWithHeight.aminoType, ConsensusStateWithHeight.typeUrl);
 function createBaseClientConsensusStates(): ClientConsensusStates {
   return {
     clientId: "",
@@ -481,6 +529,15 @@ function createBaseClientConsensusStates(): ClientConsensusStates {
 export const ClientConsensusStates = {
   typeUrl: "/ibc.core.client.v1.ClientConsensusStates",
   aminoType: "cosmos-sdk/ClientConsensusStates",
+  is(o: any): o is ClientConsensusStates {
+    return o && (o.$typeUrl === ClientConsensusStates.typeUrl || typeof o.clientId === "string" && Array.isArray(o.consensusStates) && (!o.consensusStates.length || ConsensusStateWithHeight.is(o.consensusStates[0])));
+  },
+  isSDK(o: any): o is ClientConsensusStatesSDKType {
+    return o && (o.$typeUrl === ClientConsensusStates.typeUrl || typeof o.client_id === "string" && Array.isArray(o.consensus_states) && (!o.consensus_states.length || ConsensusStateWithHeight.isSDK(o.consensus_states[0])));
+  },
+  isAmino(o: any): o is ClientConsensusStatesAmino {
+    return o && (o.$typeUrl === ClientConsensusStates.typeUrl || typeof o.client_id === "string" && Array.isArray(o.consensus_states) && (!o.consensus_states.length || ConsensusStateWithHeight.isAmino(o.consensus_states[0])));
+  },
   encode(message: ClientConsensusStates, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.clientId !== "") {
       writer.uint32(10).string(message.clientId);
@@ -509,6 +566,22 @@ export const ClientConsensusStates = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): ClientConsensusStates {
+    return {
+      clientId: isSet(object.clientId) ? String(object.clientId) : "",
+      consensusStates: Array.isArray(object?.consensusStates) ? object.consensusStates.map((e: any) => ConsensusStateWithHeight.fromJSON(e)) : []
+    };
+  },
+  toJSON(message: ClientConsensusStates): JsonSafe<ClientConsensusStates> {
+    const obj: any = {};
+    message.clientId !== undefined && (obj.clientId = message.clientId);
+    if (message.consensusStates) {
+      obj.consensusStates = message.consensusStates.map(e => e ? ConsensusStateWithHeight.toJSON(e) : undefined);
+    } else {
+      obj.consensusStates = [];
+    }
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<ClientConsensusStates>, I>>(object: I): ClientConsensusStates {
     const message = createBaseClientConsensusStates();
@@ -556,6 +629,8 @@ export const ClientConsensusStates = {
     };
   }
 };
+GlobalDecoderRegistry.register(ClientConsensusStates.typeUrl, ClientConsensusStates);
+GlobalDecoderRegistry.registerAminoProtoMapping(ClientConsensusStates.aminoType, ClientConsensusStates.typeUrl);
 function createBaseClientUpdateProposal(): ClientUpdateProposal {
   return {
     $typeUrl: "/ibc.core.client.v1.ClientUpdateProposal",
@@ -568,6 +643,15 @@ function createBaseClientUpdateProposal(): ClientUpdateProposal {
 export const ClientUpdateProposal = {
   typeUrl: "/ibc.core.client.v1.ClientUpdateProposal",
   aminoType: "cosmos-sdk/ClientUpdateProposal",
+  is(o: any): o is ClientUpdateProposal {
+    return o && (o.$typeUrl === ClientUpdateProposal.typeUrl || typeof o.title === "string" && typeof o.description === "string" && typeof o.subjectClientId === "string" && typeof o.substituteClientId === "string");
+  },
+  isSDK(o: any): o is ClientUpdateProposalSDKType {
+    return o && (o.$typeUrl === ClientUpdateProposal.typeUrl || typeof o.title === "string" && typeof o.description === "string" && typeof o.subject_client_id === "string" && typeof o.substitute_client_id === "string");
+  },
+  isAmino(o: any): o is ClientUpdateProposalAmino {
+    return o && (o.$typeUrl === ClientUpdateProposal.typeUrl || typeof o.title === "string" && typeof o.description === "string" && typeof o.subject_client_id === "string" && typeof o.substitute_client_id === "string");
+  },
   encode(message: ClientUpdateProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.title !== "") {
       writer.uint32(10).string(message.title);
@@ -608,6 +692,22 @@ export const ClientUpdateProposal = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): ClientUpdateProposal {
+    return {
+      title: isSet(object.title) ? String(object.title) : "",
+      description: isSet(object.description) ? String(object.description) : "",
+      subjectClientId: isSet(object.subjectClientId) ? String(object.subjectClientId) : "",
+      substituteClientId: isSet(object.substituteClientId) ? String(object.substituteClientId) : ""
+    };
+  },
+  toJSON(message: ClientUpdateProposal): JsonSafe<ClientUpdateProposal> {
+    const obj: any = {};
+    message.title !== undefined && (obj.title = message.title);
+    message.description !== undefined && (obj.description = message.description);
+    message.subjectClientId !== undefined && (obj.subjectClientId = message.subjectClientId);
+    message.substituteClientId !== undefined && (obj.substituteClientId = message.substituteClientId);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<ClientUpdateProposal>, I>>(object: I): ClientUpdateProposal {
     const message = createBaseClientUpdateProposal();
@@ -663,6 +763,8 @@ export const ClientUpdateProposal = {
     };
   }
 };
+GlobalDecoderRegistry.register(ClientUpdateProposal.typeUrl, ClientUpdateProposal);
+GlobalDecoderRegistry.registerAminoProtoMapping(ClientUpdateProposal.aminoType, ClientUpdateProposal.typeUrl);
 function createBaseUpgradeProposal(): UpgradeProposal {
   return {
     $typeUrl: "/ibc.core.client.v1.UpgradeProposal",
@@ -675,6 +777,15 @@ function createBaseUpgradeProposal(): UpgradeProposal {
 export const UpgradeProposal = {
   typeUrl: "/ibc.core.client.v1.UpgradeProposal",
   aminoType: "cosmos-sdk/UpgradeProposal",
+  is(o: any): o is UpgradeProposal {
+    return o && (o.$typeUrl === UpgradeProposal.typeUrl || typeof o.title === "string" && typeof o.description === "string" && Plan.is(o.plan));
+  },
+  isSDK(o: any): o is UpgradeProposalSDKType {
+    return o && (o.$typeUrl === UpgradeProposal.typeUrl || typeof o.title === "string" && typeof o.description === "string" && Plan.isSDK(o.plan));
+  },
+  isAmino(o: any): o is UpgradeProposalAmino {
+    return o && (o.$typeUrl === UpgradeProposal.typeUrl || typeof o.title === "string" && typeof o.description === "string" && Plan.isAmino(o.plan));
+  },
   encode(message: UpgradeProposal, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.title !== "") {
       writer.uint32(10).string(message.title);
@@ -715,6 +826,22 @@ export const UpgradeProposal = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): UpgradeProposal {
+    return {
+      title: isSet(object.title) ? String(object.title) : "",
+      description: isSet(object.description) ? String(object.description) : "",
+      plan: isSet(object.plan) ? Plan.fromJSON(object.plan) : undefined,
+      upgradedClientState: isSet(object.upgradedClientState) ? Any.fromJSON(object.upgradedClientState) : undefined
+    };
+  },
+  toJSON(message: UpgradeProposal): JsonSafe<UpgradeProposal> {
+    const obj: any = {};
+    message.title !== undefined && (obj.title = message.title);
+    message.description !== undefined && (obj.description = message.description);
+    message.plan !== undefined && (obj.plan = message.plan ? Plan.toJSON(message.plan) : undefined);
+    message.upgradedClientState !== undefined && (obj.upgradedClientState = message.upgradedClientState ? Any.toJSON(message.upgradedClientState) : undefined);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<UpgradeProposal>, I>>(object: I): UpgradeProposal {
     const message = createBaseUpgradeProposal();
@@ -770,6 +897,8 @@ export const UpgradeProposal = {
     };
   }
 };
+GlobalDecoderRegistry.register(UpgradeProposal.typeUrl, UpgradeProposal);
+GlobalDecoderRegistry.registerAminoProtoMapping(UpgradeProposal.aminoType, UpgradeProposal.typeUrl);
 function createBaseHeight(): Height {
   return {
     revisionNumber: BigInt(0),
@@ -779,6 +908,15 @@ function createBaseHeight(): Height {
 export const Height = {
   typeUrl: "/ibc.core.client.v1.Height",
   aminoType: "cosmos-sdk/Height",
+  is(o: any): o is Height {
+    return o && (o.$typeUrl === Height.typeUrl || typeof o.revisionNumber === "bigint" && typeof o.revisionHeight === "bigint");
+  },
+  isSDK(o: any): o is HeightSDKType {
+    return o && (o.$typeUrl === Height.typeUrl || typeof o.revision_number === "bigint" && typeof o.revision_height === "bigint");
+  },
+  isAmino(o: any): o is HeightAmino {
+    return o && (o.$typeUrl === Height.typeUrl || typeof o.revision_number === "bigint" && typeof o.revision_height === "bigint");
+  },
   encode(message: Height, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.revisionNumber !== BigInt(0)) {
       writer.uint32(8).uint64(message.revisionNumber);
@@ -808,6 +946,18 @@ export const Height = {
     }
     return message;
   },
+  fromJSON(object: any): Height {
+    return {
+      revisionNumber: isSet(object.revisionNumber) ? BigInt(object.revisionNumber.toString()) : BigInt(0),
+      revisionHeight: isSet(object.revisionHeight) ? BigInt(object.revisionHeight.toString()) : BigInt(0)
+    };
+  },
+  toJSON(message: Height): JsonSafe<Height> {
+    const obj: any = {};
+    message.revisionNumber !== undefined && (obj.revisionNumber = (message.revisionNumber || BigInt(0)).toString());
+    message.revisionHeight !== undefined && (obj.revisionHeight = (message.revisionHeight || BigInt(0)).toString());
+    return obj;
+  },
   fromPartial<I extends Exact<DeepPartial<Height>, I>>(object: I): Height {
     const message = createBaseHeight();
     message.revisionNumber = object.revisionNumber !== undefined && object.revisionNumber !== null ? BigInt(object.revisionNumber.toString()) : BigInt(0);
@@ -822,8 +972,8 @@ export const Height = {
   },
   toAmino(message: Height): HeightAmino {
     const obj: any = {};
-    obj.revision_number = message.revisionNumber !== BigInt(0) ? message.revisionNumber.toString() : undefined;
-    obj.revision_height = message.revisionHeight !== BigInt(0) ? message.revisionHeight.toString() : undefined;
+    obj.revision_number = message.revisionNumber !== BigInt(0) ? (message.revisionNumber?.toString)() : undefined;
+    obj.revision_height = message.revisionHeight !== BigInt(0) ? (message.revisionHeight?.toString)() : undefined;
     return obj;
   },
   fromAminoMsg(object: HeightAminoMsg): Height {
@@ -848,6 +998,8 @@ export const Height = {
     };
   }
 };
+GlobalDecoderRegistry.register(Height.typeUrl, Height);
+GlobalDecoderRegistry.registerAminoProtoMapping(Height.aminoType, Height.typeUrl);
 function createBaseParams(): Params {
   return {
     allowedClients: []
@@ -856,6 +1008,15 @@ function createBaseParams(): Params {
 export const Params = {
   typeUrl: "/ibc.core.client.v1.Params",
   aminoType: "cosmos-sdk/Params",
+  is(o: any): o is Params {
+    return o && (o.$typeUrl === Params.typeUrl || Array.isArray(o.allowedClients) && (!o.allowedClients.length || typeof o.allowedClients[0] === "string"));
+  },
+  isSDK(o: any): o is ParamsSDKType {
+    return o && (o.$typeUrl === Params.typeUrl || Array.isArray(o.allowed_clients) && (!o.allowed_clients.length || typeof o.allowed_clients[0] === "string"));
+  },
+  isAmino(o: any): o is ParamsAmino {
+    return o && (o.$typeUrl === Params.typeUrl || Array.isArray(o.allowed_clients) && (!o.allowed_clients.length || typeof o.allowed_clients[0] === "string"));
+  },
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.allowedClients) {
       writer.uint32(10).string(v!);
@@ -878,6 +1039,20 @@ export const Params = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): Params {
+    return {
+      allowedClients: Array.isArray(object?.allowedClients) ? object.allowedClients.map((e: any) => String(e)) : []
+    };
+  },
+  toJSON(message: Params): JsonSafe<Params> {
+    const obj: any = {};
+    if (message.allowedClients) {
+      obj.allowedClients = message.allowedClients.map(e => e);
+    } else {
+      obj.allowedClients = [];
+    }
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
     const message = createBaseParams();
@@ -920,3 +1095,5 @@ export const Params = {
     };
   }
 };
+GlobalDecoderRegistry.register(Params.typeUrl, Params);
+GlobalDecoderRegistry.registerAminoProtoMapping(Params.aminoType, Params.typeUrl);

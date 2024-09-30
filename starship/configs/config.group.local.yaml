@@ -1,0 +1,131 @@
+name: starship-manifestjs
+version: v0.2.12
+
+chains:
+  - id: manifest-ledger-beta
+    name: custom
+    image: ghcr.io/liftedinit/manifest-ledger:v0.0.1-alpha.16
+    home: /root/.manifest
+    binary: manifestd
+    prefix: manifest
+    denom: umfx
+    coins: 10000000000000umfx
+    hdPath: m/44'/118'/0'/0/0
+    coinType: 118
+    repo: https://github.com/liftedinit/manifest-ledger
+    numValidators: 1
+    env:
+      # The POA Admin is a group address
+      - name: POA_ADMIN_ADDRESS
+        value: manifest1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfmy9qj
+    scripts:
+      createGenesis:
+        file: scripts/create-manifest-genesis.sh
+    genesis:
+      app_state:
+        group:
+          group_seq: "1"
+          groups:
+            - id: "1"
+              admin: "manifest1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfmy9qj"
+              metadata: "AQ=="
+              version: "2"
+              total_weight: "2"
+              created_at: "2024-05-16T15:10:54.372190727Z"
+          group_members:
+            - group_id: "1"
+              member:
+                address: "manifest1pss7nxeh3f9md2vuxku8q99femnwdjtcwhpj7f"
+                weight: "1"
+                metadata: "user1"
+                added_at: "2024-05-16T15:10:54.372190727Z"
+            - group_id: "1"
+              member:
+                address: "manifest16e0p4vwufmsn0lucwsnfmjfx67ry84y43hfd5v"
+                weight: "1"
+                metadata: "user2"
+                added_at: "2024-05-16T15:10:54.372190727Z"
+          group_policy_seq: "1"
+          group_policies:
+            - group_id: "1"
+              address: "manifest1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfmy9qj"
+              admin: "manifest1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfmy9qj"
+              metadata: "AQ=="
+              version: "2"
+              decision_policy:
+                "@type": "/cosmos.group.v1.ThresholdDecisionPolicy"
+                threshold: "1"
+                windows:
+                  voting_period: "5s"
+                  min_execution_period: "0s"
+              created_at: "2024-05-16T15:10:54.372190727Z"
+        staking:
+          params:
+            bond_denom: "upoa"
+            min_commission_rate: "0"
+        mint:
+          params:
+            mint_denom: "notused"
+            blocks_per_year: "6311520"
+            inflation_rate_change: "0"
+            inflation_max: "0"
+            inflation_min: "0"
+          minter:
+            inflation: "0"
+            annual_provisions: "0"
+        slashing:
+          params:
+            slash_fraction_double_sign: "0"
+            slash_fraction_downtime: "0"
+        distribution:
+          params:
+            community_tax: "0"
+        tokenfactory:
+          params:
+            denom_creation_fee: []
+            denom_creation_gas_consume: 10000
+    ports:
+      rest: 1317
+      rpc: 26657
+      faucet: 8001
+    resources:
+      cpu: "0.2"
+      memory: "512Mi"
+  - id: cosmos-2
+    name: cosmoshub
+    numValidators: 1
+    ports:
+      rest: 1313
+      rpc: 26653
+      faucet: 8002
+    resources:
+      cpu: "0.2"
+      memory: "512Mi"
+
+relayers:
+  - name: manifest-cosmos
+    type: hermes
+    replicas: 1
+    chains:
+      - manifest-ledger-beta
+      - cosmos-2
+    resources:
+      cpu: "0.2"
+      memory: "512Mi"
+
+registry:
+  enabled: true
+  ports:
+    rest: 8081
+  resources:
+    cpu: "0.2"
+    memory: "512Mi"
+
+explorer:
+  enabled: true
+  type: ping-pub
+  ports:
+    rest: 8080
+  resources:
+    cpu: "0.2"
+    memory: "512Mi"

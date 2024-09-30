@@ -1,7 +1,9 @@
 import { Duration, DurationAmino, DurationSDKType } from "../../../google/protobuf/duration";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { Decimal } from "@cosmjs/math";
-import { DeepPartial, Exact } from "../../../helpers";
+import { isSet, DeepPartial, Exact } from "../../../helpers";
+import { JsonSafe } from "../../../json-safe";
+import { GlobalDecoderRegistry } from "../../../registry";
 /** StakingParams defines the parameters for the x/staking module. */
 export interface StakingParams {
   /** unbonding_time is the time duration of unbonding. */
@@ -74,6 +76,15 @@ function createBaseStakingParams(): StakingParams {
 export const StakingParams = {
   typeUrl: "/strangelove_ventures.poa.v1.StakingParams",
   aminoType: "cosmos-sdk/x/staking/Params",
+  is(o: any): o is StakingParams {
+    return o && (o.$typeUrl === StakingParams.typeUrl || Duration.is(o.unbondingTime) && typeof o.maxValidators === "number" && typeof o.maxEntries === "number" && typeof o.historicalEntries === "number" && typeof o.bondDenom === "string" && typeof o.minCommissionRate === "string");
+  },
+  isSDK(o: any): o is StakingParamsSDKType {
+    return o && (o.$typeUrl === StakingParams.typeUrl || Duration.isSDK(o.unbonding_time) && typeof o.max_validators === "number" && typeof o.max_entries === "number" && typeof o.historical_entries === "number" && typeof o.bond_denom === "string" && typeof o.min_commission_rate === "string");
+  },
+  isAmino(o: any): o is StakingParamsAmino {
+    return o && (o.$typeUrl === StakingParams.typeUrl || Duration.isAmino(o.unbonding_time) && typeof o.max_validators === "number" && typeof o.max_entries === "number" && typeof o.historical_entries === "number" && typeof o.bond_denom === "string" && typeof o.min_commission_rate === "string");
+  },
   encode(message: StakingParams, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.unbondingTime !== undefined) {
       Duration.encode(message.unbondingTime, writer.uint32(10).fork()).ldelim();
@@ -126,6 +137,26 @@ export const StakingParams = {
       }
     }
     return message;
+  },
+  fromJSON(object: any): StakingParams {
+    return {
+      unbondingTime: isSet(object.unbondingTime) ? Duration.fromJSON(object.unbondingTime) : undefined,
+      maxValidators: isSet(object.maxValidators) ? Number(object.maxValidators) : 0,
+      maxEntries: isSet(object.maxEntries) ? Number(object.maxEntries) : 0,
+      historicalEntries: isSet(object.historicalEntries) ? Number(object.historicalEntries) : 0,
+      bondDenom: isSet(object.bondDenom) ? String(object.bondDenom) : "",
+      minCommissionRate: isSet(object.minCommissionRate) ? String(object.minCommissionRate) : ""
+    };
+  },
+  toJSON(message: StakingParams): JsonSafe<StakingParams> {
+    const obj: any = {};
+    message.unbondingTime !== undefined && (obj.unbondingTime = message.unbondingTime ? Duration.toJSON(message.unbondingTime) : undefined);
+    message.maxValidators !== undefined && (obj.maxValidators = Math.round(message.maxValidators));
+    message.maxEntries !== undefined && (obj.maxEntries = Math.round(message.maxEntries));
+    message.historicalEntries !== undefined && (obj.historicalEntries = Math.round(message.historicalEntries));
+    message.bondDenom !== undefined && (obj.bondDenom = message.bondDenom);
+    message.minCommissionRate !== undefined && (obj.minCommissionRate = message.minCommissionRate);
+    return obj;
   },
   fromPartial<I extends Exact<DeepPartial<StakingParams>, I>>(object: I): StakingParams {
     const message = createBaseStakingParams();
@@ -191,3 +222,5 @@ export const StakingParams = {
     };
   }
 };
+GlobalDecoderRegistry.register(StakingParams.typeUrl, StakingParams);
+GlobalDecoderRegistry.registerAminoProtoMapping(StakingParams.aminoType, StakingParams.typeUrl);

@@ -1,4 +1,4 @@
-import { Rpc } from "../../../helpers";
+import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
 import { QueryPendingValidatorsRequest, PendingValidatorsResponse, QueryConsensusPowerRequest, QueryConsensusPowerResponse, QueryPoaAuthorityRequest, QueryPoaAuthorityResponse } from "./query";
@@ -12,8 +12,8 @@ export interface Query {
   poaAuthority(request?: QueryPoaAuthorityRequest): Promise<QueryPoaAuthorityResponse>;
 }
 export class QueryClientImpl implements Query {
-  private readonly rpc: Rpc;
-  constructor(rpc: Rpc) {
+  private readonly rpc: TxRpc;
+  constructor(rpc: TxRpc) {
     this.rpc = rpc;
   }
   /* PendingValidators returns currently pending validators of the module. */
