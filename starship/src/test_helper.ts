@@ -3,12 +3,12 @@ import { Secp256k1HdWallet } from "@cosmjs/amino";
 import { useChain } from "starshipjs";
 import {
   assertIsDeliverTxSuccess,
-  SigningStargateClient
-} from '@cosmjs/stargate';
+  SigningStargateClient,
+} from "@cosmjs/stargate";
 import { createRPCQueryClient } from "../../src/codegen/strangelove_ventures/rpc.query";
 import { Any } from "../../src/codegen/google/protobuf/any";
 import { MessageComposer as GroupMessageComposer } from "../../src/codegen/cosmos/group/v1/tx.registry";
-import { MessageComposer as ManifestMessageComposer } from '../../src/codegen/liftedinit/manifest/v1/tx.registry';
+import { MessageComposer as ManifestMessageComposer } from "../../src/codegen/liftedinit/manifest/v1/tx.registry";
 import {
   Exec,
   MsgSubmitProposalResponse,
@@ -93,9 +93,11 @@ const submitGroupProposal = async (
   fee: { amount: { denom: string; amount: string }[]; gas: string }
 ) => {
   // COMMENTING THE FOLLOWING LINE WILL CAUSE THE PAYOUT/BURN TEST TO FAIL. WHY?
-  Any.fromPartial(ManifestMessageComposer.encoded.payout({authority: "", payoutPairs: []}));
+  Any.fromPartial(
+    ManifestMessageComposer.encoded.payout({ authority: "", payoutPairs: [] })
+  );
 
-  const submitMsg  = {
+  const submitMsg = {
     groupPolicyAddress: POA_GROUP_ADDRESS,
     title,
     summary,
@@ -103,7 +105,7 @@ const submitGroupProposal = async (
     exec: Exec.EXEC_UNSPECIFIED,
     messages: messages.map((msg) => Any.fromPartial(msg)),
     metadata: "",
-  }
+  };
   const msg = GroupMessageComposer.fromPartial.submitProposal(submitMsg);
   const result = await client.signAndBroadcast(signer, [msg], fee);
   assertIsDeliverTxSuccess(result);

@@ -3,16 +3,17 @@ import {
   createAminoWallet,
   createProtoWallet,
   initChain,
-  POA_GROUP_ADDRESS, submitVoteExecGroupProposal,
+  POA_GROUP_ADDRESS,
+  submitVoteExecGroupProposal,
   test1Mnemonic,
-  test2Mnemonic
+  test2Mnemonic,
   // @ts-ignore
-} from '../src/test_helper';
+} from "../src/test_helper";
 import { OfflineSigner } from "@cosmjs/proto-signing";
-import { SigningStargateClient } from '@cosmjs/stargate';
+import { SigningStargateClient } from "@cosmjs/stargate";
 import path from "path";
 import { ConfigContext, useRegistry } from "starshipjs";
-import {getSigningCosmosClient} from "../../src/codegen";
+import { getSigningCosmosClient } from "../../src/codegen";
 import { MessageComposer as ManifestMessageComposer } from "../../src/codegen/liftedinit/manifest/v1/tx.registry";
 
 const inits = [
@@ -110,9 +111,9 @@ describe.each(inits)("$description", ({ createWallets }) => {
 
   test("burn (manifest)", async () => {
     const proposal = ManifestMessageComposer.encoded.burnHeldBalance({
-        authority: POA_GROUP_ADDRESS,
-        burnCoins: [{ denom, amount: "1000" }],
-      });
+      authority: POA_GROUP_ADDRESS,
+      burnCoins: [{ denom, amount: "1000" }],
+    });
 
     const beforeBalance = await cosmosSigningClient.getBalance(
       POA_GROUP_ADDRESS,
