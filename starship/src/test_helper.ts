@@ -3,11 +3,12 @@ import { Secp256k1HdWallet } from "@cosmjs/amino";
 import { useChain } from "starshipjs";
 import {
   assertIsDeliverTxSuccess,
-  SigningStargateClient,
-} from "@cosmjs/stargate";
+  SigningStargateClient
+} from '@cosmjs/stargate';
 import { createRPCQueryClient } from "../../src/codegen/strangelove_ventures/rpc.query";
 import { Any } from "../../src/codegen/google/protobuf/any";
 import { MessageComposer as GroupMessageComposer } from "../../src/codegen/cosmos/group/v1/tx.registry";
+import { MessageComposer as ManifestMessageComposer } from '../../src/codegen/liftedinit/manifest/v1/tx.registry';
 import {
   Exec,
   MsgSubmitProposalResponse,
@@ -88,19 +89,23 @@ const submitGroupProposal = async (
   title: string,
   summary: string,
   proposers: string[],
-  messages: Any[],
+  messages: { typeUrl: string; value: Uint8Array }[], // Encoded messages
   fee: { amount: { denom: string; amount: string }[]; gas: string }
 ) => {
-  const submitMsg = GroupMessageComposer.fromPartial.submitProposal({
+  // COMMENTING THE FOLLOWING LINE WILL CAUSE THE PAYOUT/BURN TEST TO FAIL. WHY?
+  Any.fromPartial(ManifestMessageComposer.encoded.payout({authority: "", payoutPairs: []}));
+
+  const submitMsg  = {
     groupPolicyAddress: POA_GROUP_ADDRESS,
     title,
     summary,
     proposers,
     exec: Exec.EXEC_UNSPECIFIED,
-    messages,
+    messages: messages.map((msg) => Any.fromPartial(msg)),
     metadata: "",
-  });
-  const result = await client.signAndBroadcast(signer, [submitMsg], fee);
+  }
+  const msg = GroupMessageComposer.fromPartial.submitProposal(submitMsg);
+  const result = await client.signAndBroadcast(signer, [msg], fee);
   assertIsDeliverTxSuccess(result);
   expect(result.code).toEqual(0);
 
@@ -113,7 +118,7 @@ const submitGroupProposal = async (
   return submitResponse.proposalId;
 };
 
-const voteGroupProposal = async (
+export const voteGroupProposal = async (
   signer: string,
   client: SigningStargateClient,
   proposalId: bigint,
@@ -132,7 +137,7 @@ const voteGroupProposal = async (
   expect(result.code).toEqual(0);
 };
 
-const execGroupProposal = async (
+export const execGroupProposal = async (
   signer: string,
   client: SigningStargateClient,
   proposalId: bigint,

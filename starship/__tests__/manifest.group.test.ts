@@ -3,25 +3,23 @@ import {
   createAminoWallet,
   createProtoWallet,
   initChain,
-  POA_GROUP_ADDRESS,
-  submitVoteExecGroupProposal,
+  POA_GROUP_ADDRESS, submitVoteExecGroupProposal,
   test1Mnemonic,
-  test2Mnemonic,
+  test2Mnemonic
   // @ts-ignore
-} from "../src/test_helper";
+} from '../src/test_helper';
 import { OfflineSigner } from "@cosmjs/proto-signing";
-import { SigningStargateClient } from "@cosmjs/stargate";
+import { SigningStargateClient } from '@cosmjs/stargate';
 import path from "path";
 import { ConfigContext, useRegistry } from "starshipjs";
-import {getSigningCosmosClient, liftedinit} from "../../src/codegen";
-import { Any } from "../../src/codegen/google/protobuf/any";
+import {getSigningCosmosClient} from "../../src/codegen";
 import { MessageComposer as ManifestMessageComposer } from "../../src/codegen/liftedinit/manifest/v1/tx.registry";
 
 const inits = [
-  // {
-  //   description: "group-manifest-admin (proto-signing)",
-  //   createWallets: createProtoWallet,
-  // },
+  {
+    description: "group-manifest-admin (proto-signing)",
+    createWallets: createProtoWallet,
+  },
   {
     description: "group-manifest-admin (amino-signing)",
     createWallets: createAminoWallet,
@@ -83,19 +81,17 @@ describe.each(inits)("$description", ({ createWallets }) => {
       rpcEndpoint,
       signer: test1Wallet,
     });
-    const proposal = Any.fromPartial(
-      ManifestMessageComposer.encoded.payout({
-        authority: POA_GROUP_ADDRESS,
-        payoutPairs: [
-          {
-            address: test2Address,
-            coin: { denom, amount: "1000" },
-          },
-        ],
-      })
-    );
-
     const beforeBalance = await client.getBalance(test2Address, denom);
+    const proposal = ManifestMessageComposer.encoded.payout({
+      authority: POA_GROUP_ADDRESS,
+      payoutPairs: [
+        {
+          address: test2Address,
+          coin: { denom, amount: "1000" },
+        },
+      ],
+    });
+
     await submitVoteExecGroupProposal(
       test1Address,
       client,
@@ -113,12 +109,10 @@ describe.each(inits)("$description", ({ createWallets }) => {
   }, 30000);
 
   test("burn (manifest)", async () => {
-    const proposal = Any.fromPartial(
-      ManifestMessageComposer.encoded.burnHeldBalance({
+    const proposal = ManifestMessageComposer.encoded.burnHeldBalance({
         authority: POA_GROUP_ADDRESS,
         burnCoins: [{ denom, amount: "1000" }],
-      })
-    );
+      });
 
     const beforeBalance = await cosmosSigningClient.getBalance(
       POA_GROUP_ADDRESS,
