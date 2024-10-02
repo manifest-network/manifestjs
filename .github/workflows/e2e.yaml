@@ -23,7 +23,7 @@ jobs:
           cache: "yarn"
 
       - name: Install Dependencies and Build
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Set Up Starship Infrastructure
         id: starship-infra
