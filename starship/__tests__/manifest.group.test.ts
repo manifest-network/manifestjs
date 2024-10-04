@@ -95,6 +95,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
 
     await submitVoteExecGroupProposal(
       test1Address,
+      POA_GROUP_ADDRESS,
       client,
       "payout",
       "some payout",
@@ -121,6 +122,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     );
     await submitVoteExecGroupProposal(
       test1Address,
+      POA_GROUP_ADDRESS,
       cosmosSigningClient,
       "burn",
       "some burn",

@@ -83,8 +83,9 @@ export const waitForNBlocks = async (
   }
 };
 
-const submitGroupProposal = async (
+export const submitGroupProposal = async (
   signer: string,
+  groupPolicyAddress: string,
   client: SigningStargateClient,
   title: string,
   summary: string,
@@ -98,7 +99,7 @@ const submitGroupProposal = async (
   );
 
   const submitMsg = {
-    groupPolicyAddress: POA_GROUP_ADDRESS,
+    groupPolicyAddress,
     title,
     summary,
     proposers,
@@ -156,6 +157,7 @@ export const execGroupProposal = async (
 
 export const submitVoteExecGroupProposal = async (
   signer: string,
+  groupPolicyAddress: string,
   client: SigningStargateClient,
   title: string,
   summary: string,
@@ -166,6 +168,7 @@ export const submitVoteExecGroupProposal = async (
 ) => {
   const proposalId = await submitGroupProposal(
     signer,
+    groupPolicyAddress,
     client,
     title,
     summary,
