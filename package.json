@@ -71,7 +71,7 @@
     "@cosmjs/amino": "^0.32.4",
     "@cosmjs/encoding": "^0.32.4",
     "@cosmjs/proto-signing": "^0.32.4",
-    "@cosmjs/stargate": "npm:@liftedinit/stargate@0.32.4-ll.2",
+    "@cosmjs/stargate": "npm:@liftedinit/stargate@0.32.4-ll.3",
     "@cosmjs/tendermint-rpc": "^0.32.4",
     "@cosmology/lcd": "^0.14.0"
   }
