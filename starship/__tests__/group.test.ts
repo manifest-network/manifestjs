@@ -135,7 +135,6 @@ describe.each(inits)("$description", ({ description, createWallets }) => {
   });
 
   describe("submit group proposal", () => {
-    // The following test works with both proto and amino signing.
     test("send", async () => {
       const client = await getSigningCosmosClient({
         rpcEndpoint,
@@ -167,9 +166,6 @@ describe.each(inits)("$description", ({ description, createWallets }) => {
       expect(result.code).toEqual(0);
     }, 30000);
 
-    // The following test fails with
-    //    Log: unable to resolve type URL /cosmos.group.v1.GroupMember: tx parse error
-    // This is a client-side error
     test("update group metadata", async () => {
       const client = await getSigningCosmosClient({
         rpcEndpoint,
@@ -203,9 +199,6 @@ describe.each(inits)("$description", ({ description, createWallets }) => {
       expect(result.code).toEqual(0);
     }, 30000);
 
-    // The following test fails with
-    //    Log: no concrete type registered for type URL /cosmos.group.v1.MsgCreateGroupPolicyResponse against interface *interface { ProtoMessage(); Reset(); String() string }: tx parse error
-    // This is a client-side error
     test("withdraw proposal", async () => {
       const client = await getSigningCosmosClient({
         rpcEndpoint,
@@ -270,9 +263,6 @@ describe.each(inits)("$description", ({ description, createWallets }) => {
       expect(withdrawResult.code).toEqual(0);
     }, 30000);
 
-    // The following test fails with
-    //    Log: unable to resolve type URL /cosmos.group.v1.GroupMember: tx parse error
-    // This is a client-side error
     test("update group members", async () => {
       const client = await getSigningCosmosClient({
         rpcEndpoint,
@@ -310,65 +300,6 @@ describe.each(inits)("$description", ({ description, createWallets }) => {
       assertIsDeliverTxSuccess(result);
     }, 30000);
 
-    // The following test fails with
-    //   Log: signature verification failed; please verify account number (36), sequence (2) and chain-id (manifest-ledger-beta): unauthorized
-    // This is a server-side error
-    //
-    // The following AMINO message is broadcasted:
-    //
-    // ...
-    // "msgs": [
-    //     {
-    //       "type": "cosmos-sdk/group/MsgSubmitProposal",
-    //       "value": {
-    //         "group_policy_address": "manifest1ys0dhh6x5s55h2g37zrnc7kh630jfq5p77as8pwyn60ax9zzqh9qfxfrxx",
-    //         "proposers": [
-    //           "manifest1dcq6zdnk7m44r7a7vyths57t9sru02730hqsu6"
-    //         ],
-    //         "messages": [
-    //           {
-    //             "type": "cosmos-sdk/MsgUpdateGroupPolicyMetadata",
-    //             "value": {
-    //               "admin": "manifest1ys0dhh6x5s55h2g37zrnc7kh630jfq5p77as8pwyn60ax9zzqh9qfxfrxx",
-    //               "group_policy_address": "manifest1ys0dhh6x5s55h2g37zrnc7kh630jfq5p77as8pwyn60ax9zzqh9qfxfrxx",
-    //               "metadata": "new group policy metadata"
-    //             }
-    //           }
-    //         ],
-    //         "title": "update group policy metadata",
-    //         "summary": "change the group policy metadata"
-    //       }
-    //     }
-    //   ],
-    // ...
-    //
-    // But the following AMINO message is received by the server:
-    //
-    // ...
-    // "msgs": [
-    //   {
-    //     "type": "cosmos-sdk/group/MsgSubmitProposal",
-    //     "value": {
-    //       "group_policy_address": "manifest142498n8sya3k3s5jftp7dujuqfw3ag4tpzc2ve45ykpwx6zmng8snlf063",
-    //       "messages": [
-    //         {
-    //           "type": "cosmos-sdk/MsgUpdateGroupDecisionPolicy",
-    //           "value": {
-    //             "admin": "manifest142498n8sya3k3s5jftp7dujuqfw3ag4tpzc2ve45ykpwx6zmng8snlf063",
-    //             "group_policy_address": "manifest142498n8sya3k3s5jftp7dujuqfw3ag4tpzc2ve45ykpwx6zmng8snlf063"
-    //           }
-    //         }
-    //       ],
-    //       "proposers": [
-    //         "manifest1e8wzp3wdlfdqm5tnp4t6xqmdgp6qdk57luh6mq"
-    //       ],
-    //       "summary": "change the group policy metadata",
-    //       "title": "update group policy metadata"
-    //     }
-    //   }
-    // ],
-    //
-    // Notice the `metadata` field is missing in the received message!!!!!
     test("update group policy metadata", async () => {
       const client = await getSigningCosmosClient({
         rpcEndpoint,
@@ -399,7 +330,6 @@ describe.each(inits)("$description", ({ description, createWallets }) => {
       expect(result.code).toEqual(0);
     }, 30000);
 
-    // The following test works with both proto and amino signing.
     test("update group policy decision policy", async () => {
       const client = await getSigningCosmosClient({
         rpcEndpoint,
