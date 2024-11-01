@@ -358,7 +358,7 @@ export const MsgSetPower = {
     const obj: any = {};
     obj.sender = message.sender === "" ? undefined : message.sender;
     obj.validator_address = message.validatorAddress === "" ? undefined : message.validatorAddress;
-    obj.power = message.power !== BigInt(0) ? (message.power?.toString)() : undefined;
+    obj.power = message.power !== BigInt(0) ? message.power?.toString() : undefined;
     obj.unsafe = message.unsafe === false ? undefined : message.unsafe;
     return obj;
   },

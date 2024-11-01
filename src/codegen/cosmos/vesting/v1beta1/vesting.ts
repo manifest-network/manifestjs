@@ -349,7 +349,7 @@ export const BaseVestingAccount = {
     } else {
       obj.delegated_vesting = message.delegatedVesting;
     }
-    obj.end_time = message.endTime !== BigInt(0) ? (message.endTime?.toString)() : undefined;
+    obj.end_time = message.endTime !== BigInt(0) ? message.endTime?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: BaseVestingAccountAminoMsg): BaseVestingAccount {
@@ -454,7 +454,7 @@ export const ContinuousVestingAccount = {
   toAmino(message: ContinuousVestingAccount): ContinuousVestingAccountAmino {
     const obj: any = {};
     obj.base_vesting_account = message.baseVestingAccount ? BaseVestingAccount.toAmino(message.baseVestingAccount) : undefined;
-    obj.start_time = message.startTime !== BigInt(0) ? (message.startTime?.toString)() : undefined;
+    obj.start_time = message.startTime !== BigInt(0) ? message.startTime?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: ContinuousVestingAccountAminoMsg): ContinuousVestingAccount {
@@ -651,7 +651,7 @@ export const Period = {
   },
   toAmino(message: Period): PeriodAmino {
     const obj: any = {};
-    obj.length = message.length !== BigInt(0) ? (message.length?.toString)() : undefined;
+    obj.length = message.length !== BigInt(0) ? message.length?.toString() : undefined;
     if (message.amount) {
       obj.amount = message.amount.map(e => e ? Coin.toAmino(e) : undefined);
     } else {
@@ -776,7 +776,7 @@ export const PeriodicVestingAccount = {
   toAmino(message: PeriodicVestingAccount): PeriodicVestingAccountAmino {
     const obj: any = {};
     obj.base_vesting_account = message.baseVestingAccount ? BaseVestingAccount.toAmino(message.baseVestingAccount) : undefined;
-    obj.start_time = message.startTime !== BigInt(0) ? (message.startTime?.toString)() : undefined;
+    obj.start_time = message.startTime !== BigInt(0) ? message.startTime?.toString() : undefined;
     if (message.vestingPeriods) {
       obj.vesting_periods = message.vestingPeriods.map(e => e ? Period.toAmino(e) : undefined);
     } else {
