@@ -4,24 +4,37 @@ import {
   checkPoaAdminIs,
   createAminoWallet,
   createProtoWallet,
+  execGroupProposal,
   initChain,
   POA_GROUP_ADDRESS,
-  // @ts-ignore
+  voteGroupProposal,
 } from "../src/test_helper";
 import { assertIsDeliverTxSuccess } from "@cosmjs/stargate";
-import { Exec } from "../../src/codegen/cosmos/group/v1/tx";
 import { MessageComposer as GroupMsgComposer } from "../../src/codegen/cosmos/group/v1/tx.registry";
-import { MessageComposer as SendMsgComposer } from "../../src/codegen/cosmos/bank/v1beta1/tx.registry";
 import { Any } from "../../src/codegen/google/protobuf/any";
 import {
-  ProposalStatus,
   ThresholdDecisionPolicy,
   VoteOption,
 } from "../../src/codegen/cosmos/group/v1/types";
 import { Duration } from "../../src/codegen/google/protobuf/duration";
 import { createRPCQueryClient } from "../../src/codegen/cosmos/rpc.query";
 import path from "path";
-import { getSigningCosmosTxRpc } from "../../src/codegen";
+import { getSigningCosmosClient } from "../../src";
+import {
+  Exec,
+  MsgSubmitProposalResponse,
+  MsgUpdateGroupMembers,
+  MsgUpdateGroupMetadata,
+  MsgUpdateGroupPolicyDecisionPolicy,
+  MsgUpdateGroupPolicyDecisionPolicyEncoded,
+  MsgUpdateGroupPolicyMetadata,
+  MsgWithdrawProposal,
+} from "../../src/codegen/cosmos/group/v1/tx";
+import { MsgSend } from "../../src/codegen/cosmos/bank/v1beta1/tx";
+
+BigInt.prototype["toJSON"] = function () {
+  return this.toString();
+};
 
 const inits = [
   {
@@ -72,7 +85,7 @@ describe.each(inits)("$description", ({ description, createWallets }) => {
   });
 
   test("create group", async () => {
-    const client = await getSigningCosmosTxRpc({
+    const client = await getSigningCosmosClient({
       rpcEndpoint,
       signer: test1Wallet,
     });
@@ -109,171 +122,291 @@ describe.each(inits)("$description", ({ description, createWallets }) => {
       address: t1Addr,
     });
     expect(groups.groups.length).toEqual(1);
-  });
 
-  test("submit group proposal (send)", async () => {
-    const client = await getSigningCosmosTxRpc({
-      rpcEndpoint,
-      signer: test1Wallet,
-    });
-    const queryClient = await createRPCQueryClient({ rpcEndpoint });
-
-    // Fetch the group info
-    const groups = await queryClient.cosmos.group.v1.groupsByMember({
-      address: t1Addr,
-    });
-    expect(groups.groups.length).toEqual(1);
-    const group = groups.groups[0];
-
-    // Send some tokens to the group admin
-    const msgSend = SendMsgComposer.fromPartial.send({
-      fromAddress: t1Addr,
-      toAddress: group.admin,
-      amount: [{ denom, amount: "100000" }],
-    });
-    const sendResult = await client.signAndBroadcast(
+    // Send some tokens to the group admin of the new group
+    let sendResult = await client.sendTokens(
       t1Addr,
-      [msgSend],
-      fee,
-      "send tokens to group admin"
+      groups.groups[0].admin,
+      [{ denom, amount: "10000000" }],
+      fee
     );
     assertIsDeliverTxSuccess(sendResult);
     expect(sendResult.code).toEqual(0);
+  });
 
-    const proposal = Any.fromPartial(
-      SendMsgComposer.encoded.send({
+  describe("submit group proposal", () => {
+    test("send", async () => {
+      const client = await getSigningCosmosClient({
+        rpcEndpoint,
+        signer: test1Wallet,
+      });
+
+      const group = await getGroupByMember(t1Addr);
+      const send: MsgSend = {
         fromAddress: group.admin,
         toAddress: t1Addr,
         amount: [{ denom, amount: "1000" }],
-      })
-    );
+      };
+      const proposal = Any.fromPartial(MsgSend.toProtoMsg(send));
+      const msgSubmitProposal = GroupMsgComposer.fromPartial.submitProposal({
+        groupPolicyAddress: group.admin,
+        title: "send proposal",
+        summary: "send 1000 tokens to myself",
+        proposers: [t1Addr],
+        exec: Exec.EXEC_UNSPECIFIED,
+        messages: [proposal],
+        metadata: "",
+      });
+      const result = await client.signAndBroadcast(
+        t1Addr,
+        [msgSubmitProposal],
+        fee
+      );
+      assertIsDeliverTxSuccess(result);
+      expect(result.code).toEqual(0);
+    }, 30000);
 
-    const msg = GroupMsgComposer.fromPartial.submitProposal({
-      groupPolicyAddress: group.admin,
-      title: "test proposal title",
-      summary: "test proposal summary",
-      proposers: [t1Addr],
-      exec: Exec.EXEC_UNSPECIFIED,
-      messages: [proposal],
-      metadata: "test proposal metadata",
-    });
+    test("update group metadata", async () => {
+      const client = await getSigningCosmosClient({
+        rpcEndpoint,
+        signer: test1Wallet,
+      });
+      const group = await getGroupByMember(t1Addr);
 
-    const result = await client.signAndBroadcast(
-      t1Addr,
-      [msg],
-      fee,
-      "submit group proposal test - " + description
-    );
-    assertIsDeliverTxSuccess(result);
-    expect(result.code).toEqual(0);
+      const newMetadata: MsgUpdateGroupMetadata = {
+        admin: group.admin,
+        groupId: group.id,
+        metadata: "new metadata",
+      };
+      const proposal = Any.fromPartial(
+        MsgUpdateGroupMetadata.toProtoMsg(newMetadata)
+      );
+      const msgSubmitProposal = GroupMsgComposer.fromPartial.submitProposal({
+        groupPolicyAddress: group.admin,
+        title: "update group metadata",
+        summary: "update the group metadata with new value",
+        proposers: [t1Addr],
+        exec: Exec.EXEC_UNSPECIFIED,
+        messages: [proposal],
+        metadata: "",
+      });
+      const result = await client.signAndBroadcast(
+        t1Addr,
+        [msgSubmitProposal],
+        fee
+      );
+      assertIsDeliverTxSuccess(result);
+      expect(result.code).toEqual(0);
+    }, 30000);
+
+    test("withdraw proposal", async () => {
+      const client = await getSigningCosmosClient({
+        rpcEndpoint,
+        signer: test1Wallet,
+      });
+      const group = await getGroupByMember(t1Addr);
+      const send: MsgSend = {
+        fromAddress: group.admin,
+        toAddress: t1Addr,
+        amount: [{ denom, amount: "1000" }],
+      };
+      const sendProposal = Any.fromPartial(MsgSend.toProtoMsg(send));
+      const msgSubmitSendProposal = GroupMsgComposer.fromPartial.submitProposal(
+        {
+          groupPolicyAddress: group.admin,
+          title: "send proposal to be withdrawn",
+          summary: "withdraw this proposal please",
+          proposers: [t1Addr],
+          exec: Exec.EXEC_UNSPECIFIED,
+          messages: [sendProposal],
+          metadata: "",
+        }
+      );
+      const result = await client.signAndBroadcast(
+        t1Addr,
+        [msgSubmitSendProposal],
+        fee
+      );
+      assertIsDeliverTxSuccess(result);
+      expect(result.code).toEqual(0);
+
+      // Get the proposal Id
+      const encodedResponse = result.msgResponses[0];
+      const submitResponse = MsgSubmitProposalResponse.decode(
+        encodedResponse.value
+      );
+      const proposal1Id = submitResponse.proposalId;
+
+      const withdraw: MsgWithdrawProposal = {
+        address: group.admin,
+        proposalId: proposal1Id,
+      };
+      const withdrawProposal = Any.fromPartial(
+        MsgWithdrawProposal.toProtoMsg(withdraw)
+      );
+      const msgSubmitWithdrawProposal =
+        GroupMsgComposer.fromPartial.submitProposal({
+          groupPolicyAddress: group.admin,
+          title: "withdraw proposal",
+          summary: "withdraw the proposal",
+          proposers: [t1Addr],
+          exec: Exec.EXEC_UNSPECIFIED,
+          messages: [withdrawProposal],
+          metadata: "",
+        });
+      const withdrawResult = await client.signAndBroadcast(
+        t1Addr,
+        [msgSubmitWithdrawProposal],
+        fee
+      );
+      assertIsDeliverTxSuccess(withdrawResult);
+      expect(withdrawResult.code).toEqual(0);
+    }, 30000);
+
+    test("update group members", async () => {
+      const client = await getSigningCosmosClient({
+        rpcEndpoint,
+        signer: test1Wallet,
+      });
+      const group = await getGroupByMember(t1Addr);
+      const update: MsgUpdateGroupMembers = {
+        admin: group.admin,
+        groupId: group.id,
+        memberUpdates: [
+          {
+            address: t2Addr,
+            weight: "0",
+            metadata: "user 2",
+          },
+        ],
+      };
+      const proposal = Any.fromPartial(
+        MsgUpdateGroupMembers.toProtoMsg(update)
+      );
+      const msgSubmitProposal = GroupMsgComposer.fromPartial.submitProposal({
+        groupPolicyAddress: group.admin,
+        title: "update group members",
+        summary: "update the group members",
+        proposers: [t1Addr],
+        exec: Exec.EXEC_UNSPECIFIED,
+        messages: [proposal],
+        metadata: "",
+      });
+      const result = await client.signAndBroadcast(
+        t1Addr,
+        [msgSubmitProposal],
+        fee
+      );
+      assertIsDeliverTxSuccess(result);
+    }, 30000);
+
+    test("update group policy metadata", async () => {
+      const client = await getSigningCosmosClient({
+        rpcEndpoint,
+        signer: test1Wallet,
+      });
+      const group = await getGroupByMember(t1Addr);
+
+      const newMetadata: MsgUpdateGroupPolicyMetadata = {
+        admin: group.admin,
+        groupPolicyAddress: group.admin,
+        metadata: "new group policy metadata",
+      };
+      const proposal = Any.fromPartial(
+        MsgUpdateGroupPolicyMetadata.toProtoMsg(newMetadata)
+      );
+
+      const submitMsg = GroupMsgComposer.fromPartial.submitProposal({
+        groupPolicyAddress: group.admin,
+        title: "update group policy metadata",
+        summary: "change the group policy metadata",
+        proposers: [t1Addr],
+        exec: Exec.EXEC_UNSPECIFIED,
+        messages: [proposal],
+        metadata: "",
+      });
+      const result = await client.signAndBroadcast(t1Addr, [submitMsg], fee);
+      assertIsDeliverTxSuccess(result);
+      expect(result.code).toEqual(0);
+    }, 30000);
+
+    test("update group policy decision policy", async () => {
+      const client = await getSigningCosmosClient({
+        rpcEndpoint,
+        signer: test1Wallet,
+      });
+      const queryClient = await createRPCQueryClient({ rpcEndpoint });
+      const group = await getGroupByMember(t1Addr);
+
+      const newPolicy = ThresholdDecisionPolicy.fromPartial({
+        threshold: "2",
+        windows: {
+          votingPeriod: Duration.fromPartial({ seconds: 10n }),
+          minExecutionPeriod: Duration.fromPartial({ seconds: 0n }),
+        },
+      });
+      const newPolicyEncoded: MsgUpdateGroupPolicyDecisionPolicyEncoded = {
+        admin: group.admin,
+        groupPolicyAddress: group.admin,
+        decisionPolicy: ThresholdDecisionPolicy.toProtoMsg(newPolicy),
+      };
+      const proposal = Any.fromPartial(
+        MsgUpdateGroupPolicyDecisionPolicy.toProtoMsg(newPolicyEncoded)
+      );
+      const submitMsg = GroupMsgComposer.fromPartial.submitProposal({
+        groupPolicyAddress: group.admin,
+        title: "update group policy decision policy",
+        summary: "change the group policy decision policy",
+        proposers: [t1Addr],
+        exec: Exec.EXEC_UNSPECIFIED,
+        messages: [proposal],
+        metadata: "",
+      });
+      const result = await client.signAndBroadcast(t1Addr, [submitMsg], fee);
+      assertIsDeliverTxSuccess(result);
+      expect(result.code).toEqual(0);
+
+      const encodedResponse = result.msgResponses[0];
+
+      const submitResponse = MsgSubmitProposalResponse.decode(
+        encodedResponse.value
+      );
+      const proposalId = submitResponse.proposalId;
+
+      await voteGroupProposal(
+        t1Addr,
+        client,
+        proposalId,
+        VoteOption.VOTE_OPTION_YES,
+        fee
+      );
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+      await execGroupProposal(t1Addr, client, proposalId, fee);
+
+      const groupPolicyAfter =
+        await queryClient.cosmos.group.v1.groupPolicyInfo({
+          address: group.admin,
+        });
+      expect(groupPolicyAfter.info.decisionPolicy).toEqual(newPolicy);
+    }, 30000);
   });
 
-  test("vote on (send) group proposal", async () => {
-    const client = await getSigningCosmosTxRpc({
-      rpcEndpoint,
-      signer: test1Wallet,
-    });
+  async function getGroupByMember(address: string) {
     const queryClient = await createRPCQueryClient({ rpcEndpoint });
-
-    // Fetch the group info
     const groups = await queryClient.cosmos.group.v1.groupsByMember({
-      address: t1Addr,
+      address,
     });
     expect(groups.groups.length).toEqual(1);
-    const group = groups.groups[0];
+    return groups.groups[0];
+  }
 
-    // Get the group proposals
+  async function getProposalByMember(address: string) {
+    const queryClient = await createRPCQueryClient({ rpcEndpoint });
+    const group = await getGroupByMember(address);
     const proposals = await queryClient.cosmos.group.v1.proposalsByGroupPolicy({
       address: group.admin,
     });
     expect(proposals.proposals.length).toEqual(1);
-
-    // Get the first proposal
-    const proposal = proposals.proposals[0];
-    expect(proposal.status).toEqual(ProposalStatus.PROPOSAL_STATUS_SUBMITTED);
-
-    const msg = GroupMsgComposer.fromPartial.vote({
-      proposalId: proposal.id,
-      voter: t1Addr,
-      option: VoteOption.VOTE_OPTION_YES,
-      metadata: "test vote metadata",
-      exec: Exec.EXEC_UNSPECIFIED,
-    });
-
-    const result = await client.signAndBroadcast(
-      t1Addr,
-      [msg],
-      fee,
-      "vote on group proposal test - " + description
-    );
-    assertIsDeliverTxSuccess(result);
-    expect(result.code).toEqual(0);
-
-    // Wait 10 seconds for the proposal to expire
-    await new Promise((resolve) => setTimeout(resolve, 10000));
-
-    const proposalAfterVote = await queryClient.cosmos.group.v1.proposal({
-      proposalId: proposal.id,
-    });
-    expect(proposalAfterVote.proposal.status).toEqual(
-      ProposalStatus.PROPOSAL_STATUS_ACCEPTED
-    );
-  });
-
-  test("execute (send) group proposal", async () => {
-    const client = await getSigningCosmosTxRpc({
-      rpcEndpoint,
-      signer: test1Wallet,
-    });
-    const queryClient = await createRPCQueryClient({ rpcEndpoint });
-    const initBalance = await queryClient.cosmos.bank.v1beta1.balance({
-      address: t1Addr,
-      denom,
-    });
-
-    // Fetch the group info
-    const groups = await queryClient.cosmos.group.v1.groupsByMember({
-      address: t1Addr,
-    });
-    expect(groups.groups.length).toEqual(1);
-    const group = groups.groups[0];
-
-    // Get the group proposals
-    const proposals = await queryClient.cosmos.group.v1.proposalsByGroupPolicy({
-      address: group.admin,
-    });
-    expect(proposals.proposals.length).toEqual(1);
-
-    // Get the first proposal
-    const proposal = proposals.proposals[0];
-    expect(proposal.status).toEqual(ProposalStatus.PROPOSAL_STATUS_ACCEPTED);
-
-    const msg = GroupMsgComposer.fromPartial.exec({
-      proposalId: proposal.id,
-      executor: t1Addr,
-    });
-
-    const result = await client.signAndBroadcast(
-      t1Addr,
-      [msg],
-      fee,
-      "execute group proposal test - " + description
-    );
-    assertIsDeliverTxSuccess(result);
-    expect(result.code).toEqual(0);
-
-    const amount = 1000;
-    const afterBalance = await queryClient.cosmos.bank.v1beta1.balance({
-      address: t1Addr,
-      denom,
-    });
-    // The new amount should be the initial amount minus the fees plus the amount sent in the proposal
-    expect(afterBalance.balance.amount).toEqual(
-      (
-        parseInt(initBalance.balance.amount) +
-        amount -
-        parseInt(fee.amount[0].amount)
-      ).toString()
-    );
-  });
+    return proposals.proposals[0];
+  }
 });

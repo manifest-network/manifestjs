@@ -120,6 +120,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
 
     await submitVoteExecGroupProposal(
       test1Address,
+      POA_GROUP_ADDRESS,
       client,
       "set power",
       "some set power",
@@ -138,8 +139,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     );
   }, 30000);
 
-  // TODO: Enable this test when https://github.com/cosmology-tech/telescope/issues/660 is fixed
-  test.skip("remove pending validator (poa)", async () => {
+  test("remove pending validator (poa)", async () => {
     const queryClient = await POARPCQueryClient({ rpcEndpoint });
     const pendingValidatorsBefore =
       await queryClient.strangelove_ventures.poa.v1.pendingValidators();
@@ -190,6 +190,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
 
     await submitVoteExecGroupProposal(
       test1Address,
+      POA_GROUP_ADDRESS,
       cosmosSigningClient,
       "remove pending",
       "some remove pending",
@@ -217,6 +218,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
 
     const proposalId = await submitVoteExecGroupProposal(
       test1Address,
+      POA_GROUP_ADDRESS,
       cosmosSigningClient,
       "remove validator",
       "some remove validator",

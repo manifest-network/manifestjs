@@ -127,6 +127,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     );
     await submitVoteExecGroupProposal(
       test1Address,
+      POA_GROUP_ADDRESS,
       cosmosSigningClient,
       "set denom metadata",
       "some set denom metadata",
@@ -164,6 +165,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     );
     await submitVoteExecGroupProposal(
       test1Address,
+      POA_GROUP_ADDRESS,
       cosmosSigningClient,
       "burn",
       "some burn",
@@ -193,6 +195,8 @@ describe.each(inits)("$description", ({ createWallets }) => {
     );
     await submitVoteExecGroupProposal(
       test1Address,
+      POA_GROUP_ADDRESS,
+
       cosmosSigningClient,
       "change admin",
       "some change admin",
@@ -219,6 +223,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     );
     await submitVoteExecGroupProposal(
       test1Address,
+      POA_GROUP_ADDRESS,
       cosmosSigningClient,
       "create denom",
       "some create denom",
@@ -244,6 +249,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     );
     await submitVoteExecGroupProposal(
       test1Address,
+      POA_GROUP_ADDRESS,
       cosmosSigningClient,
       "mint",
       "some mint",

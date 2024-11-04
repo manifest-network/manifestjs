@@ -421,7 +421,7 @@ export const QueryConsensusPowerResponse = {
   },
   toAmino(message: QueryConsensusPowerResponse): QueryConsensusPowerResponseAmino {
     const obj: any = {};
-    obj.consensus_power = message.consensusPower !== BigInt(0) ? (message.consensusPower?.toString)() : undefined;
+    obj.consensus_power = message.consensusPower !== BigInt(0) ? message.consensusPower?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: QueryConsensusPowerResponseAminoMsg): QueryConsensusPowerResponse {
