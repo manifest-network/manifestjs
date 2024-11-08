@@ -10,7 +10,6 @@ import path from "path";
 import { OfflineSigner } from "@cosmjs/proto-signing";
 import { getSigningCosmosClient } from "../../src";
 import { createRPCQueryClient } from "../../src/codegen/cosmos/rpc.query";
-import { MsgGrantAllowance } from "../../src/codegen/cosmos/feegrant/v1beta1/tx";
 import {
   AllowedMsgAllowance,
   BasicAllowance,
