@@ -29,6 +29,9 @@ import {
   AllowedMsgAllowance,
   BasicAllowance,
 } from "../../src/codegen/cosmos/feegrant/v1beta1/feegrant";
+import { Grant } from '../../src/codegen/cosmos/authz/v1beta1/authz';
+import { SendAuthorization } from '../../src/codegen/cosmos/bank/v1beta1/authz';
+import { MsgGrant } from '../../src/codegen/cosmos/authz/v1beta1/tx';
 
 BigInt.prototype["toJSON"] = function () {
   return this.toString();
@@ -186,6 +189,46 @@ describe.each(inits)("$description", ({ description, createWallets }) => {
       expect(groupAfterBalance.balance.amount).toEqual(
         (BigInt(groupBeforeBalance.balance.amount) - BigInt("1000")).toString()
       );
+    }, 30000);
+
+    test("authz grant", async () => {
+      const queryClient = await createRPCQueryClient({ rpcEndpoint });
+      const client = await getSigningCosmosClient({
+        rpcEndpoint,
+        signer: test1Wallet,
+      });
+
+      const group = await getGroupByMember(t1Addr);
+      const grant = MsgGrant.fromPartial({
+        granter: group.admin,
+        grantee: t1Addr,
+        grant: Grant.fromPartial({
+          authorization: SendAuthorization.fromPartial({
+            spendLimit: [{ denom, amount: "1000" }],
+            allowList: [""],
+          })
+        }),
+      })
+
+      const proposal = Any.fromPartial(MsgGrant.toProtoMsg(grant));
+      await submitVoteExecGroupProposal(
+        t1Addr,
+        group.admin,
+        client,
+        "authz grant proposal",
+        "authz grant proposal",
+        [t1Addr],
+        [proposal],
+        fee
+      );
+
+      const allowance =
+        await queryClient.cosmos.authz.v1beta1.granterGrants({
+          granter: group.admin,
+        });
+      expect(allowance.grants.length).toEqual(1);
+      expect(allowance.grants[0].granter).toEqual(grant.granter);
+      expect(allowance.grants[0].grantee).toEqual(grant.grantee);
     }, 30000);
 
     test("feegrant", async () => {
