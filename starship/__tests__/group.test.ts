@@ -4,34 +4,27 @@ import {
   checkPoaAdminIs,
   createAminoWallet,
   createProtoWallet,
-  execGroupProposal,
   initChain,
-  POA_GROUP_ADDRESS, submitVoteExecGroupProposal,
-  voteGroupProposal
+  POA_GROUP_ADDRESS, submitVoteExecGroupProposal
 } from '../src/test_helper';
 import { assertIsDeliverTxSuccess } from '@cosmjs/stargate';
 import { MessageComposer as GroupMsgComposer } from '../../src/codegen/cosmos/group/v1/tx.registry';
 import { Any } from '../../src/codegen/google/protobuf/any';
-import {
-  ProposalStatus,
-  ThresholdDecisionPolicy,
-  VoteOption
-} from '../../src/codegen/cosmos/group/v1/types';
+import { ThresholdDecisionPolicy } from '../../src/codegen/cosmos/group/v1/types';
 import { Duration } from '../../src/codegen/google/protobuf/duration';
 import { createRPCQueryClient } from '../../src/codegen/cosmos/rpc.query';
 import path from 'path';
 import { getSigningCosmosClient } from '../../src';
 import {
-  Exec,
-  MsgSubmitProposalResponse,
   MsgUpdateGroupMembers,
   MsgUpdateGroupMetadata,
   MsgUpdateGroupPolicyDecisionPolicy,
   MsgUpdateGroupPolicyDecisionPolicyEncoded,
-  MsgUpdateGroupPolicyMetadata,
-  MsgWithdrawProposal
+  MsgUpdateGroupPolicyMetadata
 } from '../../src/codegen/cosmos/group/v1/tx';
 import { MsgSend } from '../../src/codegen/cosmos/bank/v1beta1/tx';
+import { MsgGrantAllowance } from '../../src/codegen/cosmos/feegrant/v1beta1/tx';
+import { AllowedMsgAllowance, BasicAllowance } from '../../src/codegen/cosmos/feegrant/v1beta1/feegrant';
 
 BigInt.prototype['toJSON'] = function() {
   return this.toString();
@@ -161,6 +154,35 @@ describe.each(inits)('$description', ({ description, createWallets }) => {
 
       expect(t1AddrAfterBalance.balance.amount).toEqual((BigInt(t1AddrBeforeBalance.balance.amount) + BigInt('1000') - (BigInt(3) * BigInt(fee.amount[0].amount))).toString());
       expect(groupAfterBalance.balance.amount).toEqual((BigInt(groupBeforeBalance.balance.amount) - BigInt('1000')).toString());
+    }, 30000);
+
+    test('feegrant', async () => {
+      const queryClient = await createRPCQueryClient({ rpcEndpoint });
+      const client = await getSigningCosmosClient({
+        rpcEndpoint,
+        signer: test1Wallet
+      });
+
+      const group = await getGroupByMember(t1Addr);
+      const feegrant = MsgGrantAllowance.fromPartial({
+        granter: group.admin,
+        grantee: t1Addr,
+        allowance: AllowedMsgAllowance.fromPartial({
+          allowance: BasicAllowance.fromPartial({
+            spendLimit: [{ denom, amount: '1000' }],
+            expiration: null
+          }),
+          allowedMessages: ['/cosmos.bank.v1beta1.MsgSend']
+        })
+      });
+
+      const proposal = Any.fromPartial(MsgGrantAllowance.toProtoMsg(feegrant));
+      await submitVoteExecGroupProposal(t1Addr, group.admin, client, 'feegrant proposal', 'feegrant fee authorization', [t1Addr], [proposal], fee);
+
+      const allowance = await queryClient.cosmos.feegrant.v1beta1.allowancesByGranter({ granter: group.admin });
+      expect(allowance.allowances.length).toEqual(1);
+      expect(allowance.allowances[0].granter).toEqual(feegrant.granter);
+      expect(allowance.allowances[0].grantee).toEqual(feegrant.grantee);
     }, 30000);
 
     test('update group metadata', async () => {
