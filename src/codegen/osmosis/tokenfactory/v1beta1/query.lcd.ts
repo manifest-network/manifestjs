@@ -1,5 +1,5 @@
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponseSDKType, QueryDenomAuthorityMetadataRequest, QueryDenomAuthorityMetadataResponseSDKType, QueryDenomsFromCreatorRequest, QueryDenomsFromCreatorResponseSDKType } from "./query";
+import { QueryParamsRequest, QueryParamsResponseSDKType, QueryDenomAuthorityMetadataRequest, QueryDenomAuthorityMetadataResponseSDKType, QueryDenomsFromCreatorRequest, QueryDenomsFromCreatorResponseSDKType, QueryDenomsFromAdminRequest, QueryDenomsFromAdminResponseSDKType } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -26,5 +26,11 @@ export class LCDQueryClient {
   denomsFromCreator = async (params: QueryDenomsFromCreatorRequest): Promise<QueryDenomsFromCreatorResponseSDKType> => {
     const endpoint = `osmosis/tokenfactory/v1beta1/denoms_from_creator/${params.creator}`;
     return await this.req.get<QueryDenomsFromCreatorResponseSDKType>(endpoint);
+  };
+  /* DenomsFromAdmin defines a gRPC query method for fetching all
+   denominations owned by a specific admin. */
+  denomsFromAdmin = async (params: QueryDenomsFromAdminRequest): Promise<QueryDenomsFromAdminResponseSDKType> => {
+    const endpoint = `osmosis/tokenfactory/v1beta1/denoms_from_admin/${params.admin}`;
+    return await this.req.get<QueryDenomsFromAdminResponseSDKType>(endpoint);
   };
 }

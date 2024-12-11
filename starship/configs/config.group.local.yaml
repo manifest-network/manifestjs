@@ -4,7 +4,7 @@ version: v0.2.19
 chains:
   - id: manifest-ledger-beta
     name: custom
-    image: ghcr.io/liftedinit/manifest-ledger:v0.0.1-alpha.18
+    image: ghcr.io/liftedinit/manifest-ledger:v0.0.1-rc.1
     home: /root/.manifest
     binary: manifestd
     prefix: manifest

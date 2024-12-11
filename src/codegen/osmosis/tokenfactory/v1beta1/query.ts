@@ -156,6 +156,64 @@ export interface QueryDenomsFromCreatorResponseAminoMsg {
 export interface QueryDenomsFromCreatorResponseSDKType {
   denoms: string[];
 }
+/**
+ * QueryDenomsFromAdminRequest defines the request structure for the
+ * DenomsFromAdmin gRPC query.
+ */
+export interface QueryDenomsFromAdminRequest {
+  admin: string;
+}
+export interface QueryDenomsFromAdminRequestProtoMsg {
+  typeUrl: "/osmosis.tokenfactory.v1beta1.QueryDenomsFromAdminRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryDenomsFromAdminRequest defines the request structure for the
+ * DenomsFromAdmin gRPC query.
+ */
+export interface QueryDenomsFromAdminRequestAmino {
+  admin?: string;
+}
+export interface QueryDenomsFromAdminRequestAminoMsg {
+  type: "osmosis/tokenfactory/query-denoms-from-admin-request";
+  value: QueryDenomsFromAdminRequestAmino;
+}
+/**
+ * QueryDenomsFromAdminRequest defines the request structure for the
+ * DenomsFromAdmin gRPC query.
+ */
+export interface QueryDenomsFromAdminRequestSDKType {
+  admin: string;
+}
+/**
+ * QueryDenomsFromAdminRequest defines the response structure for the
+ * DenomsFromAdmin gRPC query.
+ */
+export interface QueryDenomsFromAdminResponse {
+  denoms: string[];
+}
+export interface QueryDenomsFromAdminResponseProtoMsg {
+  typeUrl: "/osmosis.tokenfactory.v1beta1.QueryDenomsFromAdminResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryDenomsFromAdminRequest defines the response structure for the
+ * DenomsFromAdmin gRPC query.
+ */
+export interface QueryDenomsFromAdminResponseAmino {
+  denoms?: string[];
+}
+export interface QueryDenomsFromAdminResponseAminoMsg {
+  type: "osmosis/tokenfactory/query-denoms-from-admin-response";
+  value: QueryDenomsFromAdminResponseAmino;
+}
+/**
+ * QueryDenomsFromAdminRequest defines the response structure for the
+ * DenomsFromAdmin gRPC query.
+ */
+export interface QueryDenomsFromAdminResponseSDKType {
+  denoms: string[];
+}
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
@@ -692,3 +750,191 @@ export const QueryDenomsFromCreatorResponse = {
 };
 GlobalDecoderRegistry.register(QueryDenomsFromCreatorResponse.typeUrl, QueryDenomsFromCreatorResponse);
 GlobalDecoderRegistry.registerAminoProtoMapping(QueryDenomsFromCreatorResponse.aminoType, QueryDenomsFromCreatorResponse.typeUrl);
+function createBaseQueryDenomsFromAdminRequest(): QueryDenomsFromAdminRequest {
+  return {
+    admin: ""
+  };
+}
+export const QueryDenomsFromAdminRequest = {
+  typeUrl: "/osmosis.tokenfactory.v1beta1.QueryDenomsFromAdminRequest",
+  aminoType: "osmosis/tokenfactory/query-denoms-from-admin-request",
+  is(o: any): o is QueryDenomsFromAdminRequest {
+    return o && (o.$typeUrl === QueryDenomsFromAdminRequest.typeUrl || typeof o.admin === "string");
+  },
+  isSDK(o: any): o is QueryDenomsFromAdminRequestSDKType {
+    return o && (o.$typeUrl === QueryDenomsFromAdminRequest.typeUrl || typeof o.admin === "string");
+  },
+  isAmino(o: any): o is QueryDenomsFromAdminRequestAmino {
+    return o && (o.$typeUrl === QueryDenomsFromAdminRequest.typeUrl || typeof o.admin === "string");
+  },
+  encode(message: QueryDenomsFromAdminRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.admin !== "") {
+      writer.uint32(10).string(message.admin);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryDenomsFromAdminRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryDenomsFromAdminRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.admin = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): QueryDenomsFromAdminRequest {
+    return {
+      admin: isSet(object.admin) ? String(object.admin) : ""
+    };
+  },
+  toJSON(message: QueryDenomsFromAdminRequest): JsonSafe<QueryDenomsFromAdminRequest> {
+    const obj: any = {};
+    message.admin !== undefined && (obj.admin = message.admin);
+    return obj;
+  },
+  fromPartial<I extends Exact<DeepPartial<QueryDenomsFromAdminRequest>, I>>(object: I): QueryDenomsFromAdminRequest {
+    const message = createBaseQueryDenomsFromAdminRequest();
+    message.admin = object.admin ?? "";
+    return message;
+  },
+  fromAmino(object: QueryDenomsFromAdminRequestAmino): QueryDenomsFromAdminRequest {
+    const message = createBaseQueryDenomsFromAdminRequest();
+    if (object.admin !== undefined && object.admin !== null) {
+      message.admin = object.admin;
+    }
+    return message;
+  },
+  toAmino(message: QueryDenomsFromAdminRequest): QueryDenomsFromAdminRequestAmino {
+    const obj: any = {};
+    obj.admin = message.admin === "" ? undefined : message.admin;
+    return obj;
+  },
+  fromAminoMsg(object: QueryDenomsFromAdminRequestAminoMsg): QueryDenomsFromAdminRequest {
+    return QueryDenomsFromAdminRequest.fromAmino(object.value);
+  },
+  toAminoMsg(message: QueryDenomsFromAdminRequest): QueryDenomsFromAdminRequestAminoMsg {
+    return {
+      type: "osmosis/tokenfactory/query-denoms-from-admin-request",
+      value: QueryDenomsFromAdminRequest.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: QueryDenomsFromAdminRequestProtoMsg): QueryDenomsFromAdminRequest {
+    return QueryDenomsFromAdminRequest.decode(message.value);
+  },
+  toProto(message: QueryDenomsFromAdminRequest): Uint8Array {
+    return QueryDenomsFromAdminRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryDenomsFromAdminRequest): QueryDenomsFromAdminRequestProtoMsg {
+    return {
+      typeUrl: "/osmosis.tokenfactory.v1beta1.QueryDenomsFromAdminRequest",
+      value: QueryDenomsFromAdminRequest.encode(message).finish()
+    };
+  }
+};
+GlobalDecoderRegistry.register(QueryDenomsFromAdminRequest.typeUrl, QueryDenomsFromAdminRequest);
+GlobalDecoderRegistry.registerAminoProtoMapping(QueryDenomsFromAdminRequest.aminoType, QueryDenomsFromAdminRequest.typeUrl);
+function createBaseQueryDenomsFromAdminResponse(): QueryDenomsFromAdminResponse {
+  return {
+    denoms: []
+  };
+}
+export const QueryDenomsFromAdminResponse = {
+  typeUrl: "/osmosis.tokenfactory.v1beta1.QueryDenomsFromAdminResponse",
+  aminoType: "osmosis/tokenfactory/query-denoms-from-admin-response",
+  is(o: any): o is QueryDenomsFromAdminResponse {
+    return o && (o.$typeUrl === QueryDenomsFromAdminResponse.typeUrl || Array.isArray(o.denoms) && (!o.denoms.length || typeof o.denoms[0] === "string"));
+  },
+  isSDK(o: any): o is QueryDenomsFromAdminResponseSDKType {
+    return o && (o.$typeUrl === QueryDenomsFromAdminResponse.typeUrl || Array.isArray(o.denoms) && (!o.denoms.length || typeof o.denoms[0] === "string"));
+  },
+  isAmino(o: any): o is QueryDenomsFromAdminResponseAmino {
+    return o && (o.$typeUrl === QueryDenomsFromAdminResponse.typeUrl || Array.isArray(o.denoms) && (!o.denoms.length || typeof o.denoms[0] === "string"));
+  },
+  encode(message: QueryDenomsFromAdminResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    for (const v of message.denoms) {
+      writer.uint32(10).string(v!);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryDenomsFromAdminResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryDenomsFromAdminResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.denoms.push(reader.string());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): QueryDenomsFromAdminResponse {
+    return {
+      denoms: Array.isArray(object?.denoms) ? object.denoms.map((e: any) => String(e)) : []
+    };
+  },
+  toJSON(message: QueryDenomsFromAdminResponse): JsonSafe<QueryDenomsFromAdminResponse> {
+    const obj: any = {};
+    if (message.denoms) {
+      obj.denoms = message.denoms.map(e => e);
+    } else {
+      obj.denoms = [];
+    }
+    return obj;
+  },
+  fromPartial<I extends Exact<DeepPartial<QueryDenomsFromAdminResponse>, I>>(object: I): QueryDenomsFromAdminResponse {
+    const message = createBaseQueryDenomsFromAdminResponse();
+    message.denoms = object.denoms?.map(e => e) || [];
+    return message;
+  },
+  fromAmino(object: QueryDenomsFromAdminResponseAmino): QueryDenomsFromAdminResponse {
+    const message = createBaseQueryDenomsFromAdminResponse();
+    message.denoms = object.denoms?.map(e => e) || [];
+    return message;
+  },
+  toAmino(message: QueryDenomsFromAdminResponse): QueryDenomsFromAdminResponseAmino {
+    const obj: any = {};
+    if (message.denoms) {
+      obj.denoms = message.denoms.map(e => e);
+    } else {
+      obj.denoms = message.denoms;
+    }
+    return obj;
+  },
+  fromAminoMsg(object: QueryDenomsFromAdminResponseAminoMsg): QueryDenomsFromAdminResponse {
+    return QueryDenomsFromAdminResponse.fromAmino(object.value);
+  },
+  toAminoMsg(message: QueryDenomsFromAdminResponse): QueryDenomsFromAdminResponseAminoMsg {
+    return {
+      type: "osmosis/tokenfactory/query-denoms-from-admin-response",
+      value: QueryDenomsFromAdminResponse.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: QueryDenomsFromAdminResponseProtoMsg): QueryDenomsFromAdminResponse {
+    return QueryDenomsFromAdminResponse.decode(message.value);
+  },
+  toProto(message: QueryDenomsFromAdminResponse): Uint8Array {
+    return QueryDenomsFromAdminResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryDenomsFromAdminResponse): QueryDenomsFromAdminResponseProtoMsg {
+    return {
+      typeUrl: "/osmosis.tokenfactory.v1beta1.QueryDenomsFromAdminResponse",
+      value: QueryDenomsFromAdminResponse.encode(message).finish()
+    };
+  }
+};
+GlobalDecoderRegistry.register(QueryDenomsFromAdminResponse.typeUrl, QueryDenomsFromAdminResponse);
+GlobalDecoderRegistry.registerAminoProtoMapping(QueryDenomsFromAdminResponse.aminoType, QueryDenomsFromAdminResponse.typeUrl);
