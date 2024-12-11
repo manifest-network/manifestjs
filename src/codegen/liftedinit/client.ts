@@ -11,6 +11,8 @@ export const liftedinitAminoConverters = {
 export const liftedinitProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...liftedinitManifestV1TxRegistry.registry];
 export const getSigningLiftedinitClientOptions = ({
   defaultTypes = defaultRegistryTypes
+}: {
+  defaultTypes?: ReadonlyArray<[string, GeneratedType]>;
 } = {}): {
   registry: Registry;
   aminoTypes: AminoTypes;

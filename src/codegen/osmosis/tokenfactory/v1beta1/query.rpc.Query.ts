@@ -1,7 +1,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryDenomAuthorityMetadataRequest, QueryDenomAuthorityMetadataResponse, QueryDenomsFromCreatorRequest, QueryDenomsFromCreatorResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryDenomAuthorityMetadataRequest, QueryDenomAuthorityMetadataResponse, QueryDenomsFromCreatorRequest, QueryDenomsFromCreatorResponse, QueryDenomsFromAdminRequest, QueryDenomsFromAdminResponse } from "./query";
 /** Query defines the gRPC querier service. */
 export interface Query {
   /**
@@ -19,6 +19,11 @@ export interface Query {
    * denominations created by a specific admin/creator.
    */
   denomsFromCreator(request: QueryDenomsFromCreatorRequest): Promise<QueryDenomsFromCreatorResponse>;
+  /**
+   * DenomsFromAdmin defines a gRPC query method for fetching all
+   * denominations owned by a specific admin.
+   */
+  denomsFromAdmin(request: QueryDenomsFromAdminRequest): Promise<QueryDenomsFromAdminResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -46,6 +51,13 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("osmosis.tokenfactory.v1beta1.Query", "DenomsFromCreator", data);
     return promise.then(data => QueryDenomsFromCreatorResponse.decode(new BinaryReader(data)));
   };
+  /* DenomsFromAdmin defines a gRPC query method for fetching all
+   denominations owned by a specific admin. */
+  denomsFromAdmin = async (request: QueryDenomsFromAdminRequest): Promise<QueryDenomsFromAdminResponse> => {
+    const data = QueryDenomsFromAdminRequest.encode(request).finish();
+    const promise = this.rpc.request("osmosis.tokenfactory.v1beta1.Query", "DenomsFromAdmin", data);
+    return promise.then(data => QueryDenomsFromAdminResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -59,6 +71,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     denomsFromCreator(request: QueryDenomsFromCreatorRequest): Promise<QueryDenomsFromCreatorResponse> {
       return queryService.denomsFromCreator(request);
+    },
+    denomsFromAdmin(request: QueryDenomsFromAdminRequest): Promise<QueryDenomsFromAdminResponse> {
+      return queryService.denomsFromAdmin(request);
     }
   };
 };
