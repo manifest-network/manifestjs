@@ -236,6 +236,10 @@ describe.each(inits)("$description", ({ createWallets }) => {
       });
     const denom = creator.denoms[0];
 
+    const denomFromAdmin = await queryClient.osmosis.tokenfactory.v1beta1.denomsFromAdmin({admin: t1Addr})
+    expect(denomFromAdmin.denoms.length).toBe(1);
+    expect(denomFromAdmin.denoms[0]).toBe(denom);
+
     const msg = MessageComposer.fromPartial.changeAdmin({
       sender: t1Addr,
       newAdmin: t2Addr,
@@ -256,5 +260,12 @@ describe.each(inits)("$description", ({ createWallets }) => {
         denom,
       });
     expect(admin.authorityMetadata.admin).toBe(t2Addr);
+
+    const denomFromAdminAfter = await queryClient.osmosis.tokenfactory.v1beta1.denomsFromAdmin({admin: t1Addr})
+    expect(denomFromAdminAfter.denoms.length).toBe(0);
+
+    const denomFromNewAdmin = await queryClient.osmosis.tokenfactory.v1beta1.denomsFromAdmin({admin: t2Addr})
+    expect(denomFromNewAdmin.denoms.length).toBe(1);
+    expect(denomFromNewAdmin.denoms[0]).toBe(denom);
   });
 });
