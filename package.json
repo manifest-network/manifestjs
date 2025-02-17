@@ -1,6 +1,6 @@
 {
-  "name": "@liftedinit/manifestjs",
-  "version": "v0.0.1-rc.1",
+  "name": "@chalabi/manifestjs",
+  "version": "v0.0.1-rc.12",
   "description": "Javascript library for interacting with Manifest",
   "author": "The Lifted Initiative <info@liftedinit.org>",
   "homepage": "https://github.com/liftedinit/manifestjs#readme",

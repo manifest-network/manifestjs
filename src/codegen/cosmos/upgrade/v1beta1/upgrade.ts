@@ -22,7 +22,7 @@ export interface Plan {
    * If this field is not empty, an error will be thrown.
    */
   /** @deprecated */
-  //time?: Date;
+  time?: Date;
   /** The height at which the upgrade must be performed. */
   height: bigint;
   /**
@@ -60,7 +60,7 @@ export interface PlanAmino {
    * If this field is not empty, an error will be thrown.
    */
   /** @deprecated */
-  time: string;
+  time?: string;
   /** The height at which the upgrade must be performed. */
   height?: string;
   /**
@@ -84,7 +84,7 @@ export interface PlanAminoMsg {
 export interface PlanSDKType {
   name: string;
   /** @deprecated */
-  time: Date;
+  time?: Date;
   height: bigint;
   info: string;
   /** @deprecated */
@@ -231,6 +231,7 @@ export interface ModuleVersionSDKType {
 function createBasePlan(): Plan {
   return {
     name: "",
+    time: undefined,
     height: BigInt(0),
     info: "",
     upgradedClientState: undefined
@@ -251,6 +252,9 @@ export const Plan = {
   encode(message: Plan, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
+    }
+    if (message.time !== undefined) {
+      Timestamp.encode(toTimestamp(message.time), writer.uint32(18).fork()).ldelim();
     }
     if (message.height !== BigInt(0)) {
       writer.uint32(24).int64(message.height);
@@ -274,12 +278,15 @@ export const Plan = {
           message.name = reader.string();
           break;
         case 2:
-          message.height = reader.int64();
+          message.time = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           break;
         case 3:
-          message.info = reader.string();
+          message.height = reader.int64();
           break;
         case 4:
+          message.info = reader.string();
+          break;
+        case 5:
           message.upgradedClientState = Any.decode(reader, reader.uint32());
           break;
         default:
@@ -292,6 +299,7 @@ export const Plan = {
   fromJSON(object: any): Plan {
     return {
       name: isSet(object.name) ? String(object.name) : "",
+      time: isSet(object.time) ? new Date(object.time) : undefined,
       height: isSet(object.height) ? BigInt(object.height.toString()) : BigInt(0),
       info: isSet(object.info) ? String(object.info) : "",
       upgradedClientState: isSet(object.upgradedClientState) ? Any.fromJSON(object.upgradedClientState) : undefined
@@ -300,6 +308,7 @@ export const Plan = {
   toJSON(message: Plan): JsonSafe<Plan> {
     const obj: any = {};
     message.name !== undefined && (obj.name = message.name);
+    message.time !== undefined && (obj.time = message.time.toISOString());
     message.height !== undefined && (obj.height = (message.height || BigInt(0)).toString());
     message.info !== undefined && (obj.info = message.info);
     message.upgradedClientState !== undefined && (obj.upgradedClientState = message.upgradedClientState ? Any.toJSON(message.upgradedClientState) : undefined);
@@ -308,6 +317,7 @@ export const Plan = {
   fromPartial<I extends Exact<DeepPartial<Plan>, I>>(object: I): Plan {
     const message = createBasePlan();
     message.name = object.name ?? "";
+    message.time = object.time ?? undefined;
     message.height = object.height !== undefined && object.height !== null ? BigInt(object.height.toString()) : BigInt(0);
     message.info = object.info ?? "";
     message.upgradedClientState = object.upgradedClientState !== undefined && object.upgradedClientState !== null ? Any.fromPartial(object.upgradedClientState) : undefined;
@@ -317,6 +327,9 @@ export const Plan = {
     const message = createBasePlan();
     if (object.name !== undefined && object.name !== null) {
       message.name = object.name;
+    }
+    if (object.time !== undefined && object.time !== null) {
+      message.time = fromTimestamp(Timestamp.fromAmino(object.time));
     }
     if (object.height !== undefined && object.height !== null) {
       message.height = BigInt(object.height);
@@ -332,6 +345,7 @@ export const Plan = {
   toAmino(message: Plan): PlanAmino {
     const obj: any = {};
     obj.name = message.name === "" ? undefined : message.name;
+    obj.time = message.time ? Timestamp.toAmino(toTimestamp(message.time)) : undefined;
     obj.height = message.height !== BigInt(0) ? message.height?.toString() : undefined;
     obj.info = message.info === "" ? undefined : message.info;
     obj.upgraded_client_state = message.upgradedClientState ? Any.toAmino(message.upgradedClientState) : undefined;
