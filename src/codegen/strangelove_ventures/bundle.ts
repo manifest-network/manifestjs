@@ -1,34 +1,34 @@
-import * as _120 from "./poa/v1/genesis";
-import * as _121 from "./poa/v1/params";
-import * as _122 from "./poa/v1/query";
-import * as _123 from "./poa/v1/tx";
-import * as _124 from "./poa/v1/validator";
-import * as _240 from "./poa/v1/tx.amino";
-import * as _241 from "./poa/v1/tx.registry";
-import * as _242 from "./poa/v1/query.lcd";
-import * as _243 from "./poa/v1/query.rpc.Query";
-import * as _244 from "./poa/v1/tx.rpc.msg";
-import * as _257 from "./lcd";
-import * as _258 from "./rpc.query";
-import * as _259 from "./rpc.tx";
+import * as _127 from "./poa/v1/genesis";
+import * as _128 from "./poa/v1/params";
+import * as _129 from "./poa/v1/query";
+import * as _130 from "./poa/v1/tx";
+import * as _131 from "./poa/v1/validator";
+import * as _252 from "./poa/v1/tx.amino";
+import * as _253 from "./poa/v1/tx.registry";
+import * as _254 from "./poa/v1/query.lcd";
+import * as _255 from "./poa/v1/query.rpc.Query";
+import * as _256 from "./poa/v1/tx.rpc.msg";
+import * as _272 from "./lcd";
+import * as _273 from "./rpc.query";
+import * as _274 from "./rpc.tx";
 export namespace strangelove_ventures {
   export namespace poa {
     export const v1 = {
-      ..._120,
-      ..._121,
-      ..._122,
-      ..._123,
-      ..._124,
-      ..._240,
-      ..._241,
-      ..._242,
-      ..._243,
-      ..._244
+      ..._127,
+      ..._128,
+      ..._129,
+      ..._130,
+      ..._131,
+      ..._252,
+      ..._253,
+      ..._254,
+      ..._255,
+      ..._256
     };
   }
   export const ClientFactory = {
-    ..._257,
-    ..._258,
-    ..._259
+    ..._272,
+    ..._273,
+    ..._274
   };
 }
