@@ -84,6 +84,12 @@ chains:
           params:
             denom_creation_fee: []
             denom_creation_gas_consume: 10000
+        wasm:
+          params:
+            code_upload_access:
+              permission: "AnyOfAddresses"
+              addresses: ["manifest1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfmy9qj"]
+            instantiate_default_permission: "AnyOfAddresses"
     ports:
       rest: 1317
       rpc: 26657
