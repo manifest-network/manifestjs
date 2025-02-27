@@ -96,10 +96,11 @@ describe.each(inits)("$description", ({ createWallets }) => {
       CosmWasmMessageComposer.encoded.storeCode({
         sender: POA_GROUP_ADDRESS,
         wasmByteCode: wasmFile,
-        instantiatePermission: AccessConfig.fromPartial({
-          permission: AccessType.ACCESS_TYPE_ANY_OF_ADDRESSES,
-          addresses: [POA_GROUP_ADDRESS],
-        })
+        // https://github.com/CosmWasm/wasmd/issues/1863
+        // instantiatePermission: AccessConfig.fromPartial({
+        //   permission: AccessType.ACCESS_TYPE_ANY_OF_ADDRESSES,
+        //   addresses: [POA_GROUP_ADDRESS],
+        // })
       })
     );
 
