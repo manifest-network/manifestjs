@@ -18,7 +18,7 @@ import { createRPCQueryClient as CosmWasmRPCQueryClient } from '../../src/codege
 import { SigningStargateClient } from '@cosmjs/stargate';
 import path from 'path';
 import fs from 'fs';
-import { AccessType } from '../../src/codegen/cosmwasm/wasm/v1/types';
+import { AccessConfig, AccessType } from '../../src/codegen/cosmwasm/wasm/v1/types';
 
 const wasmFile = fs.readFileSync(path.join(__dirname, "..", "wasm", "cw_template.wasm"));
 
@@ -96,10 +96,10 @@ describe.each(inits)("$description", ({ createWallets }) => {
       CosmWasmMessageComposer.encoded.storeCode({
         sender: POA_GROUP_ADDRESS,
         wasmByteCode: wasmFile,
-        instantiatePermission: {
+        instantiatePermission: AccessConfig.fromPartial({
           permission: AccessType.ACCESS_TYPE_ANY_OF_ADDRESSES,
           addresses: [POA_GROUP_ADDRESS],
-        }
+        })
       })
     );
 
