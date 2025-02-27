@@ -169,7 +169,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     const contracts = await queryClient.cosmwasm.wasm.v1.contractsByCreator({ creatorAddress: POA_GROUP_ADDRESS });
     const contractAddress = contracts.contractAddresses[contracts.contractAddresses.length - 1];
 
-    const queryData = JSON.stringify({ count: {} });
+    const queryData = JSON.stringify({ get_count: {} });
     const encoder = new TextEncoder();
     const queryMsg = encoder.encode(queryData);
     const countBefore = await queryClient.cosmwasm.wasm.v1.smartContractState({ address: contractAddress, queryData: queryMsg });
