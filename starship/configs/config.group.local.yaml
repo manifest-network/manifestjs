@@ -23,6 +23,10 @@ chains:
         file: scripts/create-manifest-genesis.sh
     genesis:
       app_state:
+        consensus:
+          params:
+            block:
+              max_gas: "100000000"
         group:
           group_seq: "1"
           groups:
