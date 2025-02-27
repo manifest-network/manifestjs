@@ -158,4 +158,54 @@ describe.each(inits)("$description", ({ createWallets }) => {
     const contracts = await queryClient.cosmwasm.wasm.v1.contractsByCreator({ creatorAddress: POA_GROUP_ADDRESS });
     expect(contracts.contractAddresses.length).toEqual(contractsBefore.contractAddresses.length + 1);
   }, 30000);
+
+  test("execute contract (cosmwasm)", async () => {
+    const client = await getSigningCosmosClient({
+      rpcEndpoint,
+      signer: test1Wallet,
+    });
+    const queryClient = await CosmWasmRPCQueryClient({ rpcEndpoint });
+
+    const contracts = await queryClient.cosmwasm.wasm.v1.contractsByCreator({ creatorAddress: POA_GROUP_ADDRESS });
+    const contractAddress = contracts.contractAddresses[contracts.contractAddresses.length - 1];
+
+    const queryData = JSON.stringify({ count: {} });
+    const encoder = new TextEncoder();
+    const queryMsg = encoder.encode(queryData);
+    const countBefore = await queryClient.cosmwasm.wasm.v1.smartContractState({ address: contractAddress, queryData: queryMsg });
+    const decoder = new TextDecoder();
+    const jsonString = decoder.decode(countBefore.data);
+    const jsonObj = JSON.parse(jsonString);
+    expect(jsonObj.count).toEqual("0");
+
+    const msg = JSON.stringify({ increment: {} });
+    const execMsg = encoder.encode(msg);
+
+    const proposal = Any.fromPartial(
+      CosmWasmMessageComposer.encoded.executeContract({
+        sender: POA_GROUP_ADDRESS,
+        contract: contractAddress,
+        msg: execMsg,
+        funds: [],
+      })
+    );
+
+    await submitVoteExecGroupProposal(
+      test1Address,
+      POA_GROUP_ADDRESS,
+      client,
+      "execute contract",
+      "some contract",
+      [test1Address],
+      [proposal],
+      fee
+    );
+
+    await waitForNBlocks(client, 2);
+
+    const countAfter = await queryClient.cosmwasm.wasm.v1.smartContractState({ address: contractAddress, queryData: queryMsg });
+    const jsonStringAfter = decoder.decode(countAfter.data);
+    const jsonObjAfter = JSON.parse(jsonStringAfter);
+    expect(jsonObjAfter.count).toEqual("1");
+  }, 30000);
 })
