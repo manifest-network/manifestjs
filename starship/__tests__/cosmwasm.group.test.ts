@@ -176,7 +176,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     const decoder = new TextDecoder();
     const jsonString = decoder.decode(countBefore.data);
     const jsonObj = JSON.parse(jsonString);
-    expect(jsonObj.count).toEqual("0");
+    expect(jsonObj.count).toEqual(0);
 
     const msg = JSON.stringify({ increment: {} });
     const execMsg = encoder.encode(msg);
@@ -206,6 +206,6 @@ describe.each(inits)("$description", ({ createWallets }) => {
     const countAfter = await queryClient.cosmwasm.wasm.v1.smartContractState({ address: contractAddress, queryData: queryMsg });
     const jsonStringAfter = decoder.decode(countAfter.data);
     const jsonObjAfter = JSON.parse(jsonStringAfter);
-    expect(jsonObjAfter.count).toEqual("1");
+    expect(jsonObjAfter.count).toEqual(1);
   }, 30000);
 })
