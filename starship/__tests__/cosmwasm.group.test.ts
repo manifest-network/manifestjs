@@ -61,7 +61,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
 
     test1Wallet = await createWallets(test1Mnemonic, chainData.prefix);
     test2Wallet = await createWallets(test2Mnemonic, chainData.prefix);
-    fee = { amount: [{ denom, amount: "100000" }], gas: "550000" };
+    fee = { amount: [{ denom, amount: "100000" }], gas: "10000000" };
 
     test1Address = (await test1Wallet.getAccounts())[0].address;
     test2Address = (await test2Wallet.getAccounts())[0].address;
