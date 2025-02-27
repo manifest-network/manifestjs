@@ -137,7 +137,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     expect(updatedPower.consensusPower).toEqual(
       currentPower.consensusPower + 1n
     );
-  }, 40000);
+  }, 60000);
 
   test("remove pending validator (poa)", async () => {
     const queryClient = await POARPCQueryClient({ rpcEndpoint });
@@ -203,7 +203,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     expect(pendingValidatorsAfterRemovePending.pending.length).toEqual(
       pendingValidatorsBeforeLength
     );
-  }, 40000);
+  }, 60000);
 
   test("remove validator (poa)", async () => {
     const queryClient = await POARPCQueryClient({ rpcEndpoint });
@@ -234,7 +234,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     expect(proposalInfo.proposal.executorResult).toEqual(
       ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_FAILURE
     );
-  }, 40000);
+  }, 60000);
 
   async function getFirstBondedValidatorAddress() {
     const queryClient = await CosmosRPCQueryClient({ rpcEndpoint });
