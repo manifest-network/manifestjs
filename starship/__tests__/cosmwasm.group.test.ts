@@ -119,4 +119,43 @@ describe.each(inits)("$description", ({ createWallets }) => {
     const codes = await queryClient.cosmwasm.wasm.v1.codes()
     expect(codes.codeInfos.length).toEqual(codesBefore.codeInfos.length + 1);
   }, 30000);
+
+  test("instantiate contract (cosmwasm)", async () => {
+    const client = await getSigningCosmosClient({
+      rpcEndpoint,
+      signer: test1Wallet,
+    });
+    const queryClient = await CosmWasmRPCQueryClient({ rpcEndpoint });
+
+    const contractsBefore = await queryClient.cosmwasm.wasm.v1.contractsByCreator({ creatorAddress: POA_GROUP_ADDRESS });
+    const codes = await queryClient.cosmwasm.wasm.v1.codes();
+    const codeId = codes.codeInfos[codes.codeInfos.length - 1].codeId;
+    const initJson = JSON.stringify({ count: 0 });
+    const encoder = new TextEncoder();
+    const initMsg = encoder.encode(initJson);
+
+    const proposal = Any.fromPartial(
+      CosmWasmMessageComposer.encoded.instantiateContract({
+        sender: POA_GROUP_ADDRESS,
+        admin: POA_GROUP_ADDRESS,
+        codeId,
+        label: "test contract",
+        msg: initMsg,
+        funds: [],
+      }))
+
+    await submitVoteExecGroupProposal(
+      test1Address,
+      POA_GROUP_ADDRESS,
+      client,
+      "instantiate contract",
+      "some contract",
+      [test1Address],
+      [proposal],
+      fee
+    );
+
+    const contracts = await queryClient.cosmwasm.wasm.v1.contractsByCreator({ creatorAddress: POA_GROUP_ADDRESS });
+    expect(contracts.contractAddresses.length).toEqual(contractsBefore.contractAddresses.length + 1);
+  }, 30000);
 })
