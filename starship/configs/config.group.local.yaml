@@ -1,5 +1,5 @@
 name: starship-manifestjs
-version: v0.2.19
+version: v1.3.0
 
 chains:
   - id: manifest-ledger-beta
@@ -22,11 +22,12 @@ chains:
       createGenesis:
         file: scripts/create-manifest-genesis.sh
     genesis:
+      consensus:
+        params:
+          block:
+            max_bytes: "200000"
+            max_gas: "100000000"
       app_state:
-        consensus:
-          params:
-            block:
-              max_gas: "100000000"
         group:
           group_seq: "1"
           groups:
