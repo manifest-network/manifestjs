@@ -91,7 +91,6 @@ describe.each(inits)("$description", ({ createWallets }) => {
     const queryClient = await CosmWasmRPCQueryClient({ rpcEndpoint });
 
     const codesBefore = await queryClient.cosmwasm.wasm.v1.codes();
-    expect(codesBefore.codeInfos.length).toBe(0);
 
     const proposal = Any.fromPartial(
       CosmWasmMessageComposer.encoded.storeCode({
@@ -117,6 +116,6 @@ describe.each(inits)("$description", ({ createWallets }) => {
     await waitForNBlocks(client, 2);
 
     const codes = await queryClient.cosmwasm.wasm.v1.codes()
-    expect(codes.codeInfos.length).toBeGreaterThan(0);
+    expect(codes.codeInfos.length).toEqual(codesBefore.codeInfos.length + 1);
   }, 30000);
 })
