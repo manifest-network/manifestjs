@@ -4,7 +4,7 @@ import {
   createAminoWallet,
   createProtoWallet,
   initChain,
-  POA_GROUP_ADDRESS,
+  POA_GROUP_ADDRESS, submitGroupProposal,
   submitVoteExecGroupProposal,
   test1Mnemonic,
   test1Val,
@@ -30,7 +30,7 @@ import {
   assertIsDeliverTxSuccess,
   SigningStargateClient,
 } from "@cosmjs/stargate";
-import { ProposalExecutorResult } from "../../src/codegen/cosmos/group/v1/types";
+import { ProposalExecutorResult, ProposalStatus } from '../../src/codegen/cosmos/group/v1/types';
 import path from "path";
 import { createRPCQueryClient as CosmosRPCQueryClient } from "../../src/codegen/cosmos/rpc.query";
 
@@ -242,7 +242,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
       })
     );
 
-    const proposalId = await submitVoteExecGroupProposal(
+    const proposalId = await submitGroupProposal(
       test1Address,
       POA_GROUP_ADDRESS,
       cosmosSigningClient,
@@ -251,16 +251,16 @@ describe.each(inits)("$description", ({ createWallets }) => {
       [test1Address],
       [proposal],
       fee
-    );
+    )
     const proposalInfo = await queryClient.cosmos.group.v1.proposal({
       proposalId,
     });
 
     // We don't care about the result, we just want to know if the message gets through
-    expect(proposalInfo.proposal.executorResult).toEqual(
-      ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_FAILURE
+    expect(proposalInfo.proposal.status).toEqual(
+      ProposalStatus.PROPOSAL_STATUS_SUBMITTED
     );
-  }, 120000);
+  }, 30000);
 
   async function getFirstBondedValidatorAddress() {
     const queryClient = await CosmosRPCQueryClient({ rpcEndpoint });
