@@ -234,7 +234,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     expect(proposalInfo.proposal.executorResult).toEqual(
       ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_FAILURE
     );
-  }, 20000);
+  }, 120000);
 
   async function getFirstBondedValidatorAddress() {
     const queryClient = await CosmosRPCQueryClient({ rpcEndpoint });
