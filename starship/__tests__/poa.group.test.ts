@@ -25,11 +25,12 @@ import {
   Description,
 } from "../../src/codegen/strangelove_ventures/poa/v1/validator";
 import { fromBase64 } from "@cosmjs/encoding";
-import { encodeEd25519Pubkey } from "@cosmjs/amino";
+import { encodeEd25519Pubkey, pubkeyToAddress } from '@cosmjs/amino';
 import {
   assertIsDeliverTxSuccess,
   SigningStargateClient,
 } from "@cosmjs/stargate";
+import { Ed25519, Random } from "@cosmjs/crypto";
 import { ProposalExecutorResult } from "../../src/codegen/cosmos/group/v1/types";
 import path from "path";
 import { createRPCQueryClient as CosmosRPCQueryClient } from "../../src/codegen/cosmos/rpc.query";
@@ -145,6 +146,11 @@ describe.each(inits)("$description", ({ createWallets }) => {
       await queryClient.strangelove_ventures.poa.v1.pendingValidators();
     const pendingValidatorsBeforeLength =
       pendingValidatorsBefore.pending.length;
+
+    const valKeyPair = await Ed25519.makeKeypair(Random.getBytes(32));
+    const pubKey = encodeEd25519Pubkey(valKeyPair.pubkey);
+    const valAddress = pubkeyToAddress(pubKey, "manifestvaloper")
+
     const description = Description.fromPartial({
       moniker: "test-validator",
       identity: "some identity",
@@ -164,8 +170,8 @@ describe.each(inits)("$description", ({ createWallets }) => {
       commission,
       minSelfDelegation: "1",
       delegatorAddress: "",
-      validatorAddress: test1Val.address,
-      pubkey: encodePubkey(encodeEd25519Pubkey(fromBase64(test1Val.pubkey))),
+      validatorAddress: valAddress,
+      pubkey: encodePubkey(pubKey),
     });
     const poaClient = await getSigningStrangeloveVenturesClient({
       rpcEndpoint,
@@ -184,7 +190,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     const proposal = Any.fromPartial(
       POAMessageComposer.encoded.removePending({
         sender: POA_GROUP_ADDRESS,
-        validatorAddress: test1Val.address,
+        validatorAddress: valAddress,
       })
     );
 
