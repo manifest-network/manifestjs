@@ -205,36 +205,36 @@ describe.each(inits)("$description", ({ createWallets }) => {
     );
   }, 60000);
 
-  // test("remove validator (poa)", async () => {
-  //   const queryClient = await POARPCQueryClient({ rpcEndpoint });
-  //   const validatorAddress = await getFirstBondedValidatorAddress();
-  //
-  //   const proposal = Any.fromPartial(
-  //     POAMessageComposer.encoded.removeValidator({
-  //       sender: POA_GROUP_ADDRESS,
-  //       validatorAddress,
-  //     })
-  //   );
-  //
-  //   const proposalId = await submitVoteExecGroupProposal(
-  //     test1Address,
-  //     POA_GROUP_ADDRESS,
-  //     cosmosSigningClient,
-  //     "remove validator",
-  //     "some remove validator",
-  //     [test1Address],
-  //     [proposal],
-  //     fee
-  //   );
-  //   const proposalInfo = await queryClient.cosmos.group.v1.proposal({
-  //     proposalId,
-  //   });
-  //
-  //   // We don't care about the result, we just want to know if the message gets through
-  //   expect(proposalInfo.proposal.executorResult).toEqual(
-  //     ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_FAILURE
-  //   );
-  // }, 60000);
+  test("remove validator (poa)", async () => {
+    const queryClient = await POARPCQueryClient({ rpcEndpoint });
+    const validatorAddress = await getFirstBondedValidatorAddress();
+
+    const proposal = Any.fromPartial(
+      POAMessageComposer.encoded.removeValidator({
+        sender: POA_GROUP_ADDRESS,
+        validatorAddress,
+      })
+    );
+
+    const proposalId = await submitVoteExecGroupProposal(
+      test1Address,
+      POA_GROUP_ADDRESS,
+      cosmosSigningClient,
+      "remove validator",
+      "some remove validator",
+      [test1Address],
+      [proposal],
+      fee
+    );
+    const proposalInfo = await queryClient.cosmos.group.v1.proposal({
+      proposalId,
+    });
+
+    // We don't care about the result, we just want to know if the message gets through
+    expect(proposalInfo.proposal.executorResult).toEqual(
+      ProposalExecutorResult.PROPOSAL_EXECUTOR_RESULT_FAILURE
+    );
+  }, 60000);
 
   async function getFirstBondedValidatorAddress() {
     const queryClient = await CosmosRPCQueryClient({ rpcEndpoint });
