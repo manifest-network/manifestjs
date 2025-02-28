@@ -1,8 +1,8 @@
 import { Height, HeightAmino, HeightSDKType } from "../../client/v1/client";
 import { isSet, DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { JsonSafe } from "../../../../json-safe";
 import { GlobalDecoderRegistry } from "../../../../registry";
+import { JsonSafe } from "../../../../json-safe";
 /**
  * State defines if a channel is in one of the following states:
  * CLOSED, INIT, TRYOPEN, OPEN or UNINITIALIZED.

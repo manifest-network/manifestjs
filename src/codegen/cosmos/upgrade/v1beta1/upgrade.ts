@@ -2,8 +2,8 @@ import { Timestamp } from "../../../google/protobuf/timestamp";
 import { Any, AnyAmino, AnySDKType } from "../../../google/protobuf/any";
 import { BinaryReader, BinaryWriter } from "../../../binary";
 import { toTimestamp, fromTimestamp, isSet, DeepPartial, Exact } from "../../../helpers";
-import { JsonSafe } from "../../../json-safe";
 import { GlobalDecoderRegistry } from "../../../registry";
+import { JsonSafe } from "../../../json-safe";
 /** Plan specifies information about a planned upgrade and when it should occur. */
 export interface Plan {
   /**

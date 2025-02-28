@@ -1,9 +1,9 @@
 import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
 import { Plan, PlanAmino, PlanSDKType } from "../../../../cosmos/upgrade/v1beta1/upgrade";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { GlobalDecoderRegistry } from "../../../../registry";
 import { isSet, DeepPartial, Exact } from "../../../../helpers";
 import { JsonSafe } from "../../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../../registry";
 /**
  * IdentifiedClientState defines a client state with an additional client
  * identifier field.

@@ -1,9 +1,9 @@
 import { BaseAccount, BaseAccountAmino, BaseAccountSDKType } from "../../auth/v1beta1/auth";
 import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { GlobalDecoderRegistry } from "../../../registry";
 import { isSet, DeepPartial, Exact } from "../../../helpers";
 import { JsonSafe } from "../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../registry";
 /**
  * BaseVestingAccount implements the VestingAccount interface. It contains all
  * the necessary fields needed for any vesting account implementation.

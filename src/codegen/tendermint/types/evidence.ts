@@ -2,9 +2,9 @@ import { Vote, VoteAmino, VoteSDKType, LightBlock, LightBlockAmino, LightBlockSD
 import { Timestamp } from "../../google/protobuf/timestamp";
 import { Validator, ValidatorAmino, ValidatorSDKType } from "./validator";
 import { BinaryReader, BinaryWriter } from "../../binary";
+import { GlobalDecoderRegistry } from "../../registry";
 import { isSet, DeepPartial, Exact, toTimestamp, fromTimestamp } from "../../helpers";
 import { JsonSafe } from "../../json-safe";
-import { GlobalDecoderRegistry } from "../../registry";
 export interface Evidence {
   duplicateVoteEvidence?: DuplicateVoteEvidence;
   lightClientAttackEvidence?: LightClientAttackEvidence;

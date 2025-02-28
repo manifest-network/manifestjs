@@ -1,8 +1,8 @@
 import { MerklePrefix, MerklePrefixAmino, MerklePrefixSDKType } from "../../commitment/v1/commitment";
 import { isSet, DeepPartial, Exact } from "../../../../helpers";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
-import { JsonSafe } from "../../../../json-safe";
 import { GlobalDecoderRegistry } from "../../../../registry";
+import { JsonSafe } from "../../../../json-safe";
 /**
  * State defines if a connection is in one of the following states:
  * INIT, TRYOPEN, OPEN or UNINITIALIZED.

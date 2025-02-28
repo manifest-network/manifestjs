@@ -1,8 +1,8 @@
 import { Height, HeightAmino, HeightSDKType } from "../../../core/client/v1/client";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { GlobalDecoderRegistry } from "../../../../registry";
 import { isSet, DeepPartial, Exact } from "../../../../helpers";
 import { JsonSafe } from "../../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../../registry";
 /**
  * ClientState defines a loopback (localhost) client. It requires (read-only)
  * access to keys outside the client prefix.

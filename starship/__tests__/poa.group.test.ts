@@ -4,7 +4,8 @@ import {
   createAminoWallet,
   createProtoWallet,
   initChain,
-  POA_GROUP_ADDRESS, submitGroupProposal,
+  POA_GROUP_ADDRESS,
+  submitGroupProposal,
   submitVoteExecGroupProposal,
   test1Mnemonic,
   test1Val,
@@ -30,7 +31,7 @@ import {
   assertIsDeliverTxSuccess,
   SigningStargateClient,
 } from "@cosmjs/stargate";
-import { ProposalExecutorResult, ProposalStatus } from '../../src/codegen/cosmos/group/v1/types';
+import { ProposalStatus } from '../../src/codegen/cosmos/group/v1/types';
 import path from "path";
 import { createRPCQueryClient as CosmosRPCQueryClient } from "../../src/codegen/cosmos/rpc.query";
 

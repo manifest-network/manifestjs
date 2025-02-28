@@ -1,8 +1,8 @@
 import { IdentifiedClientState, IdentifiedClientStateAmino, IdentifiedClientStateSDKType, ClientConsensusStates, ClientConsensusStatesAmino, ClientConsensusStatesSDKType, Params, ParamsAmino, ParamsSDKType } from "./client";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { GlobalDecoderRegistry } from "../../../../registry";
 import { isSet, DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 import { JsonSafe } from "../../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../../registry";
 /** GenesisState defines the ibc client submodule's genesis state. */
 export interface GenesisState {
   /** client states with their corresponding identifiers */

@@ -7,9 +7,9 @@ import { ParameterChangeProposal, ParameterChangeProposalProtoMsg, ParameterChan
 import { SoftwareUpgradeProposal, SoftwareUpgradeProposalProtoMsg, SoftwareUpgradeProposalSDKType, CancelSoftwareUpgradeProposal, CancelSoftwareUpgradeProposalProtoMsg, CancelSoftwareUpgradeProposalSDKType } from "../../upgrade/v1beta1/upgrade";
 import { ClientUpdateProposal, ClientUpdateProposalProtoMsg, ClientUpdateProposalSDKType, UpgradeProposal, UpgradeProposalProtoMsg, UpgradeProposalSDKType } from "../../../ibc/core/client/v1/client";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { GlobalDecoderRegistry } from "../../../registry";
 import { isSet, DeepPartial, Exact } from "../../../helpers";
 import { JsonSafe } from "../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../registry";
 /**
  * MsgSubmitProposal defines an sdk.Msg type that supports submitting arbitrary
  * proposal Content.

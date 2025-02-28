@@ -1,8 +1,8 @@
 import { Permissions, PermissionsAmino, PermissionsSDKType } from "./types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { GlobalDecoderRegistry } from "../../../registry";
 import { isSet, DeepPartial, Exact } from "../../../helpers";
 import { JsonSafe } from "../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../registry";
 /** MsgAuthorizeCircuitBreaker defines the Msg/AuthorizeCircuitBreaker request type. */
 export interface MsgAuthorizeCircuitBreaker {
   /**

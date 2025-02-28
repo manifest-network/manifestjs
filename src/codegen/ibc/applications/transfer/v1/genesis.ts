@@ -1,8 +1,8 @@
 import { DenomTrace, DenomTraceAmino, DenomTraceSDKType, Params, ParamsAmino, ParamsSDKType } from "./transfer";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { GlobalDecoderRegistry } from "../../../../registry";
 import { isSet, DeepPartial, Exact } from "../../../../helpers";
 import { JsonSafe } from "../../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../../registry";
 /** GenesisState defines the ibc-transfer genesis state */
 export interface GenesisState {
   portId: string;

@@ -1,8 +1,8 @@
 import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
 import { isSet, DeepPartial, Exact } from "../../../helpers";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { JsonSafe } from "../../../json-safe";
 import { GlobalDecoderRegistry } from "../../../registry";
+import { JsonSafe } from "../../../json-safe";
 /**
  * AuthorizationType defines the type of staking module authorization type
  * 

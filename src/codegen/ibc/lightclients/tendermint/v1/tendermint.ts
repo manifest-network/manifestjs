@@ -6,9 +6,9 @@ import { MerkleRoot, MerkleRootAmino, MerkleRootSDKType } from "../../../core/co
 import { SignedHeader, SignedHeaderAmino, SignedHeaderSDKType } from "../../../../tendermint/types/types";
 import { ValidatorSet, ValidatorSetAmino, ValidatorSetSDKType } from "../../../../tendermint/types/validator";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { GlobalDecoderRegistry } from "../../../../registry";
 import { isSet, DeepPartial, Exact, toTimestamp, fromTimestamp, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 import { JsonSafe } from "../../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../../registry";
 /**
  * ClientState from Tendermint tracks the current validator set, latest height,
  * and a possible frozen height.

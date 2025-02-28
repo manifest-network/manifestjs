@@ -5,9 +5,9 @@ import { Duration, DurationAmino, DurationSDKType } from "../../../google/protob
 import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
 import { ValidatorUpdate, ValidatorUpdateAmino, ValidatorUpdateSDKType } from "../../../tendermint/abci/types";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { GlobalDecoderRegistry } from "../../../registry";
 import { isSet, DeepPartial, Exact, toTimestamp, fromTimestamp } from "../../../helpers";
 import { JsonSafe } from "../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../registry";
 import { Decimal } from "@cosmjs/math";
 import { encodePubkey, decodePubkey } from "@cosmjs/proto-signing";
 /** BondStatus is the status of a validator. */

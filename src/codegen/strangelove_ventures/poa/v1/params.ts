@@ -1,9 +1,9 @@
 import { Duration, DurationAmino, DurationSDKType } from "../../../google/protobuf/duration";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { GlobalDecoderRegistry } from "../../../registry";
 import { Decimal } from "@cosmjs/math";
 import { isSet, DeepPartial, Exact } from "../../../helpers";
 import { JsonSafe } from "../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../registry";
 /** StakingParams defines the parameters for the x/staking module. */
 export interface StakingParams {
   /** unbonding_time is the time duration of unbonding. */

@@ -1,8 +1,8 @@
 import { Params, ParamsAmino, ParamsSDKType } from "./mint";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { GlobalDecoderRegistry } from "../../../registry";
 import { isSet, DeepPartial, Exact } from "../../../helpers";
 import { JsonSafe } from "../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../registry";
 /**
  * MsgUpdateParams is the Msg/UpdateParams request type.
  * 

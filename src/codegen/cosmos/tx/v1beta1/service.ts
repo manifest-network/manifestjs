@@ -5,8 +5,8 @@ import { BlockID, BlockIDAmino, BlockIDSDKType } from "../../../tendermint/types
 import { Block, BlockAmino, BlockSDKType } from "../../../tendermint/types/block";
 import { isSet, DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../helpers";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { JsonSafe } from "../../../json-safe";
 import { GlobalDecoderRegistry } from "../../../registry";
+import { JsonSafe } from "../../../json-safe";
 /** OrderBy defines the sorting order */
 export enum OrderBy {
   /**

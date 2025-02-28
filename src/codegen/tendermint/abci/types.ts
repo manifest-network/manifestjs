@@ -4,9 +4,9 @@ import { ProofOps, ProofOpsAmino, ProofOpsSDKType } from "../crypto/proof";
 import { PublicKey, PublicKeyAmino, PublicKeySDKType } from "../crypto/keys";
 import { BlockIDFlag, blockIDFlagFromJSON, blockIDFlagToJSON } from "../types/validator";
 import { BinaryReader, BinaryWriter } from "../../binary";
+import { GlobalDecoderRegistry } from "../../registry";
 import { isSet, DeepPartial, Exact, toTimestamp, fromTimestamp, bytesFromBase64, base64FromBytes } from "../../helpers";
 import { JsonSafe } from "../../json-safe";
-import { GlobalDecoderRegistry } from "../../registry";
 export enum CheckTxType {
   NEW = 0,
   RECHECK = 1,

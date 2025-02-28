@@ -2,9 +2,9 @@ import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
 import { ConnectionEnd, ConnectionEndAmino, ConnectionEndSDKType } from "../../../core/connection/v1/connection";
 import { Channel, ChannelAmino, ChannelSDKType } from "../../../core/channel/v1/channel";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { GlobalDecoderRegistry } from "../../../../registry";
 import { isSet, DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 import { JsonSafe } from "../../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../../registry";
 /**
  * DataType defines the type of solo machine proof being created. This is done
  * to preserve uniqueness of different data sign byte encodings.

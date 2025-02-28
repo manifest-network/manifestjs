@@ -2,9 +2,9 @@ import { Counterparty, CounterpartyAmino, CounterpartySDKType, Version, VersionA
 import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
 import { Height, HeightAmino, HeightSDKType } from "../../client/v1/client";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { GlobalDecoderRegistry } from "../../../../registry";
 import { isSet, DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 import { JsonSafe } from "../../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../../registry";
 /**
  * MsgConnectionOpenInit defines the msg sent by an account on Chain A to
  * initialize a connection with Chain B.

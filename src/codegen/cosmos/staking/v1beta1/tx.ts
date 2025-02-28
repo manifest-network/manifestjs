@@ -3,10 +3,10 @@ import { Any, AnyProtoMsg, AnyAmino, AnySDKType } from "../../../google/protobuf
 import { Coin, CoinAmino, CoinSDKType } from "../../base/v1beta1/coin";
 import { Timestamp } from "../../../google/protobuf/timestamp";
 import { BinaryReader, BinaryWriter } from "../../../binary";
+import { GlobalDecoderRegistry } from "../../../registry";
 import { isSet, DeepPartial, Exact, toTimestamp, fromTimestamp } from "../../../helpers";
 import { JsonSafe } from "../../../json-safe";
 import { encodePubkey, decodePubkey } from "@cosmjs/proto-signing";
-import { GlobalDecoderRegistry } from "../../../registry";
 import { Decimal } from "@cosmjs/math";
 /** MsgCreateValidator defines a SDK message for creating a new validator. */
 export interface MsgCreateValidator {

@@ -1,7 +1,7 @@
 import { BinaryReader, BinaryWriter } from "../binary";
+import { GlobalDecoderRegistry } from "../registry";
 import { isSet, bytesFromBase64, base64FromBytes, DeepPartial, Exact } from "../helpers";
 import { JsonSafe } from "../json-safe";
-import { GlobalDecoderRegistry } from "../registry";
 export enum HashOp {
   /** NO_HASH - NO_HASH is the default if no data passed. Note this is an illegal argument some places. */
   NO_HASH = 0,

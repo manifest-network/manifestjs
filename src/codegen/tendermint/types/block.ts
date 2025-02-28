@@ -1,9 +1,9 @@
 import { Header, HeaderAmino, HeaderSDKType, Data, DataAmino, DataSDKType, Commit, CommitAmino, CommitSDKType } from "./types";
 import { EvidenceList, EvidenceListAmino, EvidenceListSDKType } from "./evidence";
 import { BinaryReader, BinaryWriter } from "../../binary";
+import { GlobalDecoderRegistry } from "../../registry";
 import { isSet, DeepPartial, Exact } from "../../helpers";
 import { JsonSafe } from "../../json-safe";
-import { GlobalDecoderRegistry } from "../../registry";
 export interface Block {
   header: Header;
   data: Data;

@@ -1,8 +1,8 @@
 import { Duration, DurationAmino, DurationSDKType } from "../../google/protobuf/duration";
 import { BinaryReader, BinaryWriter } from "../../binary";
+import { GlobalDecoderRegistry } from "../../registry";
 import { isSet, DeepPartial, Exact } from "../../helpers";
 import { JsonSafe } from "../../json-safe";
-import { GlobalDecoderRegistry } from "../../registry";
 /**
  * ConsensusParams contains consensus critical parameters that determine the
  * validity of blocks.

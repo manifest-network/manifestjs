@@ -2,9 +2,9 @@ import { Any, AnyAmino, AnySDKType } from "../../../../google/protobuf/any";
 import { Event, EventAmino, EventSDKType } from "../../../../tendermint/abci/types";
 import { Block, BlockAmino, BlockSDKType } from "../../../../tendermint/types/block";
 import { BinaryReader, BinaryWriter } from "../../../../binary";
+import { GlobalDecoderRegistry } from "../../../../registry";
 import { isSet, DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../../../helpers";
 import { JsonSafe } from "../../../../json-safe";
-import { GlobalDecoderRegistry } from "../../../../registry";
 /**
  * TxResponse defines a structure containing relevant tx data and metadata. The
  * tags are stringified and the log is JSON decoded.

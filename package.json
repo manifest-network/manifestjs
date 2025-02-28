@@ -46,7 +46,7 @@
     "url": "https://github.com/liftedinit/manifestjs/issues"
   },
   "devDependencies": {
-    "@cosmology/telescope": "^1.10.6",
+    "@cosmology/telescope": "^1.11.20",
     "@protobufs/cosmos": "^0.1.0",
     "@protobufs/cosmos_proto": "^0.0.10",
     "@protobufs/gogoproto": "^0.0.10",
@@ -73,6 +73,6 @@
     "@cosmjs/proto-signing": "^0.32.4",
     "@cosmjs/stargate": "npm:@liftedinit/stargate@0.32.4-ll.3",
     "@cosmjs/tendermint-rpc": "^0.32.4",
-    "@cosmology/lcd": "^0.14.0"
+    "@cosmology/lcd": "^0.14.3"
   }
 }

@@ -1,8 +1,8 @@
 import { PublicKey, PublicKeyAmino, PublicKeySDKType } from "../crypto/keys";
 import { BinaryReader, BinaryWriter } from "../../binary";
+import { GlobalDecoderRegistry } from "../../registry";
 import { isSet, DeepPartial, Exact, bytesFromBase64, base64FromBytes } from "../../helpers";
 import { JsonSafe } from "../../json-safe";
-import { GlobalDecoderRegistry } from "../../registry";
 /** BlockIdFlag indicates which BlockID the signature is for */
 export enum BlockIDFlag {
   /** BLOCK_ID_FLAG_UNKNOWN - indicates an error condition */
