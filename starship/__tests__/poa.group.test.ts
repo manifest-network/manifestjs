@@ -4,7 +4,8 @@ import {
   createAminoWallet,
   createProtoWallet,
   initChain,
-  POA_GROUP_ADDRESS, submitGroupProposal,
+  POA_GROUP_ADDRESS,
+  submitGroupProposal,
   submitVoteExecGroupProposal,
   test1Mnemonic,
   test1Val,
@@ -25,12 +26,12 @@ import {
   Description,
 } from "../../src/codegen/strangelove_ventures/poa/v1/validator";
 import { fromBase64 } from "@cosmjs/encoding";
-import { encodeEd25519Pubkey, pubkeyToAddress } from '@cosmjs/amino';
+import { encodeEd25519Pubkey } from '@cosmjs/amino';
 import {
   assertIsDeliverTxSuccess,
   SigningStargateClient,
 } from "@cosmjs/stargate";
-import { ProposalExecutorResult, ProposalStatus } from '../../src/codegen/cosmos/group/v1/types';
+import { ProposalStatus } from '../../src/codegen/cosmos/group/v1/types';
 import path from "path";
 import { createRPCQueryClient as CosmosRPCQueryClient } from "../../src/codegen/cosmos/rpc.query";
 
@@ -168,10 +169,6 @@ describe.each(inits)("$description", ({ createWallets }) => {
     const pendingValidatorsBeforeLength =
       pendingValidatorsBefore.pending.length;
 
-    const valKeyPair = await Ed25519.makeKeypair(Random.getBytes(32));
-    const pubKey = encodeEd25519Pubkey(valKeyPair.pubkey);
-    const valAddress = pubkeyToAddress(pubKey, "manifestvaloper")
-
     const description = Description.fromPartial({
       moniker: "test-validator",
       identity: "some identity",
@@ -192,8 +189,8 @@ describe.each(inits)("$description", ({ createWallets }) => {
       commission,
       minSelfDelegation: "1",
       delegatorAddress: "",
-      validatorAddress: valAddress,
-      pubkey: encodePubkey(pubKey),
+      validatorAddress: val.valAddress,
+      pubkey: encodePubkey(encodeEd25519Pubkey(fromBase64(val.valPubkey))),
     });
     const poaClient = await getSigningStrangeloveVenturesClient({
       rpcEndpoint,
@@ -212,7 +209,7 @@ describe.each(inits)("$description", ({ createWallets }) => {
     const proposal = Any.fromPartial(
       POAMessageComposer.encoded.removePending({
         sender: POA_GROUP_ADDRESS,
-        validatorAddress: valAddress,
+        validatorAddress: val.valAddress,
       })
     );
 
