@@ -94,13 +94,13 @@ describe.each(inits)("$description", ({ createWallets }) => {
       {
         wallet: test1Wallet,
         address: test1Address,
-        valAddress: test1Address,
+        valAddress: test1Val.address,
         valPubkey: test1Val.pubkey,
       },
       {
         wallet: test4Wallet,
         address: test4Address,
-        valAddress: test4Address,
+        valAddress: test4Val.address,
         valPubkey: test4Val.pubkey,
       }
     ]
