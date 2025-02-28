@@ -8,10 +8,10 @@ import {
   submitVoteExecGroupProposal,
   test1Mnemonic,
   test1Val,
-  test2Mnemonic,
-  waitForNBlocks,
+  test2Mnemonic, test4Mnemonic, test4Val,
+  waitForNBlocks
   // @ts-ignore
-} from "../src/test_helper";
+} from '../src/test_helper';
 import { encodePubkey, OfflineSigner } from "@cosmjs/proto-signing";
 import { MessageComposer as POAMessageComposer } from "../../src/codegen/strangelove_ventures/poa/v1/tx.registry";
 import { Any } from "../../src/codegen/google/protobuf/any";
@@ -25,12 +25,11 @@ import {
   Description,
 } from "../../src/codegen/strangelove_ventures/poa/v1/validator";
 import { fromBase64 } from "@cosmjs/encoding";
-import { encodeEd25519Pubkey, pubkeyToAddress } from '@cosmjs/amino';
+import { encodeEd25519Pubkey } from '@cosmjs/amino';
 import {
   assertIsDeliverTxSuccess,
   SigningStargateClient,
 } from "@cosmjs/stargate";
-import { Ed25519, Random } from "@cosmjs/crypto";
 import { ProposalExecutorResult } from "../../src/codegen/cosmos/group/v1/types";
 import path from "path";
 import { createRPCQueryClient as CosmosRPCQueryClient } from "../../src/codegen/cosmos/rpc.query";
@@ -50,9 +49,12 @@ const inits = [
 describe.each(inits)("$description", ({ createWallets }) => {
   let test1Wallet: OfflineSigner,
     test2Wallet: OfflineSigner,
+    test4Wallet: OfflineSigner,
     test1Address: string,
     test2Address: string,
+    test4Address: string,
     rpcEndpoint: string,
+    vals: { wallet: OfflineSigner, address: string, valAddress: string, valPubkey: string }[],
     fee: { amount: { denom: string; amount: string }[]; gas: string },
     cosmosSigningClient: SigningStargateClient;
   const denom = "umfx";
@@ -74,15 +76,34 @@ describe.each(inits)("$description", ({ createWallets }) => {
 
     test1Wallet = await createWallets(test1Mnemonic, chainData.prefix);
     test2Wallet = await createWallets(test2Mnemonic, chainData.prefix);
+    test4Wallet = await createWallets(test4Mnemonic, chainData.prefix);
     fee = { amount: [{ denom, amount: "100000" }], gas: "550000" };
 
     test1Address = (await test1Wallet.getAccounts())[0].address;
     test2Address = (await test2Wallet.getAccounts())[0].address;
+    test4Address = (await test4Wallet.getAccounts())[0].address;
 
     expect(test1Address).not.toEqual(test2Address);
+    expect(test1Address).not.toEqual(test4Address);
 
     await chainData.creditFromFaucet(test1Address, denom);
     await chainData.creditFromFaucet(test2Address, denom);
+    await chainData.creditFromFaucet(test4Address, denom);
+
+    vals = [
+      {
+        wallet: test1Wallet,
+        address: test1Address,
+        valAddress: test1Address,
+        valPubkey: test1Val.pubkey,
+      },
+      {
+        wallet: test4Wallet,
+        address: test4Address,
+        valAddress: test4Address,
+        valPubkey: test4Val.pubkey,
+      }
+    ]
 
     cosmosSigningClient = await getSigningCosmosClient({
       rpcEndpoint,
@@ -147,10 +168,6 @@ describe.each(inits)("$description", ({ createWallets }) => {
     const pendingValidatorsBeforeLength =
       pendingValidatorsBefore.pending.length;
 
-    const valKeyPair = await Ed25519.makeKeypair(Random.getBytes(32));
-    const pubKey = encodeEd25519Pubkey(valKeyPair.pubkey);
-    const valAddress = pubkeyToAddress(pubKey, "manifestvaloper")
-
     const description = Description.fromPartial({
       moniker: "test-validator",
       identity: "some identity",
@@ -165,19 +182,20 @@ describe.each(inits)("$description", ({ createWallets }) => {
       maxRate: "0",
       maxChangeRate: "0",
     });
+    const val = vals[0];
     const msg = POAMessageComposer.fromPartial.createValidator({
       description,
       commission,
       minSelfDelegation: "1",
       delegatorAddress: "",
-      validatorAddress: valAddress,
-      pubkey: encodePubkey(pubKey),
+      validatorAddress: val.valAddress,
+      pubkey: encodePubkey(encodeEd25519Pubkey(fromBase64(val.valPubkey))),
     });
     const poaClient = await getSigningStrangeloveVenturesClient({
       rpcEndpoint,
-      signer: test1Wallet,
+      signer: val.wallet,
     });
-    const result = await poaClient.signAndBroadcast(test1Address, [msg], fee);
+    const result = await poaClient.signAndBroadcast(val.address, [msg], fee);
     assertIsDeliverTxSuccess(result);
     expect(result.code).toEqual(0);
 
@@ -190,17 +208,17 @@ describe.each(inits)("$description", ({ createWallets }) => {
     const proposal = Any.fromPartial(
       POAMessageComposer.encoded.removePending({
         sender: POA_GROUP_ADDRESS,
-        validatorAddress: valAddress,
+        validatorAddress: val.valAddress,
       })
     );
 
     await submitVoteExecGroupProposal(
-      test1Address,
+      val.address,
       POA_GROUP_ADDRESS,
       cosmosSigningClient,
       "remove pending",
       "some remove pending",
-      [test1Address],
+      [val.address],
       [proposal],
       fee
     );
@@ -209,6 +227,8 @@ describe.each(inits)("$description", ({ createWallets }) => {
     expect(pendingValidatorsAfterRemovePending.pending.length).toEqual(
       pendingValidatorsBeforeLength
     );
+
+    vals = vals.slice(1);
   }, 30000);
 
   test("remove validator (poa)", async () => {
