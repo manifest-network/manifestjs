@@ -45,6 +45,12 @@ chains:
                 weight: "1"
                 metadata: "user2"
                 added_at: "2024-05-16T15:10:54.372190727Z"
+            - group_id: "1"
+              member:
+                address: "manifest19h4chfdz729096nm5hhakc22puwwezggzml3f5"
+                weight: "1"
+                metadata: "user4"
+                added_at: "2024-05-16T15:10:54.372190727Z"
           group_policy_seq: "1"
           group_policies:
             - group_id: "1"
