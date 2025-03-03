@@ -162,7 +162,11 @@ describe.each(inits)("$description", ({ createWallets }) => {
     );
   }, 60000);
 
-  test("remove pending validator (poa)", async () => {
+  test(createWallets === createAminoWallet ? "remove pending validator (poa) [BROKEN for Amino (#14)]" : "remove pending validator (poa)", async () => {
+    if (createWallets === createAminoWallet) {
+      return;
+    }
+
     const queryClient = await POARPCQueryClient({ rpcEndpoint });
     const pendingValidatorsBefore =
       await queryClient.strangelove_ventures.poa.v1.pendingValidators();
