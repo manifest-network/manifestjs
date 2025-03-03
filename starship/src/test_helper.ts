@@ -28,6 +28,9 @@ export const test2Mnemonic =
 // test3 key as defined in https://github.com/cosmology-tech/starship/blob/main/starship/charts/devnet/configs/keys.json
 export const test3Mnemonic =
   "middle weather hip ghost quick oxygen awful library broken chicken tackle animal crunch appear fee indoor fitness enough orphan trend tackle faint eyebrow all";
+// manifest19h4chfdz729096nm5hhakc22puwwezggzml3f5
+export const test4Mnemonic =
+  "venture obtain second cricket please sheriff hybrid eyebrow weasel saddle switch abuse artwork clump ivory vault response diary plunge weekend wheat breeze gaze occur";
 
 // Used for POA validator testing
 export const test1Val = {
@@ -40,6 +43,11 @@ export const test3Val = {
   address: "manifestvaloper1pn45c2jdwfwrwva0cknfdlnfst28ucpus9qfk4",
   pubkey: "cWa/RsXD2eidssyLnc8UwZY2468DldmWBTCx2/d7L+c=",
 };
+export const test4Val = {
+  mnemonic: test4Mnemonic,
+  address: "manifestvaloper19h4chfdz729096nm5hhakc22puwwezgg7mz99x",
+  pubkey: "lnfZyOEx8KQVO1Z3jPxn/03BIPx0Nwu6ApxyEBEWtYM=",
+}
 
 // Create a Direct Signer wallet from a mnemonic
 export const createProtoWallet = (mnemonic: string, prefix: string) =>

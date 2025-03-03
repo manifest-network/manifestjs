@@ -1,10 +1,10 @@
 name: starship-manifestjs
-version: v0.2.19
+version: v1.3.0
 
 chains:
   - id: manifest-ledger-beta
     name: custom
-    image: ghcr.io/liftedinit/manifest-ledger:v0.0.1-rc.1
+    image: ghcr.io/liftedinit/manifest-ledger:v1.0.0
     home: /root/.manifest
     binary: manifestd
     prefix: manifest
@@ -45,6 +45,12 @@ chains:
                 weight: "1"
                 metadata: "user2"
                 added_at: "2024-05-16T15:10:54.372190727Z"
+            - group_id: "1"
+              member:
+                address: "manifest19h4chfdz729096nm5hhakc22puwwezggzml3f5"
+                weight: "1"
+                metadata: "user4"
+                added_at: "2024-05-16T15:10:54.372190727Z"
           group_policy_seq: "1"
           group_policies:
             - group_id: "1"
@@ -84,6 +90,12 @@ chains:
           params:
             denom_creation_fee: []
             denom_creation_gas_consume: 10000
+        wasm:
+          params:
+            code_upload_access:
+              permission: "AnyOfAddresses"
+              addresses: ["manifest1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfmy9qj"]
+            instantiate_default_permission: "AnyOfAddresses"
     ports:
       rest: 1317
       rpc: 26657
