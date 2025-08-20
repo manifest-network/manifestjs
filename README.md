@@ -1,8 +1,7 @@
-# manifestjs
+<h1 align="center">manifestjs</h1>
 
 <p align="center">
-  <img src="https://avatars.githubusercontent.com/u/90303796?s=200&v=4" width="80"><br />
-    Javascript library for interacting with the Manifest Network
+  <img src="https://raw.githubusercontent.com/cosmos/chain-registry/00df6ff89abd382f9efe3d37306c353e2bd8d55c/manifest/images/manifest.png" alt="Manifest Network" width="100"/>
 </p>
 
 ## install
