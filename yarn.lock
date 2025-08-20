@@ -1185,9 +1185,9 @@
     ws "^7"
     xstream "^11.14.0"
 
-"@cosmjs/stargate@npm:@liftedinit/stargate@0.32.4-ll.3":
+"@cosmjs/stargate@npm:@manifest-network/stargate@0.32.4-ll.3":
   version "0.32.4-ll.3"
-  resolved "https://registry.yarnpkg.com/@liftedinit/stargate/-/stargate-0.32.4-ll.3.tgz#9e280aedc3a14561945276bb9fd63227719d501f"
+  resolved "https://registry.yarnpkg.com/@manifest-network/stargate/-/stargate-0.32.4-ll.3.tgz#9e280aedc3a14561945276bb9fd63227719d501f"
   integrity sha512-HhRI9/43EV9jef1gnsGBPrlqJHZwy4MlX0e3VOaaAiYTB9i/0YdMiKoKUoHtMMritWD9ZeiqMtQRyzV3jJKzhg==
   dependencies:
     "@confio/ics23" "^0.6.8"

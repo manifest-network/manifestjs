@@ -8,7 +8,7 @@
 ## install
 
 ```sh
-npm install @liftedinit/manifestjs
+npm install @manifest-network/manifestjs
 ```
 
 ## Table of contents
@@ -36,7 +36,7 @@ npm install @liftedinit/manifestjs
 ### RPC Clients
 
 ```js
-import { manifest } from "@liftedinit/manifestjs";
+import { manifest } from "@manifest-network/manifestjs";
 
 const { createRPCQueryClient } = manifest.ClientFactory;
 const client = await createRPCQueryClient({ rpcEndpoint: RPC_ENDPOINT });
@@ -55,7 +55,7 @@ const balances = await client.manifest.exchange.v1beta1.exchangeBalances();
 Import the `manifest` object from `manifestjs`.
 
 ```js
-import { manifest } from "@liftedinit/manifestjs";
+import { manifest } from "@manifest-network/manifestjs";
 
 const { payout } = manifest.module.v1.MessageComposer.withTypeUrl;
 ```
@@ -63,7 +63,7 @@ const { payout } = manifest.module.v1.MessageComposer.withTypeUrl;
 #### TokenFactory Messages
 
 ```js
-import { osmosis } from "@liftedinit/manifestjs";
+import { osmosis } from "@manifest-network/manifestjs";
 
 const { createDenom } = osmosis.tokenfactory.v1.MessageComposer.withTypeUrl;
 ```
@@ -71,7 +71,7 @@ const { createDenom } = osmosis.tokenfactory.v1.MessageComposer.withTypeUrl;
 #### IBC Messages
 
 ```js
-import { ibc } from "@liftedinit/manifestjs";
+import { ibc } from "@manifest-network/manifestjs";
 
 const { transfer } = ibc.applications.transfer.v1.MessageComposer.withTypeUrl;
 ```
@@ -79,7 +79,7 @@ const { transfer } = ibc.applications.transfer.v1.MessageComposer.withTypeUrl;
 #### Cosmos Messages
 
 ```js
-import { cosmos } from "@liftedinit/manifestjs";
+import { cosmos } from "@manifest-network/manifestjs";
 
 const {
   fundCommunityPool,
@@ -116,7 +116,7 @@ Here are the docs on [creating signers](https://github.com/cosmology-tech/cosmos
 Use `getSigningmanifestClient` to get your `SigningStargateClient`, with the proto/amino messages full-loaded. No need to manually add amino types, just require and initialize the client:
 
 ```js
-import { getSigningStargateClient } from "@liftedinit/manifestjs";
+import { getSigningStargateClient } from "@manifest-network/manifestjs";
 
 const stargateClient = await getSigningStargateClient({
   rpcEndpoint,
