@@ -4,7 +4,7 @@ version: v1.3.0
 chains:
   - id: manifest-ledger-beta
     name: custom
-    image: ghcr.io/liftedinit/manifest-ledger:v1.0.0
+    image: ghcr.io/manifest-network/manifest-ledger:1.0.8
     home: /root/.manifest
     binary: manifestd
     prefix: manifest
@@ -12,7 +12,7 @@ chains:
     coins: 10000000000000umfx
     hdPath: m/44'/118'/0'/0/0
     coinType: 118
-    repo: https://github.com/liftedinit/manifest-ledger
+    repo: https://github.com/manifest-network/manifest-ledger
     numValidators: 1
     env:
       # The POA Admin is a group address

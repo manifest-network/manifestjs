@@ -2,7 +2,7 @@
 # ARG VERSION
 # FROM ${BASE_IMAGE}:${VERSION} AS source
 
-FROM ghcr.io/liftedinit/manifest-ledger:v1.0.0 as source
+FROM ghcr.io/manifest-network/manifest-ledger:1.0.8 as source
 
 FROM alpine:3.16
 

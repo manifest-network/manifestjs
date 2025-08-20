@@ -4,4 +4,4 @@ setup:
 
 .PHONY: build
 build:
-	docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/liftedinit/manifest-ledger:v1.0.0 .
+	docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/manifest-network/manifest-ledger:1.0.8 .
