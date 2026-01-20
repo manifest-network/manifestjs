@@ -3,12 +3,18 @@ import { defaultRegistryTypes, AminoTypes, SigningStargateClient } from "@cosmjs
 import { HttpEndpoint } from "@cosmjs/tendermint-rpc";
 import { createRpcClient } from "../extern";
 import { DeliverTxResponse, EncodeObject, StdFee, TxRpc, SigningClientParams } from "../types";
+import * as liftedinitBillingV1TxRegistry from "./billing/v1/tx.registry";
 import * as liftedinitManifestV1TxRegistry from "./manifest/v1/tx.registry";
+import * as liftedinitSkuV1TxRegistry from "./sku/v1/tx.registry";
+import * as liftedinitBillingV1TxAmino from "./billing/v1/tx.amino";
 import * as liftedinitManifestV1TxAmino from "./manifest/v1/tx.amino";
+import * as liftedinitSkuV1TxAmino from "./sku/v1/tx.amino";
 export const liftedinitAminoConverters = {
-  ...liftedinitManifestV1TxAmino.AminoConverter
+  ...liftedinitBillingV1TxAmino.AminoConverter,
+  ...liftedinitManifestV1TxAmino.AminoConverter,
+  ...liftedinitSkuV1TxAmino.AminoConverter
 };
-export const liftedinitProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...liftedinitManifestV1TxRegistry.registry];
+export const liftedinitProtoRegistry: ReadonlyArray<[string, GeneratedType]> = [...liftedinitBillingV1TxRegistry.registry, ...liftedinitManifestV1TxRegistry.registry, ...liftedinitSkuV1TxRegistry.registry];
 export const getSigningLiftedinitClientOptions = ({
   defaultTypes = defaultRegistryTypes
 }: {

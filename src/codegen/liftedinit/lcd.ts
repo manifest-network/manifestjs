@@ -89,6 +89,18 @@ export const createLCDClient = async ({
           requestClient
         })
       }
+    },
+    liftedinit: {
+      billing: {
+        v1: new (await import("./billing/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      },
+      sku: {
+        v1: new (await import("./sku/v1/query.lcd")).LCDQueryClient({
+          requestClient
+        })
+      }
     }
   };
 };
