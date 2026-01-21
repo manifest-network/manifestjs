@@ -225,6 +225,11 @@ export interface MsgCloseLease {
   sender: string;
   /** lease_uuids are the UUIDs of the leases to close (1-100). */
   leaseUuids: string[];
+  /**
+   * reason is an optional explanation for the closure (applied to all leases).
+   * Maximum 256 characters.
+   */
+  reason: string;
 }
 export interface MsgCloseLeaseProtoMsg {
   typeUrl: "/liftedinit.billing.v1.MsgCloseLease";
@@ -240,6 +245,11 @@ export interface MsgCloseLeaseAmino {
   sender?: string;
   /** lease_uuids are the UUIDs of the leases to close (1-100). */
   lease_uuids?: string[];
+  /**
+   * reason is an optional explanation for the closure (applied to all leases).
+   * Maximum 256 characters.
+   */
+  reason?: string;
 }
 export interface MsgCloseLeaseAminoMsg {
   type: "lifted/billing/MsgCloseLease";
@@ -253,6 +263,7 @@ export interface MsgCloseLeaseAminoMsg {
 export interface MsgCloseLeaseSDKType {
   sender: string;
   lease_uuids: string[];
+  reason: string;
 }
 /** MsgCloseLeaseResponse is the response type for MsgCloseLease. */
 export interface MsgCloseLeaseResponse {
@@ -1388,20 +1399,21 @@ GlobalDecoderRegistry.register(MsgCreateLeaseForTenantResponse.typeUrl, MsgCreat
 function createBaseMsgCloseLease(): MsgCloseLease {
   return {
     sender: "",
-    leaseUuids: []
+    leaseUuids: [],
+    reason: ""
   };
 }
 export const MsgCloseLease = {
   typeUrl: "/liftedinit.billing.v1.MsgCloseLease",
   aminoType: "lifted/billing/MsgCloseLease",
   is(o: any): o is MsgCloseLease {
-    return o && (o.$typeUrl === MsgCloseLease.typeUrl || typeof o.sender === "string" && Array.isArray(o.leaseUuids) && (!o.leaseUuids.length || typeof o.leaseUuids[0] === "string"));
+    return o && (o.$typeUrl === MsgCloseLease.typeUrl || typeof o.sender === "string" && Array.isArray(o.leaseUuids) && (!o.leaseUuids.length || typeof o.leaseUuids[0] === "string") && typeof o.reason === "string");
   },
   isSDK(o: any): o is MsgCloseLeaseSDKType {
-    return o && (o.$typeUrl === MsgCloseLease.typeUrl || typeof o.sender === "string" && Array.isArray(o.lease_uuids) && (!o.lease_uuids.length || typeof o.lease_uuids[0] === "string"));
+    return o && (o.$typeUrl === MsgCloseLease.typeUrl || typeof o.sender === "string" && Array.isArray(o.lease_uuids) && (!o.lease_uuids.length || typeof o.lease_uuids[0] === "string") && typeof o.reason === "string");
   },
   isAmino(o: any): o is MsgCloseLeaseAmino {
-    return o && (o.$typeUrl === MsgCloseLease.typeUrl || typeof o.sender === "string" && Array.isArray(o.lease_uuids) && (!o.lease_uuids.length || typeof o.lease_uuids[0] === "string"));
+    return o && (o.$typeUrl === MsgCloseLease.typeUrl || typeof o.sender === "string" && Array.isArray(o.lease_uuids) && (!o.lease_uuids.length || typeof o.lease_uuids[0] === "string") && typeof o.reason === "string");
   },
   encode(message: MsgCloseLease, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
@@ -1409,6 +1421,9 @@ export const MsgCloseLease = {
     }
     for (const v of message.leaseUuids) {
       writer.uint32(18).string(v!);
+    }
+    if (message.reason !== "") {
+      writer.uint32(26).string(message.reason);
     }
     return writer;
   },
@@ -1425,6 +1440,9 @@ export const MsgCloseLease = {
         case 2:
           message.leaseUuids.push(reader.string());
           break;
+        case 3:
+          message.reason = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1435,7 +1453,8 @@ export const MsgCloseLease = {
   fromJSON(object: any): MsgCloseLease {
     return {
       sender: isSet(object.sender) ? String(object.sender) : "",
-      leaseUuids: Array.isArray(object?.leaseUuids) ? object.leaseUuids.map((e: any) => String(e)) : []
+      leaseUuids: Array.isArray(object?.leaseUuids) ? object.leaseUuids.map((e: any) => String(e)) : [],
+      reason: isSet(object.reason) ? String(object.reason) : ""
     };
   },
   toJSON(message: MsgCloseLease): JsonSafe<MsgCloseLease> {
@@ -1446,12 +1465,14 @@ export const MsgCloseLease = {
     } else {
       obj.leaseUuids = [];
     }
+    message.reason !== undefined && (obj.reason = message.reason);
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgCloseLease>, I>>(object: I): MsgCloseLease {
     const message = createBaseMsgCloseLease();
     message.sender = object.sender ?? "";
     message.leaseUuids = object.leaseUuids?.map(e => e) || [];
+    message.reason = object.reason ?? "";
     return message;
   },
   fromAmino(object: MsgCloseLeaseAmino): MsgCloseLease {
@@ -1460,6 +1481,9 @@ export const MsgCloseLease = {
       message.sender = object.sender;
     }
     message.leaseUuids = object.lease_uuids?.map(e => e) || [];
+    if (object.reason !== undefined && object.reason !== null) {
+      message.reason = object.reason;
+    }
     return message;
   },
   toAmino(message: MsgCloseLease): MsgCloseLeaseAmino {
@@ -1470,6 +1494,7 @@ export const MsgCloseLease = {
     } else {
       obj.lease_uuids = message.leaseUuids;
     }
+    obj.reason = message.reason === "" ? undefined : message.reason;
     return obj;
   },
   fromAminoMsg(object: MsgCloseLeaseAminoMsg): MsgCloseLease {

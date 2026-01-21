@@ -255,6 +255,11 @@ export interface Lease {
    * Only set when state is EXPIRED.
    */
   expiredAt?: Date;
+  /**
+   * closure_reason is a free-form explanation for why the lease was closed.
+   * Only set when state is CLOSED. Maximum 256 characters.
+   */
+  closureReason: string;
 }
 export interface LeaseProtoMsg {
   typeUrl: "/liftedinit.billing.v1.Lease";
@@ -305,6 +310,11 @@ export interface LeaseAmino {
    * Only set when state is EXPIRED.
    */
   expired_at?: string;
+  /**
+   * closure_reason is a free-form explanation for why the lease was closed.
+   * Only set when state is CLOSED. Maximum 256 characters.
+   */
+  closure_reason?: string;
 }
 export interface LeaseAminoMsg {
   type: "lifted/billing/Lease";
@@ -324,6 +334,7 @@ export interface LeaseSDKType {
   rejected_at?: Date;
   rejection_reason: string;
   expired_at?: Date;
+  closure_reason: string;
 }
 /**
  * CreditAccount represents a tenant's credit account.
@@ -676,20 +687,21 @@ function createBaseLease(): Lease {
     acknowledgedAt: undefined,
     rejectedAt: undefined,
     rejectionReason: "",
-    expiredAt: undefined
+    expiredAt: undefined,
+    closureReason: ""
   };
 }
 export const Lease = {
   typeUrl: "/liftedinit.billing.v1.Lease",
   aminoType: "lifted/billing/Lease",
   is(o: any): o is Lease {
-    return o && (o.$typeUrl === Lease.typeUrl || typeof o.uuid === "string" && typeof o.tenant === "string" && typeof o.providerUuid === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItem.is(o.items[0])) && isSet(o.state) && Timestamp.is(o.createdAt) && Timestamp.is(o.lastSettledAt) && typeof o.rejectionReason === "string");
+    return o && (o.$typeUrl === Lease.typeUrl || typeof o.uuid === "string" && typeof o.tenant === "string" && typeof o.providerUuid === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItem.is(o.items[0])) && isSet(o.state) && Timestamp.is(o.createdAt) && Timestamp.is(o.lastSettledAt) && typeof o.rejectionReason === "string" && typeof o.closureReason === "string");
   },
   isSDK(o: any): o is LeaseSDKType {
-    return o && (o.$typeUrl === Lease.typeUrl || typeof o.uuid === "string" && typeof o.tenant === "string" && typeof o.provider_uuid === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItem.isSDK(o.items[0])) && isSet(o.state) && Timestamp.isSDK(o.created_at) && Timestamp.isSDK(o.last_settled_at) && typeof o.rejection_reason === "string");
+    return o && (o.$typeUrl === Lease.typeUrl || typeof o.uuid === "string" && typeof o.tenant === "string" && typeof o.provider_uuid === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItem.isSDK(o.items[0])) && isSet(o.state) && Timestamp.isSDK(o.created_at) && Timestamp.isSDK(o.last_settled_at) && typeof o.rejection_reason === "string" && typeof o.closure_reason === "string");
   },
   isAmino(o: any): o is LeaseAmino {
-    return o && (o.$typeUrl === Lease.typeUrl || typeof o.uuid === "string" && typeof o.tenant === "string" && typeof o.provider_uuid === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItem.isAmino(o.items[0])) && isSet(o.state) && Timestamp.isAmino(o.created_at) && Timestamp.isAmino(o.last_settled_at) && typeof o.rejection_reason === "string");
+    return o && (o.$typeUrl === Lease.typeUrl || typeof o.uuid === "string" && typeof o.tenant === "string" && typeof o.provider_uuid === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItem.isAmino(o.items[0])) && isSet(o.state) && Timestamp.isAmino(o.created_at) && Timestamp.isAmino(o.last_settled_at) && typeof o.rejection_reason === "string" && typeof o.closure_reason === "string");
   },
   encode(message: Lease, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.uuid !== "") {
@@ -727,6 +739,9 @@ export const Lease = {
     }
     if (message.expiredAt !== undefined) {
       Timestamp.encode(toTimestamp(message.expiredAt), writer.uint32(98).fork()).ldelim();
+    }
+    if (message.closureReason !== "") {
+      writer.uint32(106).string(message.closureReason);
     }
     return writer;
   },
@@ -773,6 +788,9 @@ export const Lease = {
         case 12:
           message.expiredAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
           break;
+        case 13:
+          message.closureReason = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -793,7 +811,8 @@ export const Lease = {
       acknowledgedAt: isSet(object.acknowledgedAt) ? new Date(object.acknowledgedAt) : undefined,
       rejectedAt: isSet(object.rejectedAt) ? new Date(object.rejectedAt) : undefined,
       rejectionReason: isSet(object.rejectionReason) ? String(object.rejectionReason) : "",
-      expiredAt: isSet(object.expiredAt) ? new Date(object.expiredAt) : undefined
+      expiredAt: isSet(object.expiredAt) ? new Date(object.expiredAt) : undefined,
+      closureReason: isSet(object.closureReason) ? String(object.closureReason) : ""
     };
   },
   toJSON(message: Lease): JsonSafe<Lease> {
@@ -814,6 +833,7 @@ export const Lease = {
     message.rejectedAt !== undefined && (obj.rejectedAt = message.rejectedAt.toISOString());
     message.rejectionReason !== undefined && (obj.rejectionReason = message.rejectionReason);
     message.expiredAt !== undefined && (obj.expiredAt = message.expiredAt.toISOString());
+    message.closureReason !== undefined && (obj.closureReason = message.closureReason);
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<Lease>, I>>(object: I): Lease {
@@ -830,6 +850,7 @@ export const Lease = {
     message.rejectedAt = object.rejectedAt ?? undefined;
     message.rejectionReason = object.rejectionReason ?? "";
     message.expiredAt = object.expiredAt ?? undefined;
+    message.closureReason = object.closureReason ?? "";
     return message;
   },
   fromAmino(object: LeaseAmino): Lease {
@@ -868,6 +889,9 @@ export const Lease = {
     if (object.expired_at !== undefined && object.expired_at !== null) {
       message.expiredAt = fromTimestamp(Timestamp.fromAmino(object.expired_at));
     }
+    if (object.closure_reason !== undefined && object.closure_reason !== null) {
+      message.closureReason = object.closure_reason;
+    }
     return message;
   },
   toAmino(message: Lease): LeaseAmino {
@@ -888,6 +912,7 @@ export const Lease = {
     obj.rejected_at = message.rejectedAt ? Timestamp.toAmino(toTimestamp(message.rejectedAt)) : undefined;
     obj.rejection_reason = message.rejectionReason === "" ? undefined : message.rejectionReason;
     obj.expired_at = message.expiredAt ? Timestamp.toAmino(toTimestamp(message.expiredAt)) : undefined;
+    obj.closure_reason = message.closureReason === "" ? undefined : message.closureReason;
     return obj;
   },
   fromAminoMsg(object: LeaseAminoMsg): Lease {
