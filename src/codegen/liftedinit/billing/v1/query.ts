@@ -333,6 +333,11 @@ export interface QueryCreditAccountResponse {
   creditAccount: CreditAccount;
   /** balances is the current balances at the credit address (fetched from bank module). */
   balances: Coin[];
+  /**
+   * available_balances is the amount available for new leases (balances - reserved_amounts).
+   * This is what can be used to create new leases without overbooking.
+   */
+  availableBalances: Coin[];
 }
 export interface QueryCreditAccountResponseProtoMsg {
   typeUrl: "/liftedinit.billing.v1.QueryCreditAccountResponse";
@@ -347,6 +352,11 @@ export interface QueryCreditAccountResponseAmino {
   credit_account: CreditAccountAmino;
   /** balances is the current balances at the credit address (fetched from bank module). */
   balances: CoinAmino[];
+  /**
+   * available_balances is the amount available for new leases (balances - reserved_amounts).
+   * This is what can be used to create new leases without overbooking.
+   */
+  available_balances: CoinAmino[];
 }
 export interface QueryCreditAccountResponseAminoMsg {
   type: "/liftedinit.billing.v1.QueryCreditAccountResponse";
@@ -359,6 +369,7 @@ export interface QueryCreditAccountResponseAminoMsg {
 export interface QueryCreditAccountResponseSDKType {
   credit_account: CreditAccountSDKType;
   balances: CoinSDKType[];
+  available_balances: CoinSDKType[];
 }
 /**
  * QueryCreditAddressRequest is the request type for the Query/CreditAddress RPC
@@ -1832,19 +1843,20 @@ GlobalDecoderRegistry.register(QueryCreditAccountRequest.typeUrl, QueryCreditAcc
 function createBaseQueryCreditAccountResponse(): QueryCreditAccountResponse {
   return {
     creditAccount: CreditAccount.fromPartial({}),
-    balances: []
+    balances: [],
+    availableBalances: []
   };
 }
 export const QueryCreditAccountResponse = {
   typeUrl: "/liftedinit.billing.v1.QueryCreditAccountResponse",
   is(o: any): o is QueryCreditAccountResponse {
-    return o && (o.$typeUrl === QueryCreditAccountResponse.typeUrl || CreditAccount.is(o.creditAccount) && Array.isArray(o.balances) && (!o.balances.length || Coin.is(o.balances[0])));
+    return o && (o.$typeUrl === QueryCreditAccountResponse.typeUrl || CreditAccount.is(o.creditAccount) && Array.isArray(o.balances) && (!o.balances.length || Coin.is(o.balances[0])) && Array.isArray(o.availableBalances) && (!o.availableBalances.length || Coin.is(o.availableBalances[0])));
   },
   isSDK(o: any): o is QueryCreditAccountResponseSDKType {
-    return o && (o.$typeUrl === QueryCreditAccountResponse.typeUrl || CreditAccount.isSDK(o.credit_account) && Array.isArray(o.balances) && (!o.balances.length || Coin.isSDK(o.balances[0])));
+    return o && (o.$typeUrl === QueryCreditAccountResponse.typeUrl || CreditAccount.isSDK(o.credit_account) && Array.isArray(o.balances) && (!o.balances.length || Coin.isSDK(o.balances[0])) && Array.isArray(o.available_balances) && (!o.available_balances.length || Coin.isSDK(o.available_balances[0])));
   },
   isAmino(o: any): o is QueryCreditAccountResponseAmino {
-    return o && (o.$typeUrl === QueryCreditAccountResponse.typeUrl || CreditAccount.isAmino(o.credit_account) && Array.isArray(o.balances) && (!o.balances.length || Coin.isAmino(o.balances[0])));
+    return o && (o.$typeUrl === QueryCreditAccountResponse.typeUrl || CreditAccount.isAmino(o.credit_account) && Array.isArray(o.balances) && (!o.balances.length || Coin.isAmino(o.balances[0])) && Array.isArray(o.available_balances) && (!o.available_balances.length || Coin.isAmino(o.available_balances[0])));
   },
   encode(message: QueryCreditAccountResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.creditAccount !== undefined) {
@@ -1852,6 +1864,9 @@ export const QueryCreditAccountResponse = {
     }
     for (const v of message.balances) {
       Coin.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    for (const v of message.availableBalances) {
+      Coin.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -1868,6 +1883,9 @@ export const QueryCreditAccountResponse = {
         case 2:
           message.balances.push(Coin.decode(reader, reader.uint32()));
           break;
+        case 3:
+          message.availableBalances.push(Coin.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1878,7 +1896,8 @@ export const QueryCreditAccountResponse = {
   fromJSON(object: any): QueryCreditAccountResponse {
     return {
       creditAccount: isSet(object.creditAccount) ? CreditAccount.fromJSON(object.creditAccount) : undefined,
-      balances: Array.isArray(object?.balances) ? object.balances.map((e: any) => Coin.fromJSON(e)) : []
+      balances: Array.isArray(object?.balances) ? object.balances.map((e: any) => Coin.fromJSON(e)) : [],
+      availableBalances: Array.isArray(object?.availableBalances) ? object.availableBalances.map((e: any) => Coin.fromJSON(e)) : []
     };
   },
   toJSON(message: QueryCreditAccountResponse): JsonSafe<QueryCreditAccountResponse> {
@@ -1889,12 +1908,18 @@ export const QueryCreditAccountResponse = {
     } else {
       obj.balances = [];
     }
+    if (message.availableBalances) {
+      obj.availableBalances = message.availableBalances.map(e => e ? Coin.toJSON(e) : undefined);
+    } else {
+      obj.availableBalances = [];
+    }
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<QueryCreditAccountResponse>, I>>(object: I): QueryCreditAccountResponse {
     const message = createBaseQueryCreditAccountResponse();
     message.creditAccount = object.creditAccount !== undefined && object.creditAccount !== null ? CreditAccount.fromPartial(object.creditAccount) : undefined;
     message.balances = object.balances?.map(e => Coin.fromPartial(e)) || [];
+    message.availableBalances = object.availableBalances?.map(e => Coin.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: QueryCreditAccountResponseAmino): QueryCreditAccountResponse {
@@ -1903,6 +1928,7 @@ export const QueryCreditAccountResponse = {
       message.creditAccount = CreditAccount.fromAmino(object.credit_account);
     }
     message.balances = object.balances?.map(e => Coin.fromAmino(e)) || [];
+    message.availableBalances = object.available_balances?.map(e => Coin.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: QueryCreditAccountResponse): QueryCreditAccountResponseAmino {
@@ -1912,6 +1938,11 @@ export const QueryCreditAccountResponse = {
       obj.balances = message.balances.map(e => e ? Coin.toAmino(e) : undefined);
     } else {
       obj.balances = message.balances;
+    }
+    if (message.availableBalances) {
+      obj.available_balances = message.availableBalances.map(e => e ? Coin.toAmino(e) : undefined);
+    } else {
+      obj.available_balances = message.availableBalances;
     }
     return obj;
   },

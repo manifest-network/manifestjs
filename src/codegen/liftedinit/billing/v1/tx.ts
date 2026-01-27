@@ -2,7 +2,7 @@ import { Coin, CoinAmino, CoinSDKType } from "../../../cosmos/base/v1beta1/coin"
 import { Params, ParamsAmino, ParamsSDKType } from "./types";
 import { Timestamp } from "../../../google/protobuf/timestamp";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { isSet, DeepPartial, Exact, toTimestamp, fromTimestamp } from "../../../helpers";
+import { isSet, DeepPartial, Exact, bytesFromBase64, base64FromBytes, toTimestamp, fromTimestamp } from "../../../helpers";
 import { JsonSafe } from "../../../json-safe";
 import { GlobalDecoderRegistry } from "../../../registry";
 /** LeaseItemInput is the input for creating a lease item. */
@@ -100,6 +100,12 @@ export interface MsgCreateLease {
    * All SKUs must belong to the same provider.
    */
   items: LeaseItemInput[];
+  /**
+   * meta_hash is an optional hash/reference to off-chain deployment data.
+   * Maximum 64 bytes to accommodate SHA-256/SHA-512 hashes.
+   * Immutable once set at lease creation.
+   */
+  metaHash: Uint8Array;
 }
 export interface MsgCreateLeaseProtoMsg {
   typeUrl: "/liftedinit.billing.v1.MsgCreateLease";
@@ -114,6 +120,12 @@ export interface MsgCreateLeaseAmino {
    * All SKUs must belong to the same provider.
    */
   items: LeaseItemInputAmino[];
+  /**
+   * meta_hash is an optional hash/reference to off-chain deployment data.
+   * Maximum 64 bytes to accommodate SHA-256/SHA-512 hashes.
+   * Immutable once set at lease creation.
+   */
+  meta_hash?: string;
 }
 export interface MsgCreateLeaseAminoMsg {
   type: "lifted/billing/MsgCreateLease";
@@ -123,6 +135,7 @@ export interface MsgCreateLeaseAminoMsg {
 export interface MsgCreateLeaseSDKType {
   tenant: string;
   items: LeaseItemInputSDKType[];
+  meta_hash: Uint8Array;
 }
 /** MsgCreateLeaseResponse is the response type for MsgCreateLease. */
 export interface MsgCreateLeaseResponse {
@@ -160,6 +173,12 @@ export interface MsgCreateLeaseForTenant {
    * All SKUs must belong to the same provider.
    */
   items: LeaseItemInput[];
+  /**
+   * meta_hash is an optional hash/reference to off-chain deployment data.
+   * Maximum 64 bytes to accommodate SHA-256/SHA-512 hashes.
+   * Immutable once set at lease creation.
+   */
+  metaHash: Uint8Array;
 }
 export interface MsgCreateLeaseForTenantProtoMsg {
   typeUrl: "/liftedinit.billing.v1.MsgCreateLeaseForTenant";
@@ -179,6 +198,12 @@ export interface MsgCreateLeaseForTenantAmino {
    * All SKUs must belong to the same provider.
    */
   items: LeaseItemInputAmino[];
+  /**
+   * meta_hash is an optional hash/reference to off-chain deployment data.
+   * Maximum 64 bytes to accommodate SHA-256/SHA-512 hashes.
+   * Immutable once set at lease creation.
+   */
+  meta_hash?: string;
 }
 export interface MsgCreateLeaseForTenantAminoMsg {
   type: "lifted/billing/MsgCreateLeaseForTenant";
@@ -192,6 +217,7 @@ export interface MsgCreateLeaseForTenantSDKType {
   authority: string;
   tenant: string;
   items: LeaseItemInputSDKType[];
+  meta_hash: Uint8Array;
 }
 /** MsgCreateLeaseForTenantResponse is the response type for MsgCreateLeaseForTenant. */
 export interface MsgCreateLeaseForTenantResponse {
@@ -997,20 +1023,21 @@ GlobalDecoderRegistry.register(MsgFundCreditResponse.typeUrl, MsgFundCreditRespo
 function createBaseMsgCreateLease(): MsgCreateLease {
   return {
     tenant: "",
-    items: []
+    items: [],
+    metaHash: new Uint8Array()
   };
 }
 export const MsgCreateLease = {
   typeUrl: "/liftedinit.billing.v1.MsgCreateLease",
   aminoType: "lifted/billing/MsgCreateLease",
   is(o: any): o is MsgCreateLease {
-    return o && (o.$typeUrl === MsgCreateLease.typeUrl || typeof o.tenant === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItemInput.is(o.items[0])));
+    return o && (o.$typeUrl === MsgCreateLease.typeUrl || typeof o.tenant === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItemInput.is(o.items[0])) && (o.metaHash instanceof Uint8Array || typeof o.metaHash === "string"));
   },
   isSDK(o: any): o is MsgCreateLeaseSDKType {
-    return o && (o.$typeUrl === MsgCreateLease.typeUrl || typeof o.tenant === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItemInput.isSDK(o.items[0])));
+    return o && (o.$typeUrl === MsgCreateLease.typeUrl || typeof o.tenant === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItemInput.isSDK(o.items[0])) && (o.meta_hash instanceof Uint8Array || typeof o.meta_hash === "string"));
   },
   isAmino(o: any): o is MsgCreateLeaseAmino {
-    return o && (o.$typeUrl === MsgCreateLease.typeUrl || typeof o.tenant === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItemInput.isAmino(o.items[0])));
+    return o && (o.$typeUrl === MsgCreateLease.typeUrl || typeof o.tenant === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItemInput.isAmino(o.items[0])) && (o.meta_hash instanceof Uint8Array || typeof o.meta_hash === "string"));
   },
   encode(message: MsgCreateLease, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.tenant !== "") {
@@ -1018,6 +1045,9 @@ export const MsgCreateLease = {
     }
     for (const v of message.items) {
       LeaseItemInput.encode(v!, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.metaHash.length !== 0) {
+      writer.uint32(26).bytes(message.metaHash);
     }
     return writer;
   },
@@ -1034,6 +1064,9 @@ export const MsgCreateLease = {
         case 2:
           message.items.push(LeaseItemInput.decode(reader, reader.uint32()));
           break;
+        case 3:
+          message.metaHash = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1044,7 +1077,8 @@ export const MsgCreateLease = {
   fromJSON(object: any): MsgCreateLease {
     return {
       tenant: isSet(object.tenant) ? String(object.tenant) : "",
-      items: Array.isArray(object?.items) ? object.items.map((e: any) => LeaseItemInput.fromJSON(e)) : []
+      items: Array.isArray(object?.items) ? object.items.map((e: any) => LeaseItemInput.fromJSON(e)) : [],
+      metaHash: isSet(object.metaHash) ? bytesFromBase64(object.metaHash) : new Uint8Array()
     };
   },
   toJSON(message: MsgCreateLease): JsonSafe<MsgCreateLease> {
@@ -1055,12 +1089,14 @@ export const MsgCreateLease = {
     } else {
       obj.items = [];
     }
+    message.metaHash !== undefined && (obj.metaHash = base64FromBytes(message.metaHash !== undefined ? message.metaHash : new Uint8Array()));
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgCreateLease>, I>>(object: I): MsgCreateLease {
     const message = createBaseMsgCreateLease();
     message.tenant = object.tenant ?? "";
     message.items = object.items?.map(e => LeaseItemInput.fromPartial(e)) || [];
+    message.metaHash = object.metaHash ?? new Uint8Array();
     return message;
   },
   fromAmino(object: MsgCreateLeaseAmino): MsgCreateLease {
@@ -1069,6 +1105,9 @@ export const MsgCreateLease = {
       message.tenant = object.tenant;
     }
     message.items = object.items?.map(e => LeaseItemInput.fromAmino(e)) || [];
+    if (object.meta_hash !== undefined && object.meta_hash !== null) {
+      message.metaHash = bytesFromBase64(object.meta_hash);
+    }
     return message;
   },
   toAmino(message: MsgCreateLease): MsgCreateLeaseAmino {
@@ -1079,6 +1118,7 @@ export const MsgCreateLease = {
     } else {
       obj.items = message.items;
     }
+    obj.meta_hash = message.metaHash ? base64FromBytes(message.metaHash) : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgCreateLeaseAminoMsg): MsgCreateLease {
@@ -1192,20 +1232,21 @@ function createBaseMsgCreateLeaseForTenant(): MsgCreateLeaseForTenant {
   return {
     authority: "",
     tenant: "",
-    items: []
+    items: [],
+    metaHash: new Uint8Array()
   };
 }
 export const MsgCreateLeaseForTenant = {
   typeUrl: "/liftedinit.billing.v1.MsgCreateLeaseForTenant",
   aminoType: "lifted/billing/MsgCreateLeaseForTenant",
   is(o: any): o is MsgCreateLeaseForTenant {
-    return o && (o.$typeUrl === MsgCreateLeaseForTenant.typeUrl || typeof o.authority === "string" && typeof o.tenant === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItemInput.is(o.items[0])));
+    return o && (o.$typeUrl === MsgCreateLeaseForTenant.typeUrl || typeof o.authority === "string" && typeof o.tenant === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItemInput.is(o.items[0])) && (o.metaHash instanceof Uint8Array || typeof o.metaHash === "string"));
   },
   isSDK(o: any): o is MsgCreateLeaseForTenantSDKType {
-    return o && (o.$typeUrl === MsgCreateLeaseForTenant.typeUrl || typeof o.authority === "string" && typeof o.tenant === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItemInput.isSDK(o.items[0])));
+    return o && (o.$typeUrl === MsgCreateLeaseForTenant.typeUrl || typeof o.authority === "string" && typeof o.tenant === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItemInput.isSDK(o.items[0])) && (o.meta_hash instanceof Uint8Array || typeof o.meta_hash === "string"));
   },
   isAmino(o: any): o is MsgCreateLeaseForTenantAmino {
-    return o && (o.$typeUrl === MsgCreateLeaseForTenant.typeUrl || typeof o.authority === "string" && typeof o.tenant === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItemInput.isAmino(o.items[0])));
+    return o && (o.$typeUrl === MsgCreateLeaseForTenant.typeUrl || typeof o.authority === "string" && typeof o.tenant === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItemInput.isAmino(o.items[0])) && (o.meta_hash instanceof Uint8Array || typeof o.meta_hash === "string"));
   },
   encode(message: MsgCreateLeaseForTenant, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
@@ -1216,6 +1257,9 @@ export const MsgCreateLeaseForTenant = {
     }
     for (const v of message.items) {
       LeaseItemInput.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.metaHash.length !== 0) {
+      writer.uint32(34).bytes(message.metaHash);
     }
     return writer;
   },
@@ -1235,6 +1279,9 @@ export const MsgCreateLeaseForTenant = {
         case 3:
           message.items.push(LeaseItemInput.decode(reader, reader.uint32()));
           break;
+        case 4:
+          message.metaHash = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1246,7 +1293,8 @@ export const MsgCreateLeaseForTenant = {
     return {
       authority: isSet(object.authority) ? String(object.authority) : "",
       tenant: isSet(object.tenant) ? String(object.tenant) : "",
-      items: Array.isArray(object?.items) ? object.items.map((e: any) => LeaseItemInput.fromJSON(e)) : []
+      items: Array.isArray(object?.items) ? object.items.map((e: any) => LeaseItemInput.fromJSON(e)) : [],
+      metaHash: isSet(object.metaHash) ? bytesFromBase64(object.metaHash) : new Uint8Array()
     };
   },
   toJSON(message: MsgCreateLeaseForTenant): JsonSafe<MsgCreateLeaseForTenant> {
@@ -1258,6 +1306,7 @@ export const MsgCreateLeaseForTenant = {
     } else {
       obj.items = [];
     }
+    message.metaHash !== undefined && (obj.metaHash = base64FromBytes(message.metaHash !== undefined ? message.metaHash : new Uint8Array()));
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgCreateLeaseForTenant>, I>>(object: I): MsgCreateLeaseForTenant {
@@ -1265,6 +1314,7 @@ export const MsgCreateLeaseForTenant = {
     message.authority = object.authority ?? "";
     message.tenant = object.tenant ?? "";
     message.items = object.items?.map(e => LeaseItemInput.fromPartial(e)) || [];
+    message.metaHash = object.metaHash ?? new Uint8Array();
     return message;
   },
   fromAmino(object: MsgCreateLeaseForTenantAmino): MsgCreateLeaseForTenant {
@@ -1276,6 +1326,9 @@ export const MsgCreateLeaseForTenant = {
       message.tenant = object.tenant;
     }
     message.items = object.items?.map(e => LeaseItemInput.fromAmino(e)) || [];
+    if (object.meta_hash !== undefined && object.meta_hash !== null) {
+      message.metaHash = bytesFromBase64(object.meta_hash);
+    }
     return message;
   },
   toAmino(message: MsgCreateLeaseForTenant): MsgCreateLeaseForTenantAmino {
@@ -1287,6 +1340,7 @@ export const MsgCreateLeaseForTenant = {
     } else {
       obj.items = message.items;
     }
+    obj.meta_hash = message.metaHash ? base64FromBytes(message.metaHash) : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgCreateLeaseForTenantAminoMsg): MsgCreateLeaseForTenant {

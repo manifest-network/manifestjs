@@ -1,7 +1,7 @@
 import { Coin, CoinAmino, CoinSDKType } from "../../../cosmos/base/v1beta1/coin";
 import { Timestamp } from "../../../google/protobuf/timestamp";
 import { BinaryReader, BinaryWriter } from "../../../binary";
-import { isSet, DeepPartial, Exact, toTimestamp, fromTimestamp } from "../../../helpers";
+import { isSet, DeepPartial, Exact, toTimestamp, fromTimestamp, bytesFromBase64, base64FromBytes } from "../../../helpers";
 import { JsonSafe } from "../../../json-safe";
 import { GlobalDecoderRegistry } from "../../../registry";
 /** LeaseState defines the state of a lease. */
@@ -260,6 +260,18 @@ export interface Lease {
    * Only set when state is CLOSED. Maximum 256 characters.
    */
   closureReason: string;
+  /**
+   * meta_hash is an optional hash/reference to off-chain deployment data.
+   * Set once at lease creation and immutable. Maximum 64 bytes.
+   */
+  metaHash: Uint8Array;
+  /**
+   * min_lease_duration_at_creation stores the min_lease_duration parameter value
+   * at the time this lease was created. This ensures consistent reservation
+   * calculation regardless of subsequent parameter changes.
+   * reservation = sum(locked_price × quantity) × min_lease_duration_at_creation
+   */
+  minLeaseDurationAtCreation: bigint;
 }
 export interface LeaseProtoMsg {
   typeUrl: "/liftedinit.billing.v1.Lease";
@@ -315,6 +327,18 @@ export interface LeaseAmino {
    * Only set when state is CLOSED. Maximum 256 characters.
    */
   closure_reason?: string;
+  /**
+   * meta_hash is an optional hash/reference to off-chain deployment data.
+   * Set once at lease creation and immutable. Maximum 64 bytes.
+   */
+  meta_hash?: string;
+  /**
+   * min_lease_duration_at_creation stores the min_lease_duration parameter value
+   * at the time this lease was created. This ensures consistent reservation
+   * calculation regardless of subsequent parameter changes.
+   * reservation = sum(locked_price × quantity) × min_lease_duration_at_creation
+   */
+  min_lease_duration_at_creation?: string;
 }
 export interface LeaseAminoMsg {
   type: "lifted/billing/Lease";
@@ -335,6 +359,8 @@ export interface LeaseSDKType {
   rejection_reason: string;
   expired_at?: Date;
   closure_reason: string;
+  meta_hash: Uint8Array;
+  min_lease_duration_at_creation: bigint;
 }
 /**
  * CreditAccount represents a tenant's credit account.
@@ -352,6 +378,12 @@ export interface CreditAccount {
    * Used to enforce max_pending_leases_per_tenant limit.
    */
   pendingLeaseCount: bigint;
+  /**
+   * reserved_amounts holds the sum of all credit reservations for active and pending leases.
+   * Each lease reserves: rate_per_second × min_lease_duration for each denom.
+   * This prevents overbooking by ensuring credit availability before lease creation.
+   */
+  reservedAmounts: Coin[];
 }
 export interface CreditAccountProtoMsg {
   typeUrl: "/liftedinit.billing.v1.CreditAccount";
@@ -373,6 +405,12 @@ export interface CreditAccountAmino {
    * Used to enforce max_pending_leases_per_tenant limit.
    */
   pending_lease_count?: string;
+  /**
+   * reserved_amounts holds the sum of all credit reservations for active and pending leases.
+   * Each lease reserves: rate_per_second × min_lease_duration for each denom.
+   * This prevents overbooking by ensuring credit availability before lease creation.
+   */
+  reserved_amounts: CoinAmino[];
 }
 export interface CreditAccountAminoMsg {
   type: "lifted/billing/CreditAccount";
@@ -387,6 +425,7 @@ export interface CreditAccountSDKType {
   credit_address: string;
   active_lease_count: bigint;
   pending_lease_count: bigint;
+  reserved_amounts: CoinSDKType[];
 }
 function createBaseParams(): Params {
   return {
@@ -688,20 +727,22 @@ function createBaseLease(): Lease {
     rejectedAt: undefined,
     rejectionReason: "",
     expiredAt: undefined,
-    closureReason: ""
+    closureReason: "",
+    metaHash: new Uint8Array(),
+    minLeaseDurationAtCreation: BigInt(0)
   };
 }
 export const Lease = {
   typeUrl: "/liftedinit.billing.v1.Lease",
   aminoType: "lifted/billing/Lease",
   is(o: any): o is Lease {
-    return o && (o.$typeUrl === Lease.typeUrl || typeof o.uuid === "string" && typeof o.tenant === "string" && typeof o.providerUuid === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItem.is(o.items[0])) && isSet(o.state) && Timestamp.is(o.createdAt) && Timestamp.is(o.lastSettledAt) && typeof o.rejectionReason === "string" && typeof o.closureReason === "string");
+    return o && (o.$typeUrl === Lease.typeUrl || typeof o.uuid === "string" && typeof o.tenant === "string" && typeof o.providerUuid === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItem.is(o.items[0])) && isSet(o.state) && Timestamp.is(o.createdAt) && Timestamp.is(o.lastSettledAt) && typeof o.rejectionReason === "string" && typeof o.closureReason === "string" && (o.metaHash instanceof Uint8Array || typeof o.metaHash === "string") && typeof o.minLeaseDurationAtCreation === "bigint");
   },
   isSDK(o: any): o is LeaseSDKType {
-    return o && (o.$typeUrl === Lease.typeUrl || typeof o.uuid === "string" && typeof o.tenant === "string" && typeof o.provider_uuid === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItem.isSDK(o.items[0])) && isSet(o.state) && Timestamp.isSDK(o.created_at) && Timestamp.isSDK(o.last_settled_at) && typeof o.rejection_reason === "string" && typeof o.closure_reason === "string");
+    return o && (o.$typeUrl === Lease.typeUrl || typeof o.uuid === "string" && typeof o.tenant === "string" && typeof o.provider_uuid === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItem.isSDK(o.items[0])) && isSet(o.state) && Timestamp.isSDK(o.created_at) && Timestamp.isSDK(o.last_settled_at) && typeof o.rejection_reason === "string" && typeof o.closure_reason === "string" && (o.meta_hash instanceof Uint8Array || typeof o.meta_hash === "string") && typeof o.min_lease_duration_at_creation === "bigint");
   },
   isAmino(o: any): o is LeaseAmino {
-    return o && (o.$typeUrl === Lease.typeUrl || typeof o.uuid === "string" && typeof o.tenant === "string" && typeof o.provider_uuid === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItem.isAmino(o.items[0])) && isSet(o.state) && Timestamp.isAmino(o.created_at) && Timestamp.isAmino(o.last_settled_at) && typeof o.rejection_reason === "string" && typeof o.closure_reason === "string");
+    return o && (o.$typeUrl === Lease.typeUrl || typeof o.uuid === "string" && typeof o.tenant === "string" && typeof o.provider_uuid === "string" && Array.isArray(o.items) && (!o.items.length || LeaseItem.isAmino(o.items[0])) && isSet(o.state) && Timestamp.isAmino(o.created_at) && Timestamp.isAmino(o.last_settled_at) && typeof o.rejection_reason === "string" && typeof o.closure_reason === "string" && (o.meta_hash instanceof Uint8Array || typeof o.meta_hash === "string") && typeof o.min_lease_duration_at_creation === "bigint");
   },
   encode(message: Lease, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.uuid !== "") {
@@ -742,6 +783,12 @@ export const Lease = {
     }
     if (message.closureReason !== "") {
       writer.uint32(106).string(message.closureReason);
+    }
+    if (message.metaHash.length !== 0) {
+      writer.uint32(114).bytes(message.metaHash);
+    }
+    if (message.minLeaseDurationAtCreation !== BigInt(0)) {
+      writer.uint32(120).uint64(message.minLeaseDurationAtCreation);
     }
     return writer;
   },
@@ -791,6 +838,12 @@ export const Lease = {
         case 13:
           message.closureReason = reader.string();
           break;
+        case 14:
+          message.metaHash = reader.bytes();
+          break;
+        case 15:
+          message.minLeaseDurationAtCreation = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -812,7 +865,9 @@ export const Lease = {
       rejectedAt: isSet(object.rejectedAt) ? new Date(object.rejectedAt) : undefined,
       rejectionReason: isSet(object.rejectionReason) ? String(object.rejectionReason) : "",
       expiredAt: isSet(object.expiredAt) ? new Date(object.expiredAt) : undefined,
-      closureReason: isSet(object.closureReason) ? String(object.closureReason) : ""
+      closureReason: isSet(object.closureReason) ? String(object.closureReason) : "",
+      metaHash: isSet(object.metaHash) ? bytesFromBase64(object.metaHash) : new Uint8Array(),
+      minLeaseDurationAtCreation: isSet(object.minLeaseDurationAtCreation) ? BigInt(object.minLeaseDurationAtCreation.toString()) : BigInt(0)
     };
   },
   toJSON(message: Lease): JsonSafe<Lease> {
@@ -834,6 +889,8 @@ export const Lease = {
     message.rejectionReason !== undefined && (obj.rejectionReason = message.rejectionReason);
     message.expiredAt !== undefined && (obj.expiredAt = message.expiredAt.toISOString());
     message.closureReason !== undefined && (obj.closureReason = message.closureReason);
+    message.metaHash !== undefined && (obj.metaHash = base64FromBytes(message.metaHash !== undefined ? message.metaHash : new Uint8Array()));
+    message.minLeaseDurationAtCreation !== undefined && (obj.minLeaseDurationAtCreation = (message.minLeaseDurationAtCreation || BigInt(0)).toString());
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<Lease>, I>>(object: I): Lease {
@@ -851,6 +908,8 @@ export const Lease = {
     message.rejectionReason = object.rejectionReason ?? "";
     message.expiredAt = object.expiredAt ?? undefined;
     message.closureReason = object.closureReason ?? "";
+    message.metaHash = object.metaHash ?? new Uint8Array();
+    message.minLeaseDurationAtCreation = object.minLeaseDurationAtCreation !== undefined && object.minLeaseDurationAtCreation !== null ? BigInt(object.minLeaseDurationAtCreation.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: LeaseAmino): Lease {
@@ -892,6 +951,12 @@ export const Lease = {
     if (object.closure_reason !== undefined && object.closure_reason !== null) {
       message.closureReason = object.closure_reason;
     }
+    if (object.meta_hash !== undefined && object.meta_hash !== null) {
+      message.metaHash = bytesFromBase64(object.meta_hash);
+    }
+    if (object.min_lease_duration_at_creation !== undefined && object.min_lease_duration_at_creation !== null) {
+      message.minLeaseDurationAtCreation = BigInt(object.min_lease_duration_at_creation);
+    }
     return message;
   },
   toAmino(message: Lease): LeaseAmino {
@@ -913,6 +978,8 @@ export const Lease = {
     obj.rejection_reason = message.rejectionReason === "" ? undefined : message.rejectionReason;
     obj.expired_at = message.expiredAt ? Timestamp.toAmino(toTimestamp(message.expiredAt)) : undefined;
     obj.closure_reason = message.closureReason === "" ? undefined : message.closureReason;
+    obj.meta_hash = message.metaHash ? base64FromBytes(message.metaHash) : undefined;
+    obj.min_lease_duration_at_creation = message.minLeaseDurationAtCreation !== BigInt(0) ? message.minLeaseDurationAtCreation?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: LeaseAminoMsg): Lease {
@@ -944,20 +1011,21 @@ function createBaseCreditAccount(): CreditAccount {
     tenant: "",
     creditAddress: "",
     activeLeaseCount: BigInt(0),
-    pendingLeaseCount: BigInt(0)
+    pendingLeaseCount: BigInt(0),
+    reservedAmounts: []
   };
 }
 export const CreditAccount = {
   typeUrl: "/liftedinit.billing.v1.CreditAccount",
   aminoType: "lifted/billing/CreditAccount",
   is(o: any): o is CreditAccount {
-    return o && (o.$typeUrl === CreditAccount.typeUrl || typeof o.tenant === "string" && typeof o.creditAddress === "string" && typeof o.activeLeaseCount === "bigint" && typeof o.pendingLeaseCount === "bigint");
+    return o && (o.$typeUrl === CreditAccount.typeUrl || typeof o.tenant === "string" && typeof o.creditAddress === "string" && typeof o.activeLeaseCount === "bigint" && typeof o.pendingLeaseCount === "bigint" && Array.isArray(o.reservedAmounts) && (!o.reservedAmounts.length || Coin.is(o.reservedAmounts[0])));
   },
   isSDK(o: any): o is CreditAccountSDKType {
-    return o && (o.$typeUrl === CreditAccount.typeUrl || typeof o.tenant === "string" && typeof o.credit_address === "string" && typeof o.active_lease_count === "bigint" && typeof o.pending_lease_count === "bigint");
+    return o && (o.$typeUrl === CreditAccount.typeUrl || typeof o.tenant === "string" && typeof o.credit_address === "string" && typeof o.active_lease_count === "bigint" && typeof o.pending_lease_count === "bigint" && Array.isArray(o.reserved_amounts) && (!o.reserved_amounts.length || Coin.isSDK(o.reserved_amounts[0])));
   },
   isAmino(o: any): o is CreditAccountAmino {
-    return o && (o.$typeUrl === CreditAccount.typeUrl || typeof o.tenant === "string" && typeof o.credit_address === "string" && typeof o.active_lease_count === "bigint" && typeof o.pending_lease_count === "bigint");
+    return o && (o.$typeUrl === CreditAccount.typeUrl || typeof o.tenant === "string" && typeof o.credit_address === "string" && typeof o.active_lease_count === "bigint" && typeof o.pending_lease_count === "bigint" && Array.isArray(o.reserved_amounts) && (!o.reserved_amounts.length || Coin.isAmino(o.reserved_amounts[0])));
   },
   encode(message: CreditAccount, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.tenant !== "") {
@@ -971,6 +1039,9 @@ export const CreditAccount = {
     }
     if (message.pendingLeaseCount !== BigInt(0)) {
       writer.uint32(32).uint64(message.pendingLeaseCount);
+    }
+    for (const v of message.reservedAmounts) {
+      Coin.encode(v!, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -993,6 +1064,9 @@ export const CreditAccount = {
         case 4:
           message.pendingLeaseCount = reader.uint64();
           break;
+        case 5:
+          message.reservedAmounts.push(Coin.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1005,7 +1079,8 @@ export const CreditAccount = {
       tenant: isSet(object.tenant) ? String(object.tenant) : "",
       creditAddress: isSet(object.creditAddress) ? String(object.creditAddress) : "",
       activeLeaseCount: isSet(object.activeLeaseCount) ? BigInt(object.activeLeaseCount.toString()) : BigInt(0),
-      pendingLeaseCount: isSet(object.pendingLeaseCount) ? BigInt(object.pendingLeaseCount.toString()) : BigInt(0)
+      pendingLeaseCount: isSet(object.pendingLeaseCount) ? BigInt(object.pendingLeaseCount.toString()) : BigInt(0),
+      reservedAmounts: Array.isArray(object?.reservedAmounts) ? object.reservedAmounts.map((e: any) => Coin.fromJSON(e)) : []
     };
   },
   toJSON(message: CreditAccount): JsonSafe<CreditAccount> {
@@ -1014,6 +1089,11 @@ export const CreditAccount = {
     message.creditAddress !== undefined && (obj.creditAddress = message.creditAddress);
     message.activeLeaseCount !== undefined && (obj.activeLeaseCount = (message.activeLeaseCount || BigInt(0)).toString());
     message.pendingLeaseCount !== undefined && (obj.pendingLeaseCount = (message.pendingLeaseCount || BigInt(0)).toString());
+    if (message.reservedAmounts) {
+      obj.reservedAmounts = message.reservedAmounts.map(e => e ? Coin.toJSON(e) : undefined);
+    } else {
+      obj.reservedAmounts = [];
+    }
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<CreditAccount>, I>>(object: I): CreditAccount {
@@ -1022,6 +1102,7 @@ export const CreditAccount = {
     message.creditAddress = object.creditAddress ?? "";
     message.activeLeaseCount = object.activeLeaseCount !== undefined && object.activeLeaseCount !== null ? BigInt(object.activeLeaseCount.toString()) : BigInt(0);
     message.pendingLeaseCount = object.pendingLeaseCount !== undefined && object.pendingLeaseCount !== null ? BigInt(object.pendingLeaseCount.toString()) : BigInt(0);
+    message.reservedAmounts = object.reservedAmounts?.map(e => Coin.fromPartial(e)) || [];
     return message;
   },
   fromAmino(object: CreditAccountAmino): CreditAccount {
@@ -1038,6 +1119,7 @@ export const CreditAccount = {
     if (object.pending_lease_count !== undefined && object.pending_lease_count !== null) {
       message.pendingLeaseCount = BigInt(object.pending_lease_count);
     }
+    message.reservedAmounts = object.reserved_amounts?.map(e => Coin.fromAmino(e)) || [];
     return message;
   },
   toAmino(message: CreditAccount): CreditAccountAmino {
@@ -1046,6 +1128,11 @@ export const CreditAccount = {
     obj.credit_address = message.creditAddress === "" ? undefined : message.creditAddress;
     obj.active_lease_count = message.activeLeaseCount !== BigInt(0) ? message.activeLeaseCount?.toString() : undefined;
     obj.pending_lease_count = message.pendingLeaseCount !== BigInt(0) ? message.pendingLeaseCount?.toString() : undefined;
+    if (message.reservedAmounts) {
+      obj.reserved_amounts = message.reservedAmounts.map(e => e ? Coin.toAmino(e) : undefined);
+    } else {
+      obj.reserved_amounts = message.reservedAmounts;
+    }
     return obj;
   },
   fromAminoMsg(object: CreditAccountAminoMsg): CreditAccount {
