@@ -74,7 +74,11 @@ export interface MsgCreateProviderResponseAminoMsg {
 export interface MsgCreateProviderResponseSDKType {
   uuid: string;
 }
-/** MsgUpdateProvider is the Msg/UpdateProvider request type. */
+/**
+ * MsgUpdateProvider is the Msg/UpdateProvider request type.
+ * Note: Setting active=false on an active provider will fail.
+ * Use MsgDeactivateProvider instead to ensure proper SKU cascade.
+ */
 export interface MsgUpdateProvider {
   /** authority is the address of the controlling account. */
   authority: string;
@@ -95,7 +99,11 @@ export interface MsgUpdateProviderProtoMsg {
   typeUrl: "/liftedinit.sku.v1.MsgUpdateProvider";
   value: Uint8Array;
 }
-/** MsgUpdateProvider is the Msg/UpdateProvider request type. */
+/**
+ * MsgUpdateProvider is the Msg/UpdateProvider request type.
+ * Note: Setting active=false on an active provider will fail.
+ * Use MsgDeactivateProvider instead to ensure proper SKU cascade.
+ */
 export interface MsgUpdateProviderAmino {
   /** authority is the address of the controlling account. */
   authority?: string;
@@ -116,7 +124,11 @@ export interface MsgUpdateProviderAminoMsg {
   type: "lifted/sku/MsgUpdateProvider";
   value: MsgUpdateProviderAmino;
 }
-/** MsgUpdateProvider is the Msg/UpdateProvider request type. */
+/**
+ * MsgUpdateProvider is the Msg/UpdateProvider request type.
+ * Note: Setting active=false on an active provider will fail.
+ * Use MsgDeactivateProvider instead to ensure proper SKU cascade.
+ */
 export interface MsgUpdateProviderSDKType {
   authority: string;
   uuid: string;
@@ -143,12 +155,19 @@ export interface MsgUpdateProviderResponseSDKType {}
 /**
  * MsgDeactivateProvider is the Msg/DeactivateProvider request type.
  * This performs a soft delete - the provider remains in state but is marked inactive.
+ * SKU deactivation is paginated to prevent gas exhaustion with many SKUs.
+ * If has_more is true in the response, call again to continue deactivating SKUs.
  */
 export interface MsgDeactivateProvider {
   /** authority is the address of the controlling account. */
   authority: string;
   /** uuid is the unique identifier of the provider to deactivate. */
   uuid: string;
+  /**
+   * limit is the maximum number of SKUs to deactivate in this call.
+   * If 0, uses default limit. Cannot exceed MaxDeactivateSKULimit.
+   */
+  limit: bigint;
 }
 export interface MsgDeactivateProviderProtoMsg {
   typeUrl: "/liftedinit.sku.v1.MsgDeactivateProvider";
@@ -157,12 +176,19 @@ export interface MsgDeactivateProviderProtoMsg {
 /**
  * MsgDeactivateProvider is the Msg/DeactivateProvider request type.
  * This performs a soft delete - the provider remains in state but is marked inactive.
+ * SKU deactivation is paginated to prevent gas exhaustion with many SKUs.
+ * If has_more is true in the response, call again to continue deactivating SKUs.
  */
 export interface MsgDeactivateProviderAmino {
   /** authority is the address of the controlling account. */
   authority?: string;
   /** uuid is the unique identifier of the provider to deactivate. */
   uuid?: string;
+  /**
+   * limit is the maximum number of SKUs to deactivate in this call.
+   * If 0, uses default limit. Cannot exceed MaxDeactivateSKULimit.
+   */
+  limit?: string;
 }
 export interface MsgDeactivateProviderAminoMsg {
   type: "lifted/sku/MsgDeactivateProvider";
@@ -171,25 +197,47 @@ export interface MsgDeactivateProviderAminoMsg {
 /**
  * MsgDeactivateProvider is the Msg/DeactivateProvider request type.
  * This performs a soft delete - the provider remains in state but is marked inactive.
+ * SKU deactivation is paginated to prevent gas exhaustion with many SKUs.
+ * If has_more is true in the response, call again to continue deactivating SKUs.
  */
 export interface MsgDeactivateProviderSDKType {
   authority: string;
   uuid: string;
+  limit: bigint;
 }
 /** MsgDeactivateProviderResponse is the Msg/DeactivateProvider response type. */
-export interface MsgDeactivateProviderResponse {}
+export interface MsgDeactivateProviderResponse {
+  /** deactivated_sku_count is the number of SKUs deactivated in this call. */
+  deactivatedSkuCount: bigint;
+  /**
+   * has_more indicates whether there are more active SKUs to deactivate.
+   * If true, call DeactivateProvider again to continue.
+   */
+  hasMore: boolean;
+}
 export interface MsgDeactivateProviderResponseProtoMsg {
   typeUrl: "/liftedinit.sku.v1.MsgDeactivateProviderResponse";
   value: Uint8Array;
 }
 /** MsgDeactivateProviderResponse is the Msg/DeactivateProvider response type. */
-export interface MsgDeactivateProviderResponseAmino {}
+export interface MsgDeactivateProviderResponseAmino {
+  /** deactivated_sku_count is the number of SKUs deactivated in this call. */
+  deactivated_sku_count?: string;
+  /**
+   * has_more indicates whether there are more active SKUs to deactivate.
+   * If true, call DeactivateProvider again to continue.
+   */
+  has_more?: boolean;
+}
 export interface MsgDeactivateProviderResponseAminoMsg {
   type: "/liftedinit.sku.v1.MsgDeactivateProviderResponse";
   value: MsgDeactivateProviderResponseAmino;
 }
 /** MsgDeactivateProviderResponse is the Msg/DeactivateProvider response type. */
-export interface MsgDeactivateProviderResponseSDKType {}
+export interface MsgDeactivateProviderResponseSDKType {
+  deactivated_sku_count: bigint;
+  has_more: boolean;
+}
 /** MsgCreateSKU is the Msg/CreateSKU request type. */
 export interface MsgCreateSKU {
   /** authority is the address of the controlling account. */
@@ -259,7 +307,11 @@ export interface MsgCreateSKUResponseAminoMsg {
 export interface MsgCreateSKUResponseSDKType {
   uuid: string;
 }
-/** MsgUpdateSKU is the Msg/UpdateSKU request type. */
+/**
+ * MsgUpdateSKU is the Msg/UpdateSKU request type.
+ * Note: Setting active=false on an active SKU will fail.
+ * Use MsgDeactivateSKU instead for deactivation.
+ */
 export interface MsgUpdateSKU {
   /** authority is the address of the controlling account. */
   authority: string;
@@ -282,7 +334,11 @@ export interface MsgUpdateSKUProtoMsg {
   typeUrl: "/liftedinit.sku.v1.MsgUpdateSKU";
   value: Uint8Array;
 }
-/** MsgUpdateSKU is the Msg/UpdateSKU request type. */
+/**
+ * MsgUpdateSKU is the Msg/UpdateSKU request type.
+ * Note: Setting active=false on an active SKU will fail.
+ * Use MsgDeactivateSKU instead for deactivation.
+ */
 export interface MsgUpdateSKUAmino {
   /** authority is the address of the controlling account. */
   authority?: string;
@@ -305,7 +361,11 @@ export interface MsgUpdateSKUAminoMsg {
   type: "lifted/sku/MsgUpdateSKU";
   value: MsgUpdateSKUAmino;
 }
-/** MsgUpdateSKU is the Msg/UpdateSKU request type. */
+/**
+ * MsgUpdateSKU is the Msg/UpdateSKU request type.
+ * Note: Setting active=false on an active SKU will fail.
+ * Use MsgDeactivateSKU instead for deactivation.
+ */
 export interface MsgUpdateSKUSDKType {
   authority: string;
   uuid: string;
@@ -896,20 +956,21 @@ GlobalDecoderRegistry.register(MsgUpdateProviderResponse.typeUrl, MsgUpdateProvi
 function createBaseMsgDeactivateProvider(): MsgDeactivateProvider {
   return {
     authority: "",
-    uuid: ""
+    uuid: "",
+    limit: BigInt(0)
   };
 }
 export const MsgDeactivateProvider = {
   typeUrl: "/liftedinit.sku.v1.MsgDeactivateProvider",
   aminoType: "lifted/sku/MsgDeactivateProvider",
   is(o: any): o is MsgDeactivateProvider {
-    return o && (o.$typeUrl === MsgDeactivateProvider.typeUrl || typeof o.authority === "string" && typeof o.uuid === "string");
+    return o && (o.$typeUrl === MsgDeactivateProvider.typeUrl || typeof o.authority === "string" && typeof o.uuid === "string" && typeof o.limit === "bigint");
   },
   isSDK(o: any): o is MsgDeactivateProviderSDKType {
-    return o && (o.$typeUrl === MsgDeactivateProvider.typeUrl || typeof o.authority === "string" && typeof o.uuid === "string");
+    return o && (o.$typeUrl === MsgDeactivateProvider.typeUrl || typeof o.authority === "string" && typeof o.uuid === "string" && typeof o.limit === "bigint");
   },
   isAmino(o: any): o is MsgDeactivateProviderAmino {
-    return o && (o.$typeUrl === MsgDeactivateProvider.typeUrl || typeof o.authority === "string" && typeof o.uuid === "string");
+    return o && (o.$typeUrl === MsgDeactivateProvider.typeUrl || typeof o.authority === "string" && typeof o.uuid === "string" && typeof o.limit === "bigint");
   },
   encode(message: MsgDeactivateProvider, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.authority !== "") {
@@ -917,6 +978,9 @@ export const MsgDeactivateProvider = {
     }
     if (message.uuid !== "") {
       writer.uint32(18).string(message.uuid);
+    }
+    if (message.limit !== BigInt(0)) {
+      writer.uint32(24).uint64(message.limit);
     }
     return writer;
   },
@@ -933,6 +997,9 @@ export const MsgDeactivateProvider = {
         case 2:
           message.uuid = reader.string();
           break;
+        case 3:
+          message.limit = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -943,19 +1010,22 @@ export const MsgDeactivateProvider = {
   fromJSON(object: any): MsgDeactivateProvider {
     return {
       authority: isSet(object.authority) ? String(object.authority) : "",
-      uuid: isSet(object.uuid) ? String(object.uuid) : ""
+      uuid: isSet(object.uuid) ? String(object.uuid) : "",
+      limit: isSet(object.limit) ? BigInt(object.limit.toString()) : BigInt(0)
     };
   },
   toJSON(message: MsgDeactivateProvider): JsonSafe<MsgDeactivateProvider> {
     const obj: any = {};
     message.authority !== undefined && (obj.authority = message.authority);
     message.uuid !== undefined && (obj.uuid = message.uuid);
+    message.limit !== undefined && (obj.limit = (message.limit || BigInt(0)).toString());
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgDeactivateProvider>, I>>(object: I): MsgDeactivateProvider {
     const message = createBaseMsgDeactivateProvider();
     message.authority = object.authority ?? "";
     message.uuid = object.uuid ?? "";
+    message.limit = object.limit !== undefined && object.limit !== null ? BigInt(object.limit.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: MsgDeactivateProviderAmino): MsgDeactivateProvider {
@@ -966,12 +1036,16 @@ export const MsgDeactivateProvider = {
     if (object.uuid !== undefined && object.uuid !== null) {
       message.uuid = object.uuid;
     }
+    if (object.limit !== undefined && object.limit !== null) {
+      message.limit = BigInt(object.limit);
+    }
     return message;
   },
   toAmino(message: MsgDeactivateProvider): MsgDeactivateProviderAmino {
     const obj: any = {};
     obj.authority = message.authority === "" ? undefined : message.authority;
     obj.uuid = message.uuid === "" ? undefined : message.uuid;
+    obj.limit = message.limit !== BigInt(0) ? message.limit?.toString() : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgDeactivateProviderAminoMsg): MsgDeactivateProvider {
@@ -999,20 +1073,29 @@ export const MsgDeactivateProvider = {
 GlobalDecoderRegistry.register(MsgDeactivateProvider.typeUrl, MsgDeactivateProvider);
 GlobalDecoderRegistry.registerAminoProtoMapping(MsgDeactivateProvider.aminoType, MsgDeactivateProvider.typeUrl);
 function createBaseMsgDeactivateProviderResponse(): MsgDeactivateProviderResponse {
-  return {};
+  return {
+    deactivatedSkuCount: BigInt(0),
+    hasMore: false
+  };
 }
 export const MsgDeactivateProviderResponse = {
   typeUrl: "/liftedinit.sku.v1.MsgDeactivateProviderResponse",
   is(o: any): o is MsgDeactivateProviderResponse {
-    return o && o.$typeUrl === MsgDeactivateProviderResponse.typeUrl;
+    return o && (o.$typeUrl === MsgDeactivateProviderResponse.typeUrl || typeof o.deactivatedSkuCount === "bigint" && typeof o.hasMore === "boolean");
   },
   isSDK(o: any): o is MsgDeactivateProviderResponseSDKType {
-    return o && o.$typeUrl === MsgDeactivateProviderResponse.typeUrl;
+    return o && (o.$typeUrl === MsgDeactivateProviderResponse.typeUrl || typeof o.deactivated_sku_count === "bigint" && typeof o.has_more === "boolean");
   },
   isAmino(o: any): o is MsgDeactivateProviderResponseAmino {
-    return o && o.$typeUrl === MsgDeactivateProviderResponse.typeUrl;
+    return o && (o.$typeUrl === MsgDeactivateProviderResponse.typeUrl || typeof o.deactivated_sku_count === "bigint" && typeof o.has_more === "boolean");
   },
-  encode(_: MsgDeactivateProviderResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+  encode(message: MsgDeactivateProviderResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.deactivatedSkuCount !== BigInt(0)) {
+      writer.uint32(8).uint64(message.deactivatedSkuCount);
+    }
+    if (message.hasMore === true) {
+      writer.uint32(16).bool(message.hasMore);
+    }
     return writer;
   },
   decode(input: BinaryReader | Uint8Array, length?: number): MsgDeactivateProviderResponse {
@@ -1022,6 +1105,12 @@ export const MsgDeactivateProviderResponse = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          message.deactivatedSkuCount = reader.uint64();
+          break;
+        case 2:
+          message.hasMore = reader.bool();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1029,23 +1118,38 @@ export const MsgDeactivateProviderResponse = {
     }
     return message;
   },
-  fromJSON(_: any): MsgDeactivateProviderResponse {
-    return {};
+  fromJSON(object: any): MsgDeactivateProviderResponse {
+    return {
+      deactivatedSkuCount: isSet(object.deactivatedSkuCount) ? BigInt(object.deactivatedSkuCount.toString()) : BigInt(0),
+      hasMore: isSet(object.hasMore) ? Boolean(object.hasMore) : false
+    };
   },
-  toJSON(_: MsgDeactivateProviderResponse): JsonSafe<MsgDeactivateProviderResponse> {
+  toJSON(message: MsgDeactivateProviderResponse): JsonSafe<MsgDeactivateProviderResponse> {
     const obj: any = {};
+    message.deactivatedSkuCount !== undefined && (obj.deactivatedSkuCount = (message.deactivatedSkuCount || BigInt(0)).toString());
+    message.hasMore !== undefined && (obj.hasMore = message.hasMore);
     return obj;
   },
-  fromPartial<I extends Exact<DeepPartial<MsgDeactivateProviderResponse>, I>>(_: I): MsgDeactivateProviderResponse {
+  fromPartial<I extends Exact<DeepPartial<MsgDeactivateProviderResponse>, I>>(object: I): MsgDeactivateProviderResponse {
     const message = createBaseMsgDeactivateProviderResponse();
+    message.deactivatedSkuCount = object.deactivatedSkuCount !== undefined && object.deactivatedSkuCount !== null ? BigInt(object.deactivatedSkuCount.toString()) : BigInt(0);
+    message.hasMore = object.hasMore ?? false;
     return message;
   },
-  fromAmino(_: MsgDeactivateProviderResponseAmino): MsgDeactivateProviderResponse {
+  fromAmino(object: MsgDeactivateProviderResponseAmino): MsgDeactivateProviderResponse {
     const message = createBaseMsgDeactivateProviderResponse();
+    if (object.deactivated_sku_count !== undefined && object.deactivated_sku_count !== null) {
+      message.deactivatedSkuCount = BigInt(object.deactivated_sku_count);
+    }
+    if (object.has_more !== undefined && object.has_more !== null) {
+      message.hasMore = object.has_more;
+    }
     return message;
   },
-  toAmino(_: MsgDeactivateProviderResponse): MsgDeactivateProviderResponseAmino {
+  toAmino(message: MsgDeactivateProviderResponse): MsgDeactivateProviderResponseAmino {
     const obj: any = {};
+    obj.deactivated_sku_count = message.deactivatedSkuCount !== BigInt(0) ? message.deactivatedSkuCount?.toString() : undefined;
+    obj.has_more = message.hasMore === false ? undefined : message.hasMore;
     return obj;
   },
   fromAminoMsg(object: MsgDeactivateProviderResponseAminoMsg): MsgDeactivateProviderResponse {

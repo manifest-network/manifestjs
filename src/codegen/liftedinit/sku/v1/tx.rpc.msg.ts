@@ -4,7 +4,11 @@ import { MsgCreateProvider, MsgUpdateProvider, MsgDeactivateProvider, MsgCreateS
 export interface Msg {
   /** CreateProvider creates a new provider. */
   createProvider(signerAddress: string, message: MsgCreateProvider, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
-  /** UpdateProvider updates an existing provider. */
+  /**
+   * UpdateProvider updates an existing provider.
+   * Can reactivate an inactive provider but cannot deactivate an active one.
+   * Use DeactivateProvider to deactivate (ensures proper SKU cascade).
+   */
   updateProvider(signerAddress: string, message: MsgUpdateProvider, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /**
    * DeactivateProvider deactivates a provider (soft delete).
@@ -13,7 +17,11 @@ export interface Msg {
   deactivateProvider(signerAddress: string, message: MsgDeactivateProvider, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /** CreateSKU creates a new SKU. */
   createSKU(signerAddress: string, message: MsgCreateSKU, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
-  /** UpdateSKU updates an existing SKU. */
+  /**
+   * UpdateSKU updates an existing SKU.
+   * Can reactivate an inactive SKU (if provider is active) but cannot deactivate an active one.
+   * Use DeactivateSKU to deactivate.
+   */
   updateSKU(signerAddress: string, message: MsgUpdateSKU, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /**
    * DeactivateSKU deactivates a SKU (soft delete).
@@ -36,7 +44,9 @@ export class MsgClientImpl implements Msg {
     }];
     return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
-  /* UpdateProvider updates an existing provider. */
+  /* UpdateProvider updates an existing provider.
+   Can reactivate an inactive provider but cannot deactivate an active one.
+   Use DeactivateProvider to deactivate (ensures proper SKU cascade). */
   updateProvider = async (signerAddress: string, message: MsgUpdateProvider, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
     const data = [{
       typeUrl: MsgUpdateProvider.typeUrl,
@@ -61,7 +71,9 @@ export class MsgClientImpl implements Msg {
     }];
     return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
   };
-  /* UpdateSKU updates an existing SKU. */
+  /* UpdateSKU updates an existing SKU.
+   Can reactivate an inactive SKU (if provider is active) but cannot deactivate an active one.
+   Use DeactivateSKU to deactivate. */
   updateSKU = async (signerAddress: string, message: MsgUpdateSKU, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
     const data = [{
       typeUrl: MsgUpdateSKU.typeUrl,
