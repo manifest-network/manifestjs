@@ -183,6 +183,14 @@ export interface LeaseItem {
    * The denom comes from the SKU's base_price at lease creation time.
    */
   lockedPrice: Coin;
+  /**
+   * service_name is an optional DNS-label identifier for this item within a stack deployment.
+   * Must be a valid RFC 1123 DNS label: 1-63 lowercase alphanumeric characters or hyphens,
+   * must not start or end with a hyphen (e.g., "web", "db", "my-service-1").
+   * When used, all items must have a service_name and uniqueness shifts from sku_uuid to service_name,
+   * allowing the same SKU to appear multiple times (e.g., "web" and "db" both using docker-small).
+   */
+  serviceName: string;
 }
 export interface LeaseItemProtoMsg {
   typeUrl: "/liftedinit.billing.v1.LeaseItem";
@@ -199,6 +207,14 @@ export interface LeaseItemAmino {
    * The denom comes from the SKU's base_price at lease creation time.
    */
   locked_price: CoinAmino;
+  /**
+   * service_name is an optional DNS-label identifier for this item within a stack deployment.
+   * Must be a valid RFC 1123 DNS label: 1-63 lowercase alphanumeric characters or hyphens,
+   * must not start or end with a hyphen (e.g., "web", "db", "my-service-1").
+   * When used, all items must have a service_name and uniqueness shifts from sku_uuid to service_name,
+   * allowing the same SKU to appear multiple times (e.g., "web" and "db" both using docker-small).
+   */
+  service_name?: string;
 }
 export interface LeaseItemAminoMsg {
   type: "lifted/billing/LeaseItem";
@@ -209,6 +225,7 @@ export interface LeaseItemSDKType {
   sku_uuid: string;
   quantity: bigint;
   locked_price: CoinSDKType;
+  service_name: string;
 }
 /** Lease represents a billing lease between a tenant and provider. */
 export interface Lease {
@@ -451,22 +468,22 @@ export const Params = {
   },
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.maxLeasesPerTenant !== BigInt(0)) {
-      writer.uint32(24).uint64(message.maxLeasesPerTenant);
+      writer.uint32(8).uint64(message.maxLeasesPerTenant);
     }
     for (const v of message.allowedList) {
-      writer.uint32(34).string(v!);
+      writer.uint32(18).string(v!);
     }
     if (message.maxItemsPerLease !== BigInt(0)) {
-      writer.uint32(40).uint64(message.maxItemsPerLease);
+      writer.uint32(24).uint64(message.maxItemsPerLease);
     }
     if (message.minLeaseDuration !== BigInt(0)) {
-      writer.uint32(48).uint64(message.minLeaseDuration);
+      writer.uint32(32).uint64(message.minLeaseDuration);
     }
     if (message.maxPendingLeasesPerTenant !== BigInt(0)) {
-      writer.uint32(56).uint64(message.maxPendingLeasesPerTenant);
+      writer.uint32(40).uint64(message.maxPendingLeasesPerTenant);
     }
     if (message.pendingTimeout !== BigInt(0)) {
-      writer.uint32(64).uint64(message.pendingTimeout);
+      writer.uint32(48).uint64(message.pendingTimeout);
     }
     return writer;
   },
@@ -477,22 +494,22 @@ export const Params = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 3:
+        case 1:
           message.maxLeasesPerTenant = reader.uint64();
           break;
-        case 4:
+        case 2:
           message.allowedList.push(reader.string());
           break;
-        case 5:
+        case 3:
           message.maxItemsPerLease = reader.uint64();
           break;
-        case 6:
+        case 4:
           message.minLeaseDuration = reader.uint64();
           break;
-        case 7:
+        case 5:
           message.maxPendingLeasesPerTenant = reader.uint64();
           break;
-        case 8:
+        case 6:
           message.pendingTimeout = reader.uint64();
           break;
         default:
@@ -598,20 +615,21 @@ function createBaseLeaseItem(): LeaseItem {
   return {
     skuUuid: "",
     quantity: BigInt(0),
-    lockedPrice: Coin.fromPartial({})
+    lockedPrice: Coin.fromPartial({}),
+    serviceName: ""
   };
 }
 export const LeaseItem = {
   typeUrl: "/liftedinit.billing.v1.LeaseItem",
   aminoType: "lifted/billing/LeaseItem",
   is(o: any): o is LeaseItem {
-    return o && (o.$typeUrl === LeaseItem.typeUrl || typeof o.skuUuid === "string" && typeof o.quantity === "bigint" && Coin.is(o.lockedPrice));
+    return o && (o.$typeUrl === LeaseItem.typeUrl || typeof o.skuUuid === "string" && typeof o.quantity === "bigint" && Coin.is(o.lockedPrice) && typeof o.serviceName === "string");
   },
   isSDK(o: any): o is LeaseItemSDKType {
-    return o && (o.$typeUrl === LeaseItem.typeUrl || typeof o.sku_uuid === "string" && typeof o.quantity === "bigint" && Coin.isSDK(o.locked_price));
+    return o && (o.$typeUrl === LeaseItem.typeUrl || typeof o.sku_uuid === "string" && typeof o.quantity === "bigint" && Coin.isSDK(o.locked_price) && typeof o.service_name === "string");
   },
   isAmino(o: any): o is LeaseItemAmino {
-    return o && (o.$typeUrl === LeaseItem.typeUrl || typeof o.sku_uuid === "string" && typeof o.quantity === "bigint" && Coin.isAmino(o.locked_price));
+    return o && (o.$typeUrl === LeaseItem.typeUrl || typeof o.sku_uuid === "string" && typeof o.quantity === "bigint" && Coin.isAmino(o.locked_price) && typeof o.service_name === "string");
   },
   encode(message: LeaseItem, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.skuUuid !== "") {
@@ -622,6 +640,9 @@ export const LeaseItem = {
     }
     if (message.lockedPrice !== undefined) {
       Coin.encode(message.lockedPrice, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.serviceName !== "") {
+      writer.uint32(34).string(message.serviceName);
     }
     return writer;
   },
@@ -641,6 +662,9 @@ export const LeaseItem = {
         case 3:
           message.lockedPrice = Coin.decode(reader, reader.uint32());
           break;
+        case 4:
+          message.serviceName = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -652,7 +676,8 @@ export const LeaseItem = {
     return {
       skuUuid: isSet(object.skuUuid) ? String(object.skuUuid) : "",
       quantity: isSet(object.quantity) ? BigInt(object.quantity.toString()) : BigInt(0),
-      lockedPrice: isSet(object.lockedPrice) ? Coin.fromJSON(object.lockedPrice) : undefined
+      lockedPrice: isSet(object.lockedPrice) ? Coin.fromJSON(object.lockedPrice) : undefined,
+      serviceName: isSet(object.serviceName) ? String(object.serviceName) : ""
     };
   },
   toJSON(message: LeaseItem): JsonSafe<LeaseItem> {
@@ -660,6 +685,7 @@ export const LeaseItem = {
     message.skuUuid !== undefined && (obj.skuUuid = message.skuUuid);
     message.quantity !== undefined && (obj.quantity = (message.quantity || BigInt(0)).toString());
     message.lockedPrice !== undefined && (obj.lockedPrice = message.lockedPrice ? Coin.toJSON(message.lockedPrice) : undefined);
+    message.serviceName !== undefined && (obj.serviceName = message.serviceName);
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<LeaseItem>, I>>(object: I): LeaseItem {
@@ -667,6 +693,7 @@ export const LeaseItem = {
     message.skuUuid = object.skuUuid ?? "";
     message.quantity = object.quantity !== undefined && object.quantity !== null ? BigInt(object.quantity.toString()) : BigInt(0);
     message.lockedPrice = object.lockedPrice !== undefined && object.lockedPrice !== null ? Coin.fromPartial(object.lockedPrice) : undefined;
+    message.serviceName = object.serviceName ?? "";
     return message;
   },
   fromAmino(object: LeaseItemAmino): LeaseItem {
@@ -680,6 +707,9 @@ export const LeaseItem = {
     if (object.locked_price !== undefined && object.locked_price !== null) {
       message.lockedPrice = Coin.fromAmino(object.locked_price);
     }
+    if (object.service_name !== undefined && object.service_name !== null) {
+      message.serviceName = object.service_name;
+    }
     return message;
   },
   toAmino(message: LeaseItem): LeaseItemAmino {
@@ -687,6 +717,7 @@ export const LeaseItem = {
     obj.sku_uuid = message.skuUuid === "" ? undefined : message.skuUuid;
     obj.quantity = message.quantity !== BigInt(0) ? message.quantity?.toString() : undefined;
     obj.locked_price = message.lockedPrice ? Coin.toAmino(message.lockedPrice) : Coin.toAmino(Coin.fromPartial({}));
+    obj.service_name = message.serviceName === "" ? undefined : message.serviceName;
     return obj;
   },
   fromAminoMsg(object: LeaseItemAminoMsg): LeaseItem {

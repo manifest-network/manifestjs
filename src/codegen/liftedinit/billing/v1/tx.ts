@@ -11,6 +11,13 @@ export interface LeaseItemInput {
   skuUuid: string;
   /** quantity is the number of instances. */
   quantity: bigint;
+  /**
+   * service_name is an optional DNS-label identifier for this item within a stack deployment.
+   * Must be a valid RFC 1123 DNS label: 1-63 lowercase alphanumeric characters or hyphens,
+   * must not start or end with a hyphen (e.g., "web", "db", "my-service-1").
+   * When used, all items must have a service_name and uniqueness shifts from sku_uuid to service_name.
+   */
+  serviceName: string;
 }
 export interface LeaseItemInputProtoMsg {
   typeUrl: "/liftedinit.billing.v1.LeaseItemInput";
@@ -22,6 +29,13 @@ export interface LeaseItemInputAmino {
   sku_uuid?: string;
   /** quantity is the number of instances. */
   quantity?: string;
+  /**
+   * service_name is an optional DNS-label identifier for this item within a stack deployment.
+   * Must be a valid RFC 1123 DNS label: 1-63 lowercase alphanumeric characters or hyphens,
+   * must not start or end with a hyphen (e.g., "web", "db", "my-service-1").
+   * When used, all items must have a service_name and uniqueness shifts from sku_uuid to service_name.
+   */
+  service_name?: string;
 }
 export interface LeaseItemInputAminoMsg {
   type: "lifted/billing/LeaseItemInput";
@@ -31,6 +45,7 @@ export interface LeaseItemInputAminoMsg {
 export interface LeaseItemInputSDKType {
   sku_uuid: string;
   quantity: bigint;
+  service_name: string;
 }
 /** MsgFundCredit funds a tenant's credit account. */
 export interface MsgFundCredit {
@@ -702,20 +717,21 @@ export interface MsgCancelLeaseResponseSDKType {
 function createBaseLeaseItemInput(): LeaseItemInput {
   return {
     skuUuid: "",
-    quantity: BigInt(0)
+    quantity: BigInt(0),
+    serviceName: ""
   };
 }
 export const LeaseItemInput = {
   typeUrl: "/liftedinit.billing.v1.LeaseItemInput",
   aminoType: "lifted/billing/LeaseItemInput",
   is(o: any): o is LeaseItemInput {
-    return o && (o.$typeUrl === LeaseItemInput.typeUrl || typeof o.skuUuid === "string" && typeof o.quantity === "bigint");
+    return o && (o.$typeUrl === LeaseItemInput.typeUrl || typeof o.skuUuid === "string" && typeof o.quantity === "bigint" && typeof o.serviceName === "string");
   },
   isSDK(o: any): o is LeaseItemInputSDKType {
-    return o && (o.$typeUrl === LeaseItemInput.typeUrl || typeof o.sku_uuid === "string" && typeof o.quantity === "bigint");
+    return o && (o.$typeUrl === LeaseItemInput.typeUrl || typeof o.sku_uuid === "string" && typeof o.quantity === "bigint" && typeof o.service_name === "string");
   },
   isAmino(o: any): o is LeaseItemInputAmino {
-    return o && (o.$typeUrl === LeaseItemInput.typeUrl || typeof o.sku_uuid === "string" && typeof o.quantity === "bigint");
+    return o && (o.$typeUrl === LeaseItemInput.typeUrl || typeof o.sku_uuid === "string" && typeof o.quantity === "bigint" && typeof o.service_name === "string");
   },
   encode(message: LeaseItemInput, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.skuUuid !== "") {
@@ -723,6 +739,9 @@ export const LeaseItemInput = {
     }
     if (message.quantity !== BigInt(0)) {
       writer.uint32(16).uint64(message.quantity);
+    }
+    if (message.serviceName !== "") {
+      writer.uint32(26).string(message.serviceName);
     }
     return writer;
   },
@@ -739,6 +758,9 @@ export const LeaseItemInput = {
         case 2:
           message.quantity = reader.uint64();
           break;
+        case 3:
+          message.serviceName = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -749,19 +771,22 @@ export const LeaseItemInput = {
   fromJSON(object: any): LeaseItemInput {
     return {
       skuUuid: isSet(object.skuUuid) ? String(object.skuUuid) : "",
-      quantity: isSet(object.quantity) ? BigInt(object.quantity.toString()) : BigInt(0)
+      quantity: isSet(object.quantity) ? BigInt(object.quantity.toString()) : BigInt(0),
+      serviceName: isSet(object.serviceName) ? String(object.serviceName) : ""
     };
   },
   toJSON(message: LeaseItemInput): JsonSafe<LeaseItemInput> {
     const obj: any = {};
     message.skuUuid !== undefined && (obj.skuUuid = message.skuUuid);
     message.quantity !== undefined && (obj.quantity = (message.quantity || BigInt(0)).toString());
+    message.serviceName !== undefined && (obj.serviceName = message.serviceName);
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<LeaseItemInput>, I>>(object: I): LeaseItemInput {
     const message = createBaseLeaseItemInput();
     message.skuUuid = object.skuUuid ?? "";
     message.quantity = object.quantity !== undefined && object.quantity !== null ? BigInt(object.quantity.toString()) : BigInt(0);
+    message.serviceName = object.serviceName ?? "";
     return message;
   },
   fromAmino(object: LeaseItemInputAmino): LeaseItemInput {
@@ -772,12 +797,16 @@ export const LeaseItemInput = {
     if (object.quantity !== undefined && object.quantity !== null) {
       message.quantity = BigInt(object.quantity);
     }
+    if (object.service_name !== undefined && object.service_name !== null) {
+      message.serviceName = object.service_name;
+    }
     return message;
   },
   toAmino(message: LeaseItemInput): LeaseItemInputAmino {
     const obj: any = {};
     obj.sku_uuid = message.skuUuid === "" ? undefined : message.skuUuid;
     obj.quantity = message.quantity !== BigInt(0) ? message.quantity?.toString() : undefined;
+    obj.service_name = message.serviceName === "" ? undefined : message.serviceName;
     return obj;
   },
   fromAminoMsg(object: LeaseItemInputAminoMsg): LeaseItemInput {
