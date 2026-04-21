@@ -11,6 +11,11 @@ export interface GenesisState {
   leases: Lease[];
   /** credit_accounts is the list of all credit accounts. */
   creditAccounts: CreditAccount[];
+  /**
+   * lease_sequence is the sequence counter for deterministic lease UUID generation.
+   * Exported via Sequence.Peek(); the next Sequence.Next() call will return this value.
+   */
+  leaseSequence: bigint;
 }
 export interface GenesisStateProtoMsg {
   typeUrl: "/liftedinit.billing.v1.GenesisState";
@@ -24,6 +29,11 @@ export interface GenesisStateAmino {
   leases: LeaseAmino[];
   /** credit_accounts is the list of all credit accounts. */
   credit_accounts: CreditAccountAmino[];
+  /**
+   * lease_sequence is the sequence counter for deterministic lease UUID generation.
+   * Exported via Sequence.Peek(); the next Sequence.Next() call will return this value.
+   */
+  lease_sequence: string;
 }
 export interface GenesisStateAminoMsg {
   type: "lifted/billing/GenesisState";
@@ -34,25 +44,27 @@ export interface GenesisStateSDKType {
   params: ParamsSDKType;
   leases: LeaseSDKType[];
   credit_accounts: CreditAccountSDKType[];
+  lease_sequence: bigint;
 }
 function createBaseGenesisState(): GenesisState {
   return {
     params: Params.fromPartial({}),
     leases: [],
-    creditAccounts: []
+    creditAccounts: [],
+    leaseSequence: BigInt(0)
   };
 }
 export const GenesisState = {
   typeUrl: "/liftedinit.billing.v1.GenesisState",
   aminoType: "lifted/billing/GenesisState",
   is(o: any): o is GenesisState {
-    return o && (o.$typeUrl === GenesisState.typeUrl || Params.is(o.params) && Array.isArray(o.leases) && (!o.leases.length || Lease.is(o.leases[0])) && Array.isArray(o.creditAccounts) && (!o.creditAccounts.length || CreditAccount.is(o.creditAccounts[0])));
+    return o && (o.$typeUrl === GenesisState.typeUrl || Params.is(o.params) && Array.isArray(o.leases) && (!o.leases.length || Lease.is(o.leases[0])) && Array.isArray(o.creditAccounts) && (!o.creditAccounts.length || CreditAccount.is(o.creditAccounts[0])) && typeof o.leaseSequence === "bigint");
   },
   isSDK(o: any): o is GenesisStateSDKType {
-    return o && (o.$typeUrl === GenesisState.typeUrl || Params.isSDK(o.params) && Array.isArray(o.leases) && (!o.leases.length || Lease.isSDK(o.leases[0])) && Array.isArray(o.credit_accounts) && (!o.credit_accounts.length || CreditAccount.isSDK(o.credit_accounts[0])));
+    return o && (o.$typeUrl === GenesisState.typeUrl || Params.isSDK(o.params) && Array.isArray(o.leases) && (!o.leases.length || Lease.isSDK(o.leases[0])) && Array.isArray(o.credit_accounts) && (!o.credit_accounts.length || CreditAccount.isSDK(o.credit_accounts[0])) && typeof o.lease_sequence === "bigint");
   },
   isAmino(o: any): o is GenesisStateAmino {
-    return o && (o.$typeUrl === GenesisState.typeUrl || Params.isAmino(o.params) && Array.isArray(o.leases) && (!o.leases.length || Lease.isAmino(o.leases[0])) && Array.isArray(o.credit_accounts) && (!o.credit_accounts.length || CreditAccount.isAmino(o.credit_accounts[0])));
+    return o && (o.$typeUrl === GenesisState.typeUrl || Params.isAmino(o.params) && Array.isArray(o.leases) && (!o.leases.length || Lease.isAmino(o.leases[0])) && Array.isArray(o.credit_accounts) && (!o.credit_accounts.length || CreditAccount.isAmino(o.credit_accounts[0])) && typeof o.lease_sequence === "bigint");
   },
   encode(message: GenesisState, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.params !== undefined) {
@@ -63,6 +75,9 @@ export const GenesisState = {
     }
     for (const v of message.creditAccounts) {
       CreditAccount.encode(v!, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.leaseSequence !== BigInt(0)) {
+      writer.uint32(32).uint64(message.leaseSequence);
     }
     return writer;
   },
@@ -82,6 +97,9 @@ export const GenesisState = {
         case 3:
           message.creditAccounts.push(CreditAccount.decode(reader, reader.uint32()));
           break;
+        case 4:
+          message.leaseSequence = reader.uint64();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -93,7 +111,8 @@ export const GenesisState = {
     return {
       params: isSet(object.params) ? Params.fromJSON(object.params) : undefined,
       leases: Array.isArray(object?.leases) ? object.leases.map((e: any) => Lease.fromJSON(e)) : [],
-      creditAccounts: Array.isArray(object?.creditAccounts) ? object.creditAccounts.map((e: any) => CreditAccount.fromJSON(e)) : []
+      creditAccounts: Array.isArray(object?.creditAccounts) ? object.creditAccounts.map((e: any) => CreditAccount.fromJSON(e)) : [],
+      leaseSequence: isSet(object.leaseSequence) ? BigInt(object.leaseSequence.toString()) : BigInt(0)
     };
   },
   toJSON(message: GenesisState): JsonSafe<GenesisState> {
@@ -109,6 +128,7 @@ export const GenesisState = {
     } else {
       obj.creditAccounts = [];
     }
+    message.leaseSequence !== undefined && (obj.leaseSequence = (message.leaseSequence || BigInt(0)).toString());
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<GenesisState>, I>>(object: I): GenesisState {
@@ -116,6 +136,7 @@ export const GenesisState = {
     message.params = object.params !== undefined && object.params !== null ? Params.fromPartial(object.params) : undefined;
     message.leases = object.leases?.map(e => Lease.fromPartial(e)) || [];
     message.creditAccounts = object.creditAccounts?.map(e => CreditAccount.fromPartial(e)) || [];
+    message.leaseSequence = object.leaseSequence !== undefined && object.leaseSequence !== null ? BigInt(object.leaseSequence.toString()) : BigInt(0);
     return message;
   },
   fromAmino(object: GenesisStateAmino): GenesisState {
@@ -125,6 +146,9 @@ export const GenesisState = {
     }
     message.leases = object.leases?.map(e => Lease.fromAmino(e)) || [];
     message.creditAccounts = object.credit_accounts?.map(e => CreditAccount.fromAmino(e)) || [];
+    if (object.lease_sequence !== undefined && object.lease_sequence !== null) {
+      message.leaseSequence = BigInt(object.lease_sequence);
+    }
     return message;
   },
   toAmino(message: GenesisState): GenesisStateAmino {
@@ -140,6 +164,7 @@ export const GenesisState = {
     } else {
       obj.credit_accounts = message.creditAccounts;
     }
+    obj.lease_sequence = message.leaseSequence ? message.leaseSequence?.toString() : "0";
     return obj;
   },
   fromAminoMsg(object: GenesisStateAminoMsg): GenesisState {
