@@ -64,8 +64,14 @@ export const createRPCQueryClient = async ({
       }
     },
     liftedinit: {
+      billing: {
+        v1: (await import("./billing/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
       manifest: {
         v1: (await import("./manifest/v1/query.rpc.Query")).createRpcQueryExtension(client)
+      },
+      sku: {
+        v1: (await import("./sku/v1/query.rpc.Query")).createRpcQueryExtension(client)
       }
     }
   };

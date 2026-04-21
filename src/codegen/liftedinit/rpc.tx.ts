@@ -50,8 +50,14 @@ export const createRPCMsgClient = async ({
     }
   },
   liftedinit: {
+    billing: {
+      v1: new (await import("./billing/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
     manifest: {
       v1: new (await import("./manifest/v1/tx.rpc.msg")).MsgClientImpl(rpc)
+    },
+    sku: {
+      v1: new (await import("./sku/v1/tx.rpc.msg")).MsgClientImpl(rpc)
     }
   }
 });

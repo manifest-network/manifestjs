@@ -1,6 +1,6 @@
 {
   "name": "@manifest-network/manifestjs",
-  "version": "v2.1.0",
+  "version": "2.2.0-billing-v2.3",
   "description": "Javascript library for interacting with Manifest",
   "author": "Manifest Network <hello@manifest.network>",
   "homepage": "https://github.com/manifest-network/manifestjs#readme",

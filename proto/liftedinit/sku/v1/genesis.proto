@@ -1,0 +1,27 @@
+syntax = "proto3";
+package liftedinit.sku.v1;
+
+import "gogoproto/gogo.proto";
+import "liftedinit/sku/v1/types.proto";
+
+option go_package = "github.com/manifest-network/manifest-ledger/x/sku/types";
+
+// GenesisState defines the sku module's genesis state.
+message GenesisState {
+  // params defines the module parameters.
+  Params params = 1 [ (gogoproto.nullable) = false ];
+
+  // providers is the list of providers.
+  repeated Provider providers = 2 [ (gogoproto.nullable) = false ];
+
+  // skus is the list of SKUs.
+  repeated SKU skus = 3 [ (gogoproto.nullable) = false ];
+
+  // provider_sequence is the sequence counter for deterministic provider UUID generation.
+  // Exported via Sequence.Peek(); the next Sequence.Next() call will return this value.
+  uint64 provider_sequence = 4;
+
+  // sku_sequence is the sequence counter for deterministic SKU UUID generation.
+  // Exported via Sequence.Peek(); the next Sequence.Next() call will return this value.
+  uint64 sku_sequence = 5;
+}
