@@ -813,6 +813,79 @@ export interface QueryCreditEstimateResponseSDKType {
   estimated_duration_seconds: bigint;
   active_lease_count: bigint;
 }
+/**
+ * QueryLeaseByCustomDomainRequest is the request type for the
+ * Query/LeaseByCustomDomain RPC method.
+ */
+export interface QueryLeaseByCustomDomainRequest {
+  /** custom_domain is the FQDN to look up. */
+  customDomain: string;
+}
+export interface QueryLeaseByCustomDomainRequestProtoMsg {
+  typeUrl: "/liftedinit.billing.v1.QueryLeaseByCustomDomainRequest";
+  value: Uint8Array;
+}
+/**
+ * QueryLeaseByCustomDomainRequest is the request type for the
+ * Query/LeaseByCustomDomain RPC method.
+ */
+export interface QueryLeaseByCustomDomainRequestAmino {
+  /** custom_domain is the FQDN to look up. */
+  custom_domain?: string;
+}
+export interface QueryLeaseByCustomDomainRequestAminoMsg {
+  type: "/liftedinit.billing.v1.QueryLeaseByCustomDomainRequest";
+  value: QueryLeaseByCustomDomainRequestAmino;
+}
+/**
+ * QueryLeaseByCustomDomainRequest is the request type for the
+ * Query/LeaseByCustomDomain RPC method.
+ */
+export interface QueryLeaseByCustomDomainRequestSDKType {
+  custom_domain: string;
+}
+/**
+ * QueryLeaseByCustomDomainResponse is the response type for the
+ * Query/LeaseByCustomDomain RPC method.
+ */
+export interface QueryLeaseByCustomDomainResponse {
+  /** lease is the lease that owns the LeaseItem holding this custom_domain. */
+  lease: Lease;
+  /**
+   * service_name identifies the specific LeaseItem within the lease.
+   * For a 1-item legacy lease, this is "".
+   */
+  serviceName: string;
+}
+export interface QueryLeaseByCustomDomainResponseProtoMsg {
+  typeUrl: "/liftedinit.billing.v1.QueryLeaseByCustomDomainResponse";
+  value: Uint8Array;
+}
+/**
+ * QueryLeaseByCustomDomainResponse is the response type for the
+ * Query/LeaseByCustomDomain RPC method.
+ */
+export interface QueryLeaseByCustomDomainResponseAmino {
+  /** lease is the lease that owns the LeaseItem holding this custom_domain. */
+  lease: LeaseAmino;
+  /**
+   * service_name identifies the specific LeaseItem within the lease.
+   * For a 1-item legacy lease, this is "".
+   */
+  service_name?: string;
+}
+export interface QueryLeaseByCustomDomainResponseAminoMsg {
+  type: "/liftedinit.billing.v1.QueryLeaseByCustomDomainResponse";
+  value: QueryLeaseByCustomDomainResponseAmino;
+}
+/**
+ * QueryLeaseByCustomDomainResponse is the response type for the
+ * Query/LeaseByCustomDomain RPC method.
+ */
+export interface QueryLeaseByCustomDomainResponseSDKType {
+  lease: LeaseSDKType;
+  service_name: string;
+}
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
@@ -3135,3 +3208,183 @@ export const QueryCreditEstimateResponse = {
   }
 };
 GlobalDecoderRegistry.register(QueryCreditEstimateResponse.typeUrl, QueryCreditEstimateResponse);
+function createBaseQueryLeaseByCustomDomainRequest(): QueryLeaseByCustomDomainRequest {
+  return {
+    customDomain: ""
+  };
+}
+export const QueryLeaseByCustomDomainRequest = {
+  typeUrl: "/liftedinit.billing.v1.QueryLeaseByCustomDomainRequest",
+  is(o: any): o is QueryLeaseByCustomDomainRequest {
+    return o && (o.$typeUrl === QueryLeaseByCustomDomainRequest.typeUrl || typeof o.customDomain === "string");
+  },
+  isSDK(o: any): o is QueryLeaseByCustomDomainRequestSDKType {
+    return o && (o.$typeUrl === QueryLeaseByCustomDomainRequest.typeUrl || typeof o.custom_domain === "string");
+  },
+  isAmino(o: any): o is QueryLeaseByCustomDomainRequestAmino {
+    return o && (o.$typeUrl === QueryLeaseByCustomDomainRequest.typeUrl || typeof o.custom_domain === "string");
+  },
+  encode(message: QueryLeaseByCustomDomainRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.customDomain !== "") {
+      writer.uint32(10).string(message.customDomain);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryLeaseByCustomDomainRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryLeaseByCustomDomainRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.customDomain = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): QueryLeaseByCustomDomainRequest {
+    return {
+      customDomain: isSet(object.customDomain) ? String(object.customDomain) : ""
+    };
+  },
+  toJSON(message: QueryLeaseByCustomDomainRequest): JsonSafe<QueryLeaseByCustomDomainRequest> {
+    const obj: any = {};
+    message.customDomain !== undefined && (obj.customDomain = message.customDomain);
+    return obj;
+  },
+  fromPartial<I extends Exact<DeepPartial<QueryLeaseByCustomDomainRequest>, I>>(object: I): QueryLeaseByCustomDomainRequest {
+    const message = createBaseQueryLeaseByCustomDomainRequest();
+    message.customDomain = object.customDomain ?? "";
+    return message;
+  },
+  fromAmino(object: QueryLeaseByCustomDomainRequestAmino): QueryLeaseByCustomDomainRequest {
+    const message = createBaseQueryLeaseByCustomDomainRequest();
+    if (object.custom_domain !== undefined && object.custom_domain !== null) {
+      message.customDomain = object.custom_domain;
+    }
+    return message;
+  },
+  toAmino(message: QueryLeaseByCustomDomainRequest): QueryLeaseByCustomDomainRequestAmino {
+    const obj: any = {};
+    obj.custom_domain = message.customDomain === "" ? undefined : message.customDomain;
+    return obj;
+  },
+  fromAminoMsg(object: QueryLeaseByCustomDomainRequestAminoMsg): QueryLeaseByCustomDomainRequest {
+    return QueryLeaseByCustomDomainRequest.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryLeaseByCustomDomainRequestProtoMsg): QueryLeaseByCustomDomainRequest {
+    return QueryLeaseByCustomDomainRequest.decode(message.value);
+  },
+  toProto(message: QueryLeaseByCustomDomainRequest): Uint8Array {
+    return QueryLeaseByCustomDomainRequest.encode(message).finish();
+  },
+  toProtoMsg(message: QueryLeaseByCustomDomainRequest): QueryLeaseByCustomDomainRequestProtoMsg {
+    return {
+      typeUrl: "/liftedinit.billing.v1.QueryLeaseByCustomDomainRequest",
+      value: QueryLeaseByCustomDomainRequest.encode(message).finish()
+    };
+  }
+};
+GlobalDecoderRegistry.register(QueryLeaseByCustomDomainRequest.typeUrl, QueryLeaseByCustomDomainRequest);
+function createBaseQueryLeaseByCustomDomainResponse(): QueryLeaseByCustomDomainResponse {
+  return {
+    lease: Lease.fromPartial({}),
+    serviceName: ""
+  };
+}
+export const QueryLeaseByCustomDomainResponse = {
+  typeUrl: "/liftedinit.billing.v1.QueryLeaseByCustomDomainResponse",
+  is(o: any): o is QueryLeaseByCustomDomainResponse {
+    return o && (o.$typeUrl === QueryLeaseByCustomDomainResponse.typeUrl || Lease.is(o.lease) && typeof o.serviceName === "string");
+  },
+  isSDK(o: any): o is QueryLeaseByCustomDomainResponseSDKType {
+    return o && (o.$typeUrl === QueryLeaseByCustomDomainResponse.typeUrl || Lease.isSDK(o.lease) && typeof o.service_name === "string");
+  },
+  isAmino(o: any): o is QueryLeaseByCustomDomainResponseAmino {
+    return o && (o.$typeUrl === QueryLeaseByCustomDomainResponse.typeUrl || Lease.isAmino(o.lease) && typeof o.service_name === "string");
+  },
+  encode(message: QueryLeaseByCustomDomainResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.lease !== undefined) {
+      Lease.encode(message.lease, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.serviceName !== "") {
+      writer.uint32(18).string(message.serviceName);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): QueryLeaseByCustomDomainResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryLeaseByCustomDomainResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.lease = Lease.decode(reader, reader.uint32());
+          break;
+        case 2:
+          message.serviceName = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): QueryLeaseByCustomDomainResponse {
+    return {
+      lease: isSet(object.lease) ? Lease.fromJSON(object.lease) : undefined,
+      serviceName: isSet(object.serviceName) ? String(object.serviceName) : ""
+    };
+  },
+  toJSON(message: QueryLeaseByCustomDomainResponse): JsonSafe<QueryLeaseByCustomDomainResponse> {
+    const obj: any = {};
+    message.lease !== undefined && (obj.lease = message.lease ? Lease.toJSON(message.lease) : undefined);
+    message.serviceName !== undefined && (obj.serviceName = message.serviceName);
+    return obj;
+  },
+  fromPartial<I extends Exact<DeepPartial<QueryLeaseByCustomDomainResponse>, I>>(object: I): QueryLeaseByCustomDomainResponse {
+    const message = createBaseQueryLeaseByCustomDomainResponse();
+    message.lease = object.lease !== undefined && object.lease !== null ? Lease.fromPartial(object.lease) : undefined;
+    message.serviceName = object.serviceName ?? "";
+    return message;
+  },
+  fromAmino(object: QueryLeaseByCustomDomainResponseAmino): QueryLeaseByCustomDomainResponse {
+    const message = createBaseQueryLeaseByCustomDomainResponse();
+    if (object.lease !== undefined && object.lease !== null) {
+      message.lease = Lease.fromAmino(object.lease);
+    }
+    if (object.service_name !== undefined && object.service_name !== null) {
+      message.serviceName = object.service_name;
+    }
+    return message;
+  },
+  toAmino(message: QueryLeaseByCustomDomainResponse): QueryLeaseByCustomDomainResponseAmino {
+    const obj: any = {};
+    obj.lease = message.lease ? Lease.toAmino(message.lease) : Lease.toAmino(Lease.fromPartial({}));
+    obj.service_name = message.serviceName === "" ? undefined : message.serviceName;
+    return obj;
+  },
+  fromAminoMsg(object: QueryLeaseByCustomDomainResponseAminoMsg): QueryLeaseByCustomDomainResponse {
+    return QueryLeaseByCustomDomainResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: QueryLeaseByCustomDomainResponseProtoMsg): QueryLeaseByCustomDomainResponse {
+    return QueryLeaseByCustomDomainResponse.decode(message.value);
+  },
+  toProto(message: QueryLeaseByCustomDomainResponse): Uint8Array {
+    return QueryLeaseByCustomDomainResponse.encode(message).finish();
+  },
+  toProtoMsg(message: QueryLeaseByCustomDomainResponse): QueryLeaseByCustomDomainResponseProtoMsg {
+    return {
+      typeUrl: "/liftedinit.billing.v1.QueryLeaseByCustomDomainResponse",
+      value: QueryLeaseByCustomDomainResponse.encode(message).finish()
+    };
+  }
+};
+GlobalDecoderRegistry.register(QueryLeaseByCustomDomainResponse.typeUrl, QueryLeaseByCustomDomainResponse);

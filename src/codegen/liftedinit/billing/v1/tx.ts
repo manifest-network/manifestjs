@@ -714,6 +714,103 @@ export interface MsgCancelLeaseResponseSDKType {
   cancelled_at: Date;
   cancelled_count: bigint;
 }
+/**
+ * MsgSetItemCustomDomain sets or clears the custom_domain on a specific
+ * LeaseItem, identified by its service_name (the lease's commit-time uniqueness
+ * key). For a 1-item legacy lease, service_name is "". An empty custom_domain
+ * clears the field and frees the index entry.
+ */
+export interface MsgSetItemCustomDomain {
+  /**
+   * sender is the address signing the transaction. Must be the lease tenant,
+   * the module authority, or an address in params.allowed_list.
+   */
+  sender: string;
+  /** lease_uuid is the UUID of the lease that owns the target item. */
+  leaseUuid: string;
+  /**
+   * service_name addresses the target LeaseItem. The keeper finds the unique
+   * item where item.service_name == this value. For a 1-item legacy lease
+   * (item.service_name == ""), pass "". Multi-item legacy leases cannot use
+   * custom_domain because the lookup would be ambiguous.
+   */
+  serviceName: string;
+  /**
+   * custom_domain is the FQDN to assign. An empty string clears the field
+   * and removes any existing reverse-index entry.
+   */
+  customDomain: string;
+}
+export interface MsgSetItemCustomDomainProtoMsg {
+  typeUrl: "/liftedinit.billing.v1.MsgSetItemCustomDomain";
+  value: Uint8Array;
+}
+/**
+ * MsgSetItemCustomDomain sets or clears the custom_domain on a specific
+ * LeaseItem, identified by its service_name (the lease's commit-time uniqueness
+ * key). For a 1-item legacy lease, service_name is "". An empty custom_domain
+ * clears the field and frees the index entry.
+ */
+export interface MsgSetItemCustomDomainAmino {
+  /**
+   * sender is the address signing the transaction. Must be the lease tenant,
+   * the module authority, or an address in params.allowed_list.
+   */
+  sender?: string;
+  /** lease_uuid is the UUID of the lease that owns the target item. */
+  lease_uuid?: string;
+  /**
+   * service_name addresses the target LeaseItem. The keeper finds the unique
+   * item where item.service_name == this value. For a 1-item legacy lease
+   * (item.service_name == ""), pass "". Multi-item legacy leases cannot use
+   * custom_domain because the lookup would be ambiguous.
+   */
+  service_name?: string;
+  /**
+   * custom_domain is the FQDN to assign. An empty string clears the field
+   * and removes any existing reverse-index entry.
+   */
+  custom_domain?: string;
+}
+export interface MsgSetItemCustomDomainAminoMsg {
+  type: "lifted/billing/MsgSetItemCustomDomain";
+  value: MsgSetItemCustomDomainAmino;
+}
+/**
+ * MsgSetItemCustomDomain sets or clears the custom_domain on a specific
+ * LeaseItem, identified by its service_name (the lease's commit-time uniqueness
+ * key). For a 1-item legacy lease, service_name is "". An empty custom_domain
+ * clears the field and frees the index entry.
+ */
+export interface MsgSetItemCustomDomainSDKType {
+  sender: string;
+  lease_uuid: string;
+  service_name: string;
+  custom_domain: string;
+}
+/**
+ * MsgSetItemCustomDomainResponse is the response type for
+ * MsgSetItemCustomDomain.
+ */
+export interface MsgSetItemCustomDomainResponse {}
+export interface MsgSetItemCustomDomainResponseProtoMsg {
+  typeUrl: "/liftedinit.billing.v1.MsgSetItemCustomDomainResponse";
+  value: Uint8Array;
+}
+/**
+ * MsgSetItemCustomDomainResponse is the response type for
+ * MsgSetItemCustomDomain.
+ */
+export interface MsgSetItemCustomDomainResponseAmino {}
+export interface MsgSetItemCustomDomainResponseAminoMsg {
+  type: "/liftedinit.billing.v1.MsgSetItemCustomDomainResponse";
+  value: MsgSetItemCustomDomainResponseAmino;
+}
+/**
+ * MsgSetItemCustomDomainResponse is the response type for
+ * MsgSetItemCustomDomain.
+ */
+export interface MsgSetItemCustomDomainResponseSDKType {}
 function createBaseLeaseItemInput(): LeaseItemInput {
   return {
     skuUuid: "",
@@ -2801,3 +2898,203 @@ export const MsgCancelLeaseResponse = {
   }
 };
 GlobalDecoderRegistry.register(MsgCancelLeaseResponse.typeUrl, MsgCancelLeaseResponse);
+function createBaseMsgSetItemCustomDomain(): MsgSetItemCustomDomain {
+  return {
+    sender: "",
+    leaseUuid: "",
+    serviceName: "",
+    customDomain: ""
+  };
+}
+export const MsgSetItemCustomDomain = {
+  typeUrl: "/liftedinit.billing.v1.MsgSetItemCustomDomain",
+  aminoType: "lifted/billing/MsgSetItemCustomDomain",
+  is(o: any): o is MsgSetItemCustomDomain {
+    return o && (o.$typeUrl === MsgSetItemCustomDomain.typeUrl || typeof o.sender === "string" && typeof o.leaseUuid === "string" && typeof o.serviceName === "string" && typeof o.customDomain === "string");
+  },
+  isSDK(o: any): o is MsgSetItemCustomDomainSDKType {
+    return o && (o.$typeUrl === MsgSetItemCustomDomain.typeUrl || typeof o.sender === "string" && typeof o.lease_uuid === "string" && typeof o.service_name === "string" && typeof o.custom_domain === "string");
+  },
+  isAmino(o: any): o is MsgSetItemCustomDomainAmino {
+    return o && (o.$typeUrl === MsgSetItemCustomDomain.typeUrl || typeof o.sender === "string" && typeof o.lease_uuid === "string" && typeof o.service_name === "string" && typeof o.custom_domain === "string");
+  },
+  encode(message: MsgSetItemCustomDomain, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.sender !== "") {
+      writer.uint32(10).string(message.sender);
+    }
+    if (message.leaseUuid !== "") {
+      writer.uint32(18).string(message.leaseUuid);
+    }
+    if (message.serviceName !== "") {
+      writer.uint32(26).string(message.serviceName);
+    }
+    if (message.customDomain !== "") {
+      writer.uint32(34).string(message.customDomain);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetItemCustomDomain {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetItemCustomDomain();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.sender = reader.string();
+          break;
+        case 2:
+          message.leaseUuid = reader.string();
+          break;
+        case 3:
+          message.serviceName = reader.string();
+          break;
+        case 4:
+          message.customDomain = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): MsgSetItemCustomDomain {
+    return {
+      sender: isSet(object.sender) ? String(object.sender) : "",
+      leaseUuid: isSet(object.leaseUuid) ? String(object.leaseUuid) : "",
+      serviceName: isSet(object.serviceName) ? String(object.serviceName) : "",
+      customDomain: isSet(object.customDomain) ? String(object.customDomain) : ""
+    };
+  },
+  toJSON(message: MsgSetItemCustomDomain): JsonSafe<MsgSetItemCustomDomain> {
+    const obj: any = {};
+    message.sender !== undefined && (obj.sender = message.sender);
+    message.leaseUuid !== undefined && (obj.leaseUuid = message.leaseUuid);
+    message.serviceName !== undefined && (obj.serviceName = message.serviceName);
+    message.customDomain !== undefined && (obj.customDomain = message.customDomain);
+    return obj;
+  },
+  fromPartial<I extends Exact<DeepPartial<MsgSetItemCustomDomain>, I>>(object: I): MsgSetItemCustomDomain {
+    const message = createBaseMsgSetItemCustomDomain();
+    message.sender = object.sender ?? "";
+    message.leaseUuid = object.leaseUuid ?? "";
+    message.serviceName = object.serviceName ?? "";
+    message.customDomain = object.customDomain ?? "";
+    return message;
+  },
+  fromAmino(object: MsgSetItemCustomDomainAmino): MsgSetItemCustomDomain {
+    const message = createBaseMsgSetItemCustomDomain();
+    if (object.sender !== undefined && object.sender !== null) {
+      message.sender = object.sender;
+    }
+    if (object.lease_uuid !== undefined && object.lease_uuid !== null) {
+      message.leaseUuid = object.lease_uuid;
+    }
+    if (object.service_name !== undefined && object.service_name !== null) {
+      message.serviceName = object.service_name;
+    }
+    if (object.custom_domain !== undefined && object.custom_domain !== null) {
+      message.customDomain = object.custom_domain;
+    }
+    return message;
+  },
+  toAmino(message: MsgSetItemCustomDomain): MsgSetItemCustomDomainAmino {
+    const obj: any = {};
+    obj.sender = message.sender === "" ? undefined : message.sender;
+    obj.lease_uuid = message.leaseUuid === "" ? undefined : message.leaseUuid;
+    obj.service_name = message.serviceName === "" ? undefined : message.serviceName;
+    obj.custom_domain = message.customDomain === "" ? undefined : message.customDomain;
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetItemCustomDomainAminoMsg): MsgSetItemCustomDomain {
+    return MsgSetItemCustomDomain.fromAmino(object.value);
+  },
+  toAminoMsg(message: MsgSetItemCustomDomain): MsgSetItemCustomDomainAminoMsg {
+    return {
+      type: "lifted/billing/MsgSetItemCustomDomain",
+      value: MsgSetItemCustomDomain.toAmino(message)
+    };
+  },
+  fromProtoMsg(message: MsgSetItemCustomDomainProtoMsg): MsgSetItemCustomDomain {
+    return MsgSetItemCustomDomain.decode(message.value);
+  },
+  toProto(message: MsgSetItemCustomDomain): Uint8Array {
+    return MsgSetItemCustomDomain.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetItemCustomDomain): MsgSetItemCustomDomainProtoMsg {
+    return {
+      typeUrl: "/liftedinit.billing.v1.MsgSetItemCustomDomain",
+      value: MsgSetItemCustomDomain.encode(message).finish()
+    };
+  }
+};
+GlobalDecoderRegistry.register(MsgSetItemCustomDomain.typeUrl, MsgSetItemCustomDomain);
+GlobalDecoderRegistry.registerAminoProtoMapping(MsgSetItemCustomDomain.aminoType, MsgSetItemCustomDomain.typeUrl);
+function createBaseMsgSetItemCustomDomainResponse(): MsgSetItemCustomDomainResponse {
+  return {};
+}
+export const MsgSetItemCustomDomainResponse = {
+  typeUrl: "/liftedinit.billing.v1.MsgSetItemCustomDomainResponse",
+  is(o: any): o is MsgSetItemCustomDomainResponse {
+    return o && o.$typeUrl === MsgSetItemCustomDomainResponse.typeUrl;
+  },
+  isSDK(o: any): o is MsgSetItemCustomDomainResponseSDKType {
+    return o && o.$typeUrl === MsgSetItemCustomDomainResponse.typeUrl;
+  },
+  isAmino(o: any): o is MsgSetItemCustomDomainResponseAmino {
+    return o && o.$typeUrl === MsgSetItemCustomDomainResponse.typeUrl;
+  },
+  encode(_: MsgSetItemCustomDomainResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): MsgSetItemCustomDomainResponse {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseMsgSetItemCustomDomainResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(_: any): MsgSetItemCustomDomainResponse {
+    return {};
+  },
+  toJSON(_: MsgSetItemCustomDomainResponse): JsonSafe<MsgSetItemCustomDomainResponse> {
+    const obj: any = {};
+    return obj;
+  },
+  fromPartial<I extends Exact<DeepPartial<MsgSetItemCustomDomainResponse>, I>>(_: I): MsgSetItemCustomDomainResponse {
+    const message = createBaseMsgSetItemCustomDomainResponse();
+    return message;
+  },
+  fromAmino(_: MsgSetItemCustomDomainResponseAmino): MsgSetItemCustomDomainResponse {
+    const message = createBaseMsgSetItemCustomDomainResponse();
+    return message;
+  },
+  toAmino(_: MsgSetItemCustomDomainResponse): MsgSetItemCustomDomainResponseAmino {
+    const obj: any = {};
+    return obj;
+  },
+  fromAminoMsg(object: MsgSetItemCustomDomainResponseAminoMsg): MsgSetItemCustomDomainResponse {
+    return MsgSetItemCustomDomainResponse.fromAmino(object.value);
+  },
+  fromProtoMsg(message: MsgSetItemCustomDomainResponseProtoMsg): MsgSetItemCustomDomainResponse {
+    return MsgSetItemCustomDomainResponse.decode(message.value);
+  },
+  toProto(message: MsgSetItemCustomDomainResponse): Uint8Array {
+    return MsgSetItemCustomDomainResponse.encode(message).finish();
+  },
+  toProtoMsg(message: MsgSetItemCustomDomainResponse): MsgSetItemCustomDomainResponseProtoMsg {
+    return {
+      typeUrl: "/liftedinit.billing.v1.MsgSetItemCustomDomainResponse",
+      value: MsgSetItemCustomDomainResponse.encode(message).finish()
+    };
+  }
+};
+GlobalDecoderRegistry.register(MsgSetItemCustomDomainResponse.typeUrl, MsgSetItemCustomDomainResponse);

@@ -1,8 +1,8 @@
 //@ts-nocheck
 import { TelescopeGeneratedType } from "../../../types";
 import { Registry } from "@cosmjs/proto-signing";
-import { MsgFundCredit, MsgCreateLease, MsgCreateLeaseForTenant, MsgAcknowledgeLease, MsgRejectLease, MsgCancelLease, MsgCloseLease, MsgWithdraw, MsgUpdateParams } from "./tx";
-export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/liftedinit.billing.v1.MsgFundCredit", MsgFundCredit], ["/liftedinit.billing.v1.MsgCreateLease", MsgCreateLease], ["/liftedinit.billing.v1.MsgCreateLeaseForTenant", MsgCreateLeaseForTenant], ["/liftedinit.billing.v1.MsgAcknowledgeLease", MsgAcknowledgeLease], ["/liftedinit.billing.v1.MsgRejectLease", MsgRejectLease], ["/liftedinit.billing.v1.MsgCancelLease", MsgCancelLease], ["/liftedinit.billing.v1.MsgCloseLease", MsgCloseLease], ["/liftedinit.billing.v1.MsgWithdraw", MsgWithdraw], ["/liftedinit.billing.v1.MsgUpdateParams", MsgUpdateParams]];
+import { MsgFundCredit, MsgCreateLease, MsgCreateLeaseForTenant, MsgAcknowledgeLease, MsgRejectLease, MsgCancelLease, MsgCloseLease, MsgWithdraw, MsgUpdateParams, MsgSetItemCustomDomain } from "./tx";
+export const registry: ReadonlyArray<[string, TelescopeGeneratedType<any, any, any>]> = [["/liftedinit.billing.v1.MsgFundCredit", MsgFundCredit], ["/liftedinit.billing.v1.MsgCreateLease", MsgCreateLease], ["/liftedinit.billing.v1.MsgCreateLeaseForTenant", MsgCreateLeaseForTenant], ["/liftedinit.billing.v1.MsgAcknowledgeLease", MsgAcknowledgeLease], ["/liftedinit.billing.v1.MsgRejectLease", MsgRejectLease], ["/liftedinit.billing.v1.MsgCancelLease", MsgCancelLease], ["/liftedinit.billing.v1.MsgCloseLease", MsgCloseLease], ["/liftedinit.billing.v1.MsgWithdraw", MsgWithdraw], ["/liftedinit.billing.v1.MsgUpdateParams", MsgUpdateParams], ["/liftedinit.billing.v1.MsgSetItemCustomDomain", MsgSetItemCustomDomain]];
 export const load = (protoRegistry: Registry) => {
   registry.forEach(([typeUrl, mod]) => {
     protoRegistry.register(typeUrl, mod);
@@ -63,6 +63,12 @@ export const MessageComposer = {
         typeUrl: "/liftedinit.billing.v1.MsgUpdateParams",
         value: MsgUpdateParams.encode(value).finish()
       };
+    },
+    setItemCustomDomain(value: MsgSetItemCustomDomain) {
+      return {
+        typeUrl: "/liftedinit.billing.v1.MsgSetItemCustomDomain",
+        value: MsgSetItemCustomDomain.encode(value).finish()
+      };
     }
   },
   withTypeUrl: {
@@ -117,6 +123,12 @@ export const MessageComposer = {
     updateParams(value: MsgUpdateParams) {
       return {
         typeUrl: "/liftedinit.billing.v1.MsgUpdateParams",
+        value
+      };
+    },
+    setItemCustomDomain(value: MsgSetItemCustomDomain) {
+      return {
+        typeUrl: "/liftedinit.billing.v1.MsgSetItemCustomDomain",
         value
       };
     }
@@ -175,6 +187,12 @@ export const MessageComposer = {
         typeUrl: "/liftedinit.billing.v1.MsgUpdateParams",
         value: MsgUpdateParams.toJSON(value)
       };
+    },
+    setItemCustomDomain(value: MsgSetItemCustomDomain) {
+      return {
+        typeUrl: "/liftedinit.billing.v1.MsgSetItemCustomDomain",
+        value: MsgSetItemCustomDomain.toJSON(value)
+      };
     }
   },
   fromJSON: {
@@ -231,6 +249,12 @@ export const MessageComposer = {
         typeUrl: "/liftedinit.billing.v1.MsgUpdateParams",
         value: MsgUpdateParams.fromJSON(value)
       };
+    },
+    setItemCustomDomain(value: any) {
+      return {
+        typeUrl: "/liftedinit.billing.v1.MsgSetItemCustomDomain",
+        value: MsgSetItemCustomDomain.fromJSON(value)
+      };
     }
   },
   fromPartial: {
@@ -286,6 +310,12 @@ export const MessageComposer = {
       return {
         typeUrl: "/liftedinit.billing.v1.MsgUpdateParams",
         value: MsgUpdateParams.fromPartial(value)
+      };
+    },
+    setItemCustomDomain(value: MsgSetItemCustomDomain) {
+      return {
+        typeUrl: "/liftedinit.billing.v1.MsgSetItemCustomDomain",
+        value: MsgSetItemCustomDomain.fromPartial(value)
       };
     }
   }
