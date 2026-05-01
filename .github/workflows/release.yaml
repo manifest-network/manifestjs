@@ -2,7 +2,7 @@ name: Release
 
 on:
   push:
-    tags: ['v[0-9]*.[0-9]*.[0-9]*']
+    tags: ['v*']
 
 permissions:
   contents: write
@@ -23,8 +23,12 @@ jobs:
       - name: Upgrade npm for OIDC trusted publishing
         run: npm install -g npm@11.5.1
 
-      - name: Validate tag matches package version
+      - name: Validate tag format and matches package version
         run: |
+          if [[ ! "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::tag $GITHUB_REF_NAME is not a strict semver release tag (expected vMAJOR.MINOR.PATCH)"
+            exit 1
+          fi
           TAG_VERSION="${GITHUB_REF_NAME#v}"
           PKG_VERSION=$(node -p "require('./package.json').version")
           if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
@@ -64,7 +68,7 @@ jobs:
             echo "::warning::${PKG_NAME}@${VERSION} already published, skipping"
             exit 0
           fi
-          npm publish --provenance --access public
+          npm publish --ignore-scripts --provenance --access public
 
       - name: Create GitHub Release
         env:
