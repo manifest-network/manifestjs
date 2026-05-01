@@ -1,7 +1,7 @@
 import { TxRpc } from "../../../types";
 import { BinaryReader } from "../../../binary";
 import { QueryClient, createProtobufRpcClient } from "@cosmjs/stargate";
-import { QueryParamsRequest, QueryParamsResponse, QueryLeaseRequest, QueryLeaseResponse, QueryLeasesRequest, QueryLeasesResponse, QueryLeasesByTenantRequest, QueryLeasesByTenantResponse, QueryLeasesByProviderRequest, QueryLeasesByProviderResponse, QueryCreditAccountRequest, QueryCreditAccountResponse, QueryCreditAddressRequest, QueryCreditAddressResponse, QueryWithdrawableAmountRequest, QueryWithdrawableAmountResponse, QueryProviderWithdrawableRequest, QueryProviderWithdrawableResponse, QueryCreditAccountsRequest, QueryCreditAccountsResponse, QueryLeasesBySKURequest, QueryLeasesBySKUResponse, QueryCreditEstimateRequest, QueryCreditEstimateResponse } from "./query";
+import { QueryParamsRequest, QueryParamsResponse, QueryLeaseRequest, QueryLeaseResponse, QueryLeasesRequest, QueryLeasesResponse, QueryLeasesByTenantRequest, QueryLeasesByTenantResponse, QueryLeasesByProviderRequest, QueryLeasesByProviderResponse, QueryCreditAccountRequest, QueryCreditAccountResponse, QueryCreditAddressRequest, QueryCreditAddressResponse, QueryWithdrawableAmountRequest, QueryWithdrawableAmountResponse, QueryProviderWithdrawableRequest, QueryProviderWithdrawableResponse, QueryCreditAccountsRequest, QueryCreditAccountsResponse, QueryLeasesBySKURequest, QueryLeasesBySKUResponse, QueryCreditEstimateRequest, QueryCreditEstimateResponse, QueryLeaseByCustomDomainRequest, QueryLeaseByCustomDomainResponse } from "./query";
 /** Query defines the gRPC querier service for the billing module. */
 export interface Query {
   /** Params queries the module parameters. */
@@ -28,6 +28,11 @@ export interface Query {
   leasesBySKU(request: QueryLeasesBySKURequest): Promise<QueryLeasesBySKUResponse>;
   /** CreditEstimate estimates remaining lease duration for a tenant. */
   creditEstimate(request: QueryCreditEstimateRequest): Promise<QueryCreditEstimateResponse>;
+  /**
+   * LeaseByCustomDomain returns the active or pending lease that has claimed
+   * the given custom_domain, if any.
+   */
+  leaseByCustomDomain(request: QueryLeaseByCustomDomainRequest): Promise<QueryLeaseByCustomDomainResponse>;
 }
 export class QueryClientImpl implements Query {
   private readonly rpc: TxRpc;
@@ -108,6 +113,13 @@ export class QueryClientImpl implements Query {
     const promise = this.rpc.request("liftedinit.billing.v1.Query", "CreditEstimate", data);
     return promise.then(data => QueryCreditEstimateResponse.decode(new BinaryReader(data)));
   };
+  /* LeaseByCustomDomain returns the active or pending lease that has claimed
+   the given custom_domain, if any. */
+  leaseByCustomDomain = async (request: QueryLeaseByCustomDomainRequest): Promise<QueryLeaseByCustomDomainResponse> => {
+    const data = QueryLeaseByCustomDomainRequest.encode(request).finish();
+    const promise = this.rpc.request("liftedinit.billing.v1.Query", "LeaseByCustomDomain", data);
+    return promise.then(data => QueryLeaseByCustomDomainResponse.decode(new BinaryReader(data)));
+  };
 }
 export const createRpcQueryExtension = (base: QueryClient) => {
   const rpc = createProtobufRpcClient(base);
@@ -148,6 +160,9 @@ export const createRpcQueryExtension = (base: QueryClient) => {
     },
     creditEstimate(request: QueryCreditEstimateRequest): Promise<QueryCreditEstimateResponse> {
       return queryService.creditEstimate(request);
+    },
+    leaseByCustomDomain(request: QueryLeaseByCustomDomainRequest): Promise<QueryLeaseByCustomDomainResponse> {
+      return queryService.leaseByCustomDomain(request);
     }
   };
 };

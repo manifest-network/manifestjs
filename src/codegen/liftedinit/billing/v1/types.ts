@@ -118,6 +118,16 @@ export interface Params {
    * Must be between 60 (1 minute) and 86400 (24 hours).
    */
   pendingTimeout: bigint;
+  /**
+   * reserved_domain_suffixes is the list of DNS suffixes (each beginning with `.`)
+   * that tenants are forbidden from claiming as a LeaseItem.custom_domain. These match
+   * provider wildcard zones (e.g. `.barney0.manifest0.net`) where the provider
+   * already serves auto-generated subdomains under a wildcard TLS cert. The match
+   * is a case-insensitive label-boundary suffix check and also covers the apex
+   * (e.g. `barney0.manifest0.net` itself). Tunable via MsgUpdateParams so new
+   * provider zones can be reserved without a chain upgrade.
+   */
+  reservedDomainSuffixes: string[];
 }
 export interface ParamsProtoMsg {
   typeUrl: "/liftedinit.billing.v1.Params";
@@ -158,6 +168,16 @@ export interface ParamsAmino {
    * Must be between 60 (1 minute) and 86400 (24 hours).
    */
   pending_timeout?: string;
+  /**
+   * reserved_domain_suffixes is the list of DNS suffixes (each beginning with `.`)
+   * that tenants are forbidden from claiming as a LeaseItem.custom_domain. These match
+   * provider wildcard zones (e.g. `.barney0.manifest0.net`) where the provider
+   * already serves auto-generated subdomains under a wildcard TLS cert. The match
+   * is a case-insensitive label-boundary suffix check and also covers the apex
+   * (e.g. `barney0.manifest0.net` itself). Tunable via MsgUpdateParams so new
+   * provider zones can be reserved without a chain upgrade.
+   */
+  reserved_domain_suffixes?: string[];
 }
 export interface ParamsAminoMsg {
   type: "lifted/billing/Params";
@@ -171,6 +191,7 @@ export interface ParamsSDKType {
   min_lease_duration: bigint;
   max_pending_leases_per_tenant: bigint;
   pending_timeout: bigint;
+  reserved_domain_suffixes: string[];
 }
 /** LeaseItem represents a single SKU item within a lease. */
 export interface LeaseItem {
@@ -189,8 +210,26 @@ export interface LeaseItem {
    * must not start or end with a hyphen (e.g., "web", "db", "my-service-1").
    * When used, all items must have a service_name and uniqueness shifts from sku_uuid to service_name,
    * allowing the same SKU to appear multiple times (e.g., "web" and "db" both using docker-small).
+   * 
+   * COMPUTE-SPECIFIC: this field belongs in a future x/deployment module rather
+   * than the generic billing lease. It lives here today as a pragmatic shortcut
+   * alongside LeaseItem.custom_domain. When a non-compute lease kind ships,
+   * migrate this (and custom_domain) into x/deployment via a state migration.
+   * Tracked: ENG-80.
    */
   serviceName: string;
+  /**
+   * custom_domain is the optional FQDN the tenant has assigned to this item.
+   * When set, requests to this domain are routed to this item's container by
+   * the provider, with a TLS cert provisioned via HTTP-01.
+   * 
+   * COMPUTE-SPECIFIC: this field belongs in a future x/deployment module rather
+   * than the generic billing lease. It lives here today as a pragmatic shortcut
+   * alongside LeaseItem.service_name. When a non-compute lease kind ships,
+   * migrate this (and service_name) into x/deployment via a state migration.
+   * Tracked: ENG-80.
+   */
+  customDomain: string;
 }
 export interface LeaseItemProtoMsg {
   typeUrl: "/liftedinit.billing.v1.LeaseItem";
@@ -213,8 +252,26 @@ export interface LeaseItemAmino {
    * must not start or end with a hyphen (e.g., "web", "db", "my-service-1").
    * When used, all items must have a service_name and uniqueness shifts from sku_uuid to service_name,
    * allowing the same SKU to appear multiple times (e.g., "web" and "db" both using docker-small).
+   * 
+   * COMPUTE-SPECIFIC: this field belongs in a future x/deployment module rather
+   * than the generic billing lease. It lives here today as a pragmatic shortcut
+   * alongside LeaseItem.custom_domain. When a non-compute lease kind ships,
+   * migrate this (and custom_domain) into x/deployment via a state migration.
+   * Tracked: ENG-80.
    */
   service_name?: string;
+  /**
+   * custom_domain is the optional FQDN the tenant has assigned to this item.
+   * When set, requests to this domain are routed to this item's container by
+   * the provider, with a TLS cert provisioned via HTTP-01.
+   * 
+   * COMPUTE-SPECIFIC: this field belongs in a future x/deployment module rather
+   * than the generic billing lease. It lives here today as a pragmatic shortcut
+   * alongside LeaseItem.service_name. When a non-compute lease kind ships,
+   * migrate this (and service_name) into x/deployment via a state migration.
+   * Tracked: ENG-80.
+   */
+  custom_domain?: string;
 }
 export interface LeaseItemAminoMsg {
   type: "lifted/billing/LeaseItem";
@@ -226,6 +283,7 @@ export interface LeaseItemSDKType {
   quantity: bigint;
   locked_price: CoinSDKType;
   service_name: string;
+  custom_domain: string;
 }
 /** Lease represents a billing lease between a tenant and provider. */
 export interface Lease {
@@ -380,6 +438,51 @@ export interface LeaseSDKType {
   min_lease_duration_at_creation: bigint;
 }
 /**
+ * CustomDomainTarget identifies which lease + item a custom_domain resolves to.
+ * Used as the value type of the CustomDomainIndex reverse-lookup map so that
+ * queries by domain return the routing target without iterating lease items.
+ */
+export interface CustomDomainTarget {
+  /** lease_uuid is the UUID of the lease that holds the domain claim. */
+  leaseUuid: string;
+  /**
+   * service_name is the addressing key of the LeaseItem within that lease.
+   * For a 1-item legacy lease (item.service_name == ""), this is "".
+   */
+  serviceName: string;
+}
+export interface CustomDomainTargetProtoMsg {
+  typeUrl: "/liftedinit.billing.v1.CustomDomainTarget";
+  value: Uint8Array;
+}
+/**
+ * CustomDomainTarget identifies which lease + item a custom_domain resolves to.
+ * Used as the value type of the CustomDomainIndex reverse-lookup map so that
+ * queries by domain return the routing target without iterating lease items.
+ */
+export interface CustomDomainTargetAmino {
+  /** lease_uuid is the UUID of the lease that holds the domain claim. */
+  lease_uuid?: string;
+  /**
+   * service_name is the addressing key of the LeaseItem within that lease.
+   * For a 1-item legacy lease (item.service_name == ""), this is "".
+   */
+  service_name?: string;
+}
+export interface CustomDomainTargetAminoMsg {
+  type: "/liftedinit.billing.v1.CustomDomainTarget";
+  value: CustomDomainTargetAmino;
+}
+/**
+ * CustomDomainTarget identifies which lease + item a custom_domain resolves to.
+ * Used as the value type of the CustomDomainIndex reverse-lookup map so that
+ * queries by domain return the routing target without iterating lease items.
+ */
+export interface CustomDomainTargetSDKType {
+  lease_uuid: string;
+  service_name: string;
+}
+/**
  * CreditAccount represents a tenant's credit account.
  * The actual balance is tracked by the bank module at the credit_address.
  */
@@ -451,20 +554,21 @@ function createBaseParams(): Params {
     maxItemsPerLease: BigInt(0),
     minLeaseDuration: BigInt(0),
     maxPendingLeasesPerTenant: BigInt(0),
-    pendingTimeout: BigInt(0)
+    pendingTimeout: BigInt(0),
+    reservedDomainSuffixes: []
   };
 }
 export const Params = {
   typeUrl: "/liftedinit.billing.v1.Params",
   aminoType: "lifted/billing/Params",
   is(o: any): o is Params {
-    return o && (o.$typeUrl === Params.typeUrl || typeof o.maxLeasesPerTenant === "bigint" && Array.isArray(o.allowedList) && (!o.allowedList.length || typeof o.allowedList[0] === "string") && typeof o.maxItemsPerLease === "bigint" && typeof o.minLeaseDuration === "bigint" && typeof o.maxPendingLeasesPerTenant === "bigint" && typeof o.pendingTimeout === "bigint");
+    return o && (o.$typeUrl === Params.typeUrl || typeof o.maxLeasesPerTenant === "bigint" && Array.isArray(o.allowedList) && (!o.allowedList.length || typeof o.allowedList[0] === "string") && typeof o.maxItemsPerLease === "bigint" && typeof o.minLeaseDuration === "bigint" && typeof o.maxPendingLeasesPerTenant === "bigint" && typeof o.pendingTimeout === "bigint" && Array.isArray(o.reservedDomainSuffixes) && (!o.reservedDomainSuffixes.length || typeof o.reservedDomainSuffixes[0] === "string"));
   },
   isSDK(o: any): o is ParamsSDKType {
-    return o && (o.$typeUrl === Params.typeUrl || typeof o.max_leases_per_tenant === "bigint" && Array.isArray(o.allowed_list) && (!o.allowed_list.length || typeof o.allowed_list[0] === "string") && typeof o.max_items_per_lease === "bigint" && typeof o.min_lease_duration === "bigint" && typeof o.max_pending_leases_per_tenant === "bigint" && typeof o.pending_timeout === "bigint");
+    return o && (o.$typeUrl === Params.typeUrl || typeof o.max_leases_per_tenant === "bigint" && Array.isArray(o.allowed_list) && (!o.allowed_list.length || typeof o.allowed_list[0] === "string") && typeof o.max_items_per_lease === "bigint" && typeof o.min_lease_duration === "bigint" && typeof o.max_pending_leases_per_tenant === "bigint" && typeof o.pending_timeout === "bigint" && Array.isArray(o.reserved_domain_suffixes) && (!o.reserved_domain_suffixes.length || typeof o.reserved_domain_suffixes[0] === "string"));
   },
   isAmino(o: any): o is ParamsAmino {
-    return o && (o.$typeUrl === Params.typeUrl || typeof o.max_leases_per_tenant === "bigint" && Array.isArray(o.allowed_list) && (!o.allowed_list.length || typeof o.allowed_list[0] === "string") && typeof o.max_items_per_lease === "bigint" && typeof o.min_lease_duration === "bigint" && typeof o.max_pending_leases_per_tenant === "bigint" && typeof o.pending_timeout === "bigint");
+    return o && (o.$typeUrl === Params.typeUrl || typeof o.max_leases_per_tenant === "bigint" && Array.isArray(o.allowed_list) && (!o.allowed_list.length || typeof o.allowed_list[0] === "string") && typeof o.max_items_per_lease === "bigint" && typeof o.min_lease_duration === "bigint" && typeof o.max_pending_leases_per_tenant === "bigint" && typeof o.pending_timeout === "bigint" && Array.isArray(o.reserved_domain_suffixes) && (!o.reserved_domain_suffixes.length || typeof o.reserved_domain_suffixes[0] === "string"));
   },
   encode(message: Params, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.maxLeasesPerTenant !== BigInt(0)) {
@@ -484,6 +588,9 @@ export const Params = {
     }
     if (message.pendingTimeout !== BigInt(0)) {
       writer.uint32(48).uint64(message.pendingTimeout);
+    }
+    for (const v of message.reservedDomainSuffixes) {
+      writer.uint32(58).string(v!);
     }
     return writer;
   },
@@ -512,6 +619,9 @@ export const Params = {
         case 6:
           message.pendingTimeout = reader.uint64();
           break;
+        case 7:
+          message.reservedDomainSuffixes.push(reader.string());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -526,7 +636,8 @@ export const Params = {
       maxItemsPerLease: isSet(object.maxItemsPerLease) ? BigInt(object.maxItemsPerLease.toString()) : BigInt(0),
       minLeaseDuration: isSet(object.minLeaseDuration) ? BigInt(object.minLeaseDuration.toString()) : BigInt(0),
       maxPendingLeasesPerTenant: isSet(object.maxPendingLeasesPerTenant) ? BigInt(object.maxPendingLeasesPerTenant.toString()) : BigInt(0),
-      pendingTimeout: isSet(object.pendingTimeout) ? BigInt(object.pendingTimeout.toString()) : BigInt(0)
+      pendingTimeout: isSet(object.pendingTimeout) ? BigInt(object.pendingTimeout.toString()) : BigInt(0),
+      reservedDomainSuffixes: Array.isArray(object?.reservedDomainSuffixes) ? object.reservedDomainSuffixes.map((e: any) => String(e)) : []
     };
   },
   toJSON(message: Params): JsonSafe<Params> {
@@ -541,6 +652,11 @@ export const Params = {
     message.minLeaseDuration !== undefined && (obj.minLeaseDuration = (message.minLeaseDuration || BigInt(0)).toString());
     message.maxPendingLeasesPerTenant !== undefined && (obj.maxPendingLeasesPerTenant = (message.maxPendingLeasesPerTenant || BigInt(0)).toString());
     message.pendingTimeout !== undefined && (obj.pendingTimeout = (message.pendingTimeout || BigInt(0)).toString());
+    if (message.reservedDomainSuffixes) {
+      obj.reservedDomainSuffixes = message.reservedDomainSuffixes.map(e => e);
+    } else {
+      obj.reservedDomainSuffixes = [];
+    }
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<Params>, I>>(object: I): Params {
@@ -551,6 +667,7 @@ export const Params = {
     message.minLeaseDuration = object.minLeaseDuration !== undefined && object.minLeaseDuration !== null ? BigInt(object.minLeaseDuration.toString()) : BigInt(0);
     message.maxPendingLeasesPerTenant = object.maxPendingLeasesPerTenant !== undefined && object.maxPendingLeasesPerTenant !== null ? BigInt(object.maxPendingLeasesPerTenant.toString()) : BigInt(0);
     message.pendingTimeout = object.pendingTimeout !== undefined && object.pendingTimeout !== null ? BigInt(object.pendingTimeout.toString()) : BigInt(0);
+    message.reservedDomainSuffixes = object.reservedDomainSuffixes?.map(e => e) || [];
     return message;
   },
   fromAmino(object: ParamsAmino): Params {
@@ -571,6 +688,7 @@ export const Params = {
     if (object.pending_timeout !== undefined && object.pending_timeout !== null) {
       message.pendingTimeout = BigInt(object.pending_timeout);
     }
+    message.reservedDomainSuffixes = object.reserved_domain_suffixes?.map(e => e) || [];
     return message;
   },
   toAmino(message: Params): ParamsAmino {
@@ -585,6 +703,11 @@ export const Params = {
     obj.min_lease_duration = message.minLeaseDuration !== BigInt(0) ? message.minLeaseDuration?.toString() : undefined;
     obj.max_pending_leases_per_tenant = message.maxPendingLeasesPerTenant !== BigInt(0) ? message.maxPendingLeasesPerTenant?.toString() : undefined;
     obj.pending_timeout = message.pendingTimeout !== BigInt(0) ? message.pendingTimeout?.toString() : undefined;
+    if (message.reservedDomainSuffixes) {
+      obj.reserved_domain_suffixes = message.reservedDomainSuffixes.map(e => e);
+    } else {
+      obj.reserved_domain_suffixes = message.reservedDomainSuffixes;
+    }
     return obj;
   },
   fromAminoMsg(object: ParamsAminoMsg): Params {
@@ -616,20 +739,21 @@ function createBaseLeaseItem(): LeaseItem {
     skuUuid: "",
     quantity: BigInt(0),
     lockedPrice: Coin.fromPartial({}),
-    serviceName: ""
+    serviceName: "",
+    customDomain: ""
   };
 }
 export const LeaseItem = {
   typeUrl: "/liftedinit.billing.v1.LeaseItem",
   aminoType: "lifted/billing/LeaseItem",
   is(o: any): o is LeaseItem {
-    return o && (o.$typeUrl === LeaseItem.typeUrl || typeof o.skuUuid === "string" && typeof o.quantity === "bigint" && Coin.is(o.lockedPrice) && typeof o.serviceName === "string");
+    return o && (o.$typeUrl === LeaseItem.typeUrl || typeof o.skuUuid === "string" && typeof o.quantity === "bigint" && Coin.is(o.lockedPrice) && typeof o.serviceName === "string" && typeof o.customDomain === "string");
   },
   isSDK(o: any): o is LeaseItemSDKType {
-    return o && (o.$typeUrl === LeaseItem.typeUrl || typeof o.sku_uuid === "string" && typeof o.quantity === "bigint" && Coin.isSDK(o.locked_price) && typeof o.service_name === "string");
+    return o && (o.$typeUrl === LeaseItem.typeUrl || typeof o.sku_uuid === "string" && typeof o.quantity === "bigint" && Coin.isSDK(o.locked_price) && typeof o.service_name === "string" && typeof o.custom_domain === "string");
   },
   isAmino(o: any): o is LeaseItemAmino {
-    return o && (o.$typeUrl === LeaseItem.typeUrl || typeof o.sku_uuid === "string" && typeof o.quantity === "bigint" && Coin.isAmino(o.locked_price) && typeof o.service_name === "string");
+    return o && (o.$typeUrl === LeaseItem.typeUrl || typeof o.sku_uuid === "string" && typeof o.quantity === "bigint" && Coin.isAmino(o.locked_price) && typeof o.service_name === "string" && typeof o.custom_domain === "string");
   },
   encode(message: LeaseItem, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.skuUuid !== "") {
@@ -643,6 +767,9 @@ export const LeaseItem = {
     }
     if (message.serviceName !== "") {
       writer.uint32(34).string(message.serviceName);
+    }
+    if (message.customDomain !== "") {
+      writer.uint32(42).string(message.customDomain);
     }
     return writer;
   },
@@ -665,6 +792,9 @@ export const LeaseItem = {
         case 4:
           message.serviceName = reader.string();
           break;
+        case 5:
+          message.customDomain = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -677,7 +807,8 @@ export const LeaseItem = {
       skuUuid: isSet(object.skuUuid) ? String(object.skuUuid) : "",
       quantity: isSet(object.quantity) ? BigInt(object.quantity.toString()) : BigInt(0),
       lockedPrice: isSet(object.lockedPrice) ? Coin.fromJSON(object.lockedPrice) : undefined,
-      serviceName: isSet(object.serviceName) ? String(object.serviceName) : ""
+      serviceName: isSet(object.serviceName) ? String(object.serviceName) : "",
+      customDomain: isSet(object.customDomain) ? String(object.customDomain) : ""
     };
   },
   toJSON(message: LeaseItem): JsonSafe<LeaseItem> {
@@ -686,6 +817,7 @@ export const LeaseItem = {
     message.quantity !== undefined && (obj.quantity = (message.quantity || BigInt(0)).toString());
     message.lockedPrice !== undefined && (obj.lockedPrice = message.lockedPrice ? Coin.toJSON(message.lockedPrice) : undefined);
     message.serviceName !== undefined && (obj.serviceName = message.serviceName);
+    message.customDomain !== undefined && (obj.customDomain = message.customDomain);
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<LeaseItem>, I>>(object: I): LeaseItem {
@@ -694,6 +826,7 @@ export const LeaseItem = {
     message.quantity = object.quantity !== undefined && object.quantity !== null ? BigInt(object.quantity.toString()) : BigInt(0);
     message.lockedPrice = object.lockedPrice !== undefined && object.lockedPrice !== null ? Coin.fromPartial(object.lockedPrice) : undefined;
     message.serviceName = object.serviceName ?? "";
+    message.customDomain = object.customDomain ?? "";
     return message;
   },
   fromAmino(object: LeaseItemAmino): LeaseItem {
@@ -710,6 +843,9 @@ export const LeaseItem = {
     if (object.service_name !== undefined && object.service_name !== null) {
       message.serviceName = object.service_name;
     }
+    if (object.custom_domain !== undefined && object.custom_domain !== null) {
+      message.customDomain = object.custom_domain;
+    }
     return message;
   },
   toAmino(message: LeaseItem): LeaseItemAmino {
@@ -718,6 +854,7 @@ export const LeaseItem = {
     obj.quantity = message.quantity !== BigInt(0) ? message.quantity?.toString() : undefined;
     obj.locked_price = message.lockedPrice ? Coin.toAmino(message.lockedPrice) : Coin.toAmino(Coin.fromPartial({}));
     obj.service_name = message.serviceName === "" ? undefined : message.serviceName;
+    obj.custom_domain = message.customDomain === "" ? undefined : message.customDomain;
     return obj;
   },
   fromAminoMsg(object: LeaseItemAminoMsg): LeaseItem {
@@ -1037,6 +1174,103 @@ export const Lease = {
 };
 GlobalDecoderRegistry.register(Lease.typeUrl, Lease);
 GlobalDecoderRegistry.registerAminoProtoMapping(Lease.aminoType, Lease.typeUrl);
+function createBaseCustomDomainTarget(): CustomDomainTarget {
+  return {
+    leaseUuid: "",
+    serviceName: ""
+  };
+}
+export const CustomDomainTarget = {
+  typeUrl: "/liftedinit.billing.v1.CustomDomainTarget",
+  is(o: any): o is CustomDomainTarget {
+    return o && (o.$typeUrl === CustomDomainTarget.typeUrl || typeof o.leaseUuid === "string" && typeof o.serviceName === "string");
+  },
+  isSDK(o: any): o is CustomDomainTargetSDKType {
+    return o && (o.$typeUrl === CustomDomainTarget.typeUrl || typeof o.lease_uuid === "string" && typeof o.service_name === "string");
+  },
+  isAmino(o: any): o is CustomDomainTargetAmino {
+    return o && (o.$typeUrl === CustomDomainTarget.typeUrl || typeof o.lease_uuid === "string" && typeof o.service_name === "string");
+  },
+  encode(message: CustomDomainTarget, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
+    if (message.leaseUuid !== "") {
+      writer.uint32(10).string(message.leaseUuid);
+    }
+    if (message.serviceName !== "") {
+      writer.uint32(18).string(message.serviceName);
+    }
+    return writer;
+  },
+  decode(input: BinaryReader | Uint8Array, length?: number): CustomDomainTarget {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseCustomDomainTarget();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.leaseUuid = reader.string();
+          break;
+        case 2:
+          message.serviceName = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+  fromJSON(object: any): CustomDomainTarget {
+    return {
+      leaseUuid: isSet(object.leaseUuid) ? String(object.leaseUuid) : "",
+      serviceName: isSet(object.serviceName) ? String(object.serviceName) : ""
+    };
+  },
+  toJSON(message: CustomDomainTarget): JsonSafe<CustomDomainTarget> {
+    const obj: any = {};
+    message.leaseUuid !== undefined && (obj.leaseUuid = message.leaseUuid);
+    message.serviceName !== undefined && (obj.serviceName = message.serviceName);
+    return obj;
+  },
+  fromPartial<I extends Exact<DeepPartial<CustomDomainTarget>, I>>(object: I): CustomDomainTarget {
+    const message = createBaseCustomDomainTarget();
+    message.leaseUuid = object.leaseUuid ?? "";
+    message.serviceName = object.serviceName ?? "";
+    return message;
+  },
+  fromAmino(object: CustomDomainTargetAmino): CustomDomainTarget {
+    const message = createBaseCustomDomainTarget();
+    if (object.lease_uuid !== undefined && object.lease_uuid !== null) {
+      message.leaseUuid = object.lease_uuid;
+    }
+    if (object.service_name !== undefined && object.service_name !== null) {
+      message.serviceName = object.service_name;
+    }
+    return message;
+  },
+  toAmino(message: CustomDomainTarget): CustomDomainTargetAmino {
+    const obj: any = {};
+    obj.lease_uuid = message.leaseUuid === "" ? undefined : message.leaseUuid;
+    obj.service_name = message.serviceName === "" ? undefined : message.serviceName;
+    return obj;
+  },
+  fromAminoMsg(object: CustomDomainTargetAminoMsg): CustomDomainTarget {
+    return CustomDomainTarget.fromAmino(object.value);
+  },
+  fromProtoMsg(message: CustomDomainTargetProtoMsg): CustomDomainTarget {
+    return CustomDomainTarget.decode(message.value);
+  },
+  toProto(message: CustomDomainTarget): Uint8Array {
+    return CustomDomainTarget.encode(message).finish();
+  },
+  toProtoMsg(message: CustomDomainTarget): CustomDomainTargetProtoMsg {
+    return {
+      typeUrl: "/liftedinit.billing.v1.CustomDomainTarget",
+      value: CustomDomainTarget.encode(message).finish()
+    };
+  }
+};
+GlobalDecoderRegistry.register(CustomDomainTarget.typeUrl, CustomDomainTarget);
 function createBaseCreditAccount(): CreditAccount {
   return {
     tenant: "",

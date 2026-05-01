@@ -1,6 +1,6 @@
 import { setPaginationParams } from "../../../helpers";
 import { LCDClient } from "@cosmology/lcd";
-import { QueryParamsRequest, QueryParamsResponseSDKType, QueryLeaseRequest, QueryLeaseResponseSDKType, QueryLeasesRequest, QueryLeasesResponseSDKType, QueryLeasesByTenantRequest, QueryLeasesByTenantResponseSDKType, QueryLeasesByProviderRequest, QueryLeasesByProviderResponseSDKType, QueryCreditAccountRequest, QueryCreditAccountResponseSDKType, QueryCreditAddressRequest, QueryCreditAddressResponseSDKType, QueryWithdrawableAmountRequest, QueryWithdrawableAmountResponseSDKType, QueryProviderWithdrawableRequest, QueryProviderWithdrawableResponseSDKType, QueryCreditAccountsRequest, QueryCreditAccountsResponseSDKType, QueryLeasesBySKURequest, QueryLeasesBySKUResponseSDKType, QueryCreditEstimateRequest, QueryCreditEstimateResponseSDKType } from "./query";
+import { QueryParamsRequest, QueryParamsResponseSDKType, QueryLeaseRequest, QueryLeaseResponseSDKType, QueryLeasesRequest, QueryLeasesResponseSDKType, QueryLeasesByTenantRequest, QueryLeasesByTenantResponseSDKType, QueryLeasesByProviderRequest, QueryLeasesByProviderResponseSDKType, QueryCreditAccountRequest, QueryCreditAccountResponseSDKType, QueryCreditAddressRequest, QueryCreditAddressResponseSDKType, QueryWithdrawableAmountRequest, QueryWithdrawableAmountResponseSDKType, QueryProviderWithdrawableRequest, QueryProviderWithdrawableResponseSDKType, QueryCreditAccountsRequest, QueryCreditAccountsResponseSDKType, QueryLeasesBySKURequest, QueryLeasesBySKUResponseSDKType, QueryCreditEstimateRequest, QueryCreditEstimateResponseSDKType, QueryLeaseByCustomDomainRequest, QueryLeaseByCustomDomainResponseSDKType } from "./query";
 export class LCDQueryClient {
   req: LCDClient;
   constructor({
@@ -119,5 +119,11 @@ export class LCDQueryClient {
   creditEstimate = async (params: QueryCreditEstimateRequest): Promise<QueryCreditEstimateResponseSDKType> => {
     const endpoint = `liftedinit/billing/v1/credit/${params.tenant}/estimate`;
     return await this.req.get<QueryCreditEstimateResponseSDKType>(endpoint);
+  };
+  /* LeaseByCustomDomain returns the active or pending lease that has claimed
+   the given custom_domain, if any. */
+  leaseByCustomDomain = async (params: QueryLeaseByCustomDomainRequest): Promise<QueryLeaseByCustomDomainResponseSDKType> => {
+    const endpoint = `liftedinit/billing/v1/lease/by-domain/${params.customDomain}`;
+    return await this.req.get<QueryLeaseByCustomDomainResponseSDKType>(endpoint);
   };
 }

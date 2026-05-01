@@ -1,4 +1,4 @@
-import { MsgFundCredit, MsgCreateLease, MsgCreateLeaseForTenant, MsgAcknowledgeLease, MsgRejectLease, MsgCancelLease, MsgCloseLease, MsgWithdraw, MsgUpdateParams } from "./tx";
+import { MsgFundCredit, MsgCreateLease, MsgCreateLeaseForTenant, MsgAcknowledgeLease, MsgRejectLease, MsgCancelLease, MsgCloseLease, MsgWithdraw, MsgUpdateParams, MsgSetItemCustomDomain } from "./tx";
 export const AminoConverter = {
   "/liftedinit.billing.v1.MsgFundCredit": {
     aminoType: "lifted/billing/MsgFundCredit",
@@ -44,5 +44,10 @@ export const AminoConverter = {
     aminoType: "lifted/billing/MsgUpdateParams",
     toAmino: MsgUpdateParams.toAmino,
     fromAmino: MsgUpdateParams.fromAmino
+  },
+  "/liftedinit.billing.v1.MsgSetItemCustomDomain": {
+    aminoType: "lifted/billing/MsgSetItemCustomDomain",
+    toAmino: MsgSetItemCustomDomain.toAmino,
+    fromAmino: MsgSetItemCustomDomain.fromAmino
   }
 };

@@ -1,5 +1,5 @@
 import { DeliverTxResponse, StdFee, TxRpc } from "../../../types";
-import { MsgFundCredit, MsgCreateLease, MsgCreateLeaseForTenant, MsgAcknowledgeLease, MsgRejectLease, MsgCancelLease, MsgCloseLease, MsgWithdraw, MsgUpdateParams } from "./tx";
+import { MsgFundCredit, MsgCreateLease, MsgCreateLeaseForTenant, MsgAcknowledgeLease, MsgRejectLease, MsgCancelLease, MsgCloseLease, MsgWithdraw, MsgUpdateParams, MsgSetItemCustomDomain } from "./tx";
 /** Msg defines the billing module's Msg service. */
 export interface Msg {
   /** FundCredit funds a tenant's credit account. */
@@ -39,6 +39,14 @@ export interface Msg {
   withdraw(signerAddress: string, message: MsgWithdraw, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
   /** UpdateParams updates the module parameters. */
   updateParams(signerAddress: string, message: MsgUpdateParams, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
+  /**
+   * SetItemCustomDomain sets or clears the custom_domain on a specific
+   * LeaseItem, identified by service_name. Authorised senders: the lease's
+   * tenant, the module authority, or any address in params.allowed_list. The
+   * lease must be in PENDING or ACTIVE state; an empty custom_domain clears
+   * the field and frees the index entry.
+   */
+  setItemCustomDomain(signerAddress: string, message: MsgSetItemCustomDomain, fee: number | StdFee | "auto", memo?: string): Promise<DeliverTxResponse>;
 }
 export class MsgClientImpl implements Msg {
   private readonly rpc: TxRpc;
@@ -120,6 +128,18 @@ export class MsgClientImpl implements Msg {
   updateParams = async (signerAddress: string, message: MsgUpdateParams, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
     const data = [{
       typeUrl: MsgUpdateParams.typeUrl,
+      value: message
+    }];
+    return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
+  };
+  /* SetItemCustomDomain sets or clears the custom_domain on a specific
+   LeaseItem, identified by service_name. Authorised senders: the lease's
+   tenant, the module authority, or any address in params.allowed_list. The
+   lease must be in PENDING or ACTIVE state; an empty custom_domain clears
+   the field and frees the index entry. */
+  setItemCustomDomain = async (signerAddress: string, message: MsgSetItemCustomDomain, fee: number | StdFee | "auto" = "auto", memo: string = ""): Promise<DeliverTxResponse> => {
+    const data = [{
+      typeUrl: MsgSetItemCustomDomain.typeUrl,
       value: message
     }];
     return this.rpc.signAndBroadcast!(signerAddress, data, fee, memo);
