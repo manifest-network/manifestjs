@@ -73,8 +73,11 @@ const msg = burnHeldBalance({
 Because both messages are authority-only, the typical flow is to wrap them in a `cosmos.group.v1.MsgSubmitProposal`. Use the `encoded` flavor to produce `Uint8Array` values that fit inside `google.protobuf.Any`:
 
 ```ts
-import { cosmos, liftedinit } from '@manifest-network/manifestjs';
+import { cosmos, liftedinit, getSigningLiftedinitClient } from '@manifest-network/manifestjs';
 import { Any } from '@manifest-network/manifestjs/dist/codegen/google/protobuf/any';
+
+const client = await getSigningLiftedinitClient({ rpcEndpoint: RPC_ENDPOINT, signer });
+const fee = { amount: [{ denom: 'umfx', amount: '330000' }], gas: '300000' };
 
 const payoutEncoded = liftedinit.manifest.v1.MessageComposer.encoded.payout({
   authority: GROUP_POLICY_ADDRESS,

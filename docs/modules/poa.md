@@ -92,8 +92,15 @@ const poa = client.strangelove_ventures.poa.v1;
 ## Worked example — admitting a pending validator via group
 
 ```ts
-import { cosmos, strangelove_ventures } from '@manifest-network/manifestjs';
+import {
+  cosmos,
+  strangelove_ventures,
+  getSigningStrangeloveVenturesClient,
+} from '@manifest-network/manifestjs';
 import { Any } from '@manifest-network/manifestjs/dist/codegen/google/protobuf/any';
+
+const client = await getSigningStrangeloveVenturesClient({ rpcEndpoint: RPC_ENDPOINT, signer });
+const fee = { amount: [{ denom: 'umfx', amount: '330000' }], gas: '300000' };
 
 // 1. Encode MsgSetPower with the group policy as sender
 const setPowerEncoded = strangelove_ventures.poa.v1.MessageComposer.encoded.setPower({

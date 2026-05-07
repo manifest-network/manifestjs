@@ -200,6 +200,8 @@ const { params } = await billing.params({});
 
 ```ts
 import { liftedinit, getSigningLiftedinitClient } from '@manifest-network/manifestjs';
+import { MsgCreateLeaseResponse } from '@manifest-network/manifestjs/dist/codegen/liftedinit/billing/v1/tx';
+
 const composer = liftedinit.billing.v1.MessageComposer.withTypeUrl;
 
 const client = await getSigningLiftedinitClient({ rpcEndpoint: RPC_ENDPOINT, signer });
@@ -226,8 +228,6 @@ const createMsg = composer.createLease({
 const createResult = await client.signAndBroadcast(tenantAddress, [createMsg], fee);
 
 // 3. Decode the lease UUID from the response
-import { MsgCreateLeaseResponse } from
-  '@manifest-network/manifestjs/dist/codegen/liftedinit/billing/v1/tx';
 const leaseUuid = MsgCreateLeaseResponse.decode(createResult.msgResponses[0].value).leaseUuid;
 
 // 4. (Provider) acknowledges
