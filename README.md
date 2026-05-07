@@ -72,7 +72,7 @@ For browser apps, use [cosmos-kit](https://github.com/cosmology-tech/cosmos-kit)
 
 ```ts
 import { getSigningLiftedinitClient } from '@manifest-network/manifestjs';
-import { liftedinit } from '@manifest-network/manifestjs';
+import { cosmos } from '@manifest-network/manifestjs';
 
 // `signer` comes from cosmos-kit (Keplr, Leap, etc.)
 const client = await getSigningLiftedinitClient({
@@ -80,13 +80,12 @@ const client = await getSigningLiftedinitClient({
   signer,
 });
 
-const { payout } = liftedinit.manifest.v1.MessageComposer.withTypeUrl;
+const { send } = cosmos.bank.v1beta1.MessageComposer.withTypeUrl;
 
-const msg = payout({
-  authority: 'manifest1...',
-  payoutPairs: [
-    { address: 'manifest1recipient...', coin: { denom: 'umfx', amount: '1000000' } },
-  ],
+const msg = send({
+  fromAddress: senderAddress,
+  toAddress: 'manifest1recipient...',
+  amount: [{ denom: 'umfx', amount: '1000000' }],
 });
 
 const fee = { amount: [{ denom: 'umfx', amount: '220000' }], gas: '200000' };
@@ -95,6 +94,8 @@ const result = await client.signAndBroadcast(senderAddress, [msg], fee);
 
 The `getSigningLiftedinitClient` registry covers `liftedinit.*` plus the default cosmos-sdk types, so a typical Manifest-only app does not need to compose registries manually. If you also need to send `cosmos.group`, `osmosis.tokenfactory`, or `strangelove_ventures.poa` messages from the same client, see [Advanced](#advanced--building-a-multi-namespace-signer).
 
+> **Authority-gated messages.** Several Manifest modules require the **module authority** as the signer — `liftedinit.manifest.v1.MsgPayout` / `MsgBurnHeldBalance`, every `MsgUpdateParams`, and the POA admin messages. On Manifest mainnet/testnet that authority is a `cosmos.group` policy address (no private key), so those messages can't be signed directly — they must be wrapped in a `cosmos.group.v1.MsgSubmitProposal`. See the per-module references ([manifest](docs/modules/manifest.md), [billing](docs/modules/billing.md#worked-example--tenant-lifecycle), [POA](docs/modules/poa.md#worked-example--admitting-a-pending-validator-via-group)) for the group-proposal flow.
+
 ### Backend / scripts (raw signer)
 
 For Node scripts and tests, build a signer with `@cosmjs/proto-signing` (proto/Direct) or `@cosmjs/amino` (Amino — recommended for Ledger HW):
@@ -102,7 +103,7 @@ For Node scripts and tests, build a signer with `@cosmjs/proto-signing` (proto/D
 ```ts
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { getSigningLiftedinitClient } from '@manifest-network/manifestjs';
-import { liftedinit } from '@manifest-network/manifestjs';
+import { cosmos } from '@manifest-network/manifestjs';
 
 const signer = await DirectSecp256k1HdWallet.fromMnemonic(MNEMONIC, {
   prefix: 'manifest',
@@ -114,10 +115,11 @@ const client = await getSigningLiftedinitClient({
   signer,
 });
 
-const { burnHeldBalance } = liftedinit.manifest.v1.MessageComposer.withTypeUrl;
-const msg = burnHeldBalance({
-  authority: address,
-  burnCoins: [{ denom: 'umfx', amount: '1000' }],
+const { send } = cosmos.bank.v1beta1.MessageComposer.withTypeUrl;
+const msg = send({
+  fromAddress: address,
+  toAddress: 'manifest1recipient...',
+  amount: [{ denom: 'umfx', amount: '1000' }],
 });
 
 const fee = { amount: [{ denom: 'umfx', amount: '220000' }], gas: '200000' };
@@ -252,6 +254,8 @@ await tx.cosmos.bank.v1beta1.send(
 ```
 
 The same pattern is available on `cosmos`, `osmosis`, `strangelove_ventures`, `cosmwasm`, and `ibc` namespaces.
+
+> **Cross-namespace caveat.** The example above mixes `tx.liftedinit.*` with `tx.cosmos.bank.*` against a `liftedinit`-namespace client. That works for **Direct/proto** signers because `defaultRegistryTypes` (folded into `liftedinitProtoRegistry`) covers cosmos protos. It will **not** work for **Amino** signers (Ledger, Keplr's amino mode), because `liftedinitAminoConverters` only includes `billing`/`manifest`/`sku` converters — Amino-signing `cosmos.bank.MsgSend` will throw at `aminoTypes.toAmino()`. If you need Amino + cross-namespace messages, build a multi-namespace `SigningStargateClient` per the [Advanced section](#advanced--building-a-multi-namespace-signer).
 
 > Each method accepts `fee: number | StdFee | "auto"`, but `"auto"` requires the underlying `SigningStargateClient` to be constructed with a `gasPrice` — and `getSigning<Namespace>Client` does not set one. Pass an explicit `StdFee` (as above), or build your own `SigningStargateClient` via the [Advanced section](#advanced--building-a-multi-namespace-signer) and supply `{ gasPrice: GasPrice.fromString('1.1umfx') }` if you want gas estimation. The current `umfx` gas-price tiers (fixed-min `1`, low `1.05`, average `1.1`, high `3`) come from the [chain-registry entry for manifest](https://github.com/cosmos/chain-registry/blob/master/manifest/chain.json); double-check before sending real value, since the registry is the source of truth.
 
