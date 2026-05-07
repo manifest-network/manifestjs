@@ -71,11 +71,10 @@ For each namespace the package generates:
 For browser apps, use [cosmos-kit](https://github.com/cosmology-tech/cosmos-kit) for wallet connection and let it provide the signer. Once you have an `OfflineSigner`, hand it to one of the `getSigning*Client` factories:
 
 ```ts
-import { getSigningLiftedinitClient } from '@manifest-network/manifestjs';
-import { cosmos } from '@manifest-network/manifestjs';
+import { getSigningCosmosClient, cosmos } from '@manifest-network/manifestjs';
 
 // `signer` comes from cosmos-kit (Keplr, Leap, etc.)
-const client = await getSigningLiftedinitClient({
+const client = await getSigningCosmosClient({
   rpcEndpoint: RPC_ENDPOINT,
   signer,
 });
@@ -92,7 +91,7 @@ const fee = { amount: [{ denom: 'umfx', amount: '220000' }], gas: '200000' };
 const result = await client.signAndBroadcast(senderAddress, [msg], fee);
 ```
 
-The `getSigningLiftedinitClient` registry covers `liftedinit.*` plus the default cosmos-sdk types, so a typical Manifest-only app does not need to compose registries manually. If you also need to send `cosmos.group`, `osmosis.tokenfactory`, or `strangelove_ventures.poa` messages from the same client, see [Advanced](#advanced--building-a-multi-namespace-signer).
+`getSigningCosmosClient` is the safest choice for cosmos-only transactions because its registry **and** amino converters cover every cosmos module bundled with this package — so the same code path works for Direct/proto signers and Amino signers (Ledger, Keplr's amino mode). For module-specific transactions, use the matching factory: `getSigningLiftedinitClient`, `getSigningOsmosisClient`, `getSigningStrangeloveVenturesClient`, `getSigningCosmwasmClient`, or `getSigningIbcClient`. Each is pre-wired (registry + amino) for its own namespace's messages — see the [Module reference](#module-reference) for examples. To send messages from multiple namespaces in a single transaction, see [Advanced](#advanced--building-a-multi-namespace-signer).
 
 > **Authority-gated messages.** Several Manifest modules require the **module authority** as the signer — `liftedinit.manifest.v1.MsgPayout` / `MsgBurnHeldBalance`, every `MsgUpdateParams`, and the POA admin messages. On Manifest mainnet/testnet that authority is a `cosmos.group` policy address (no private key), so those messages can't be signed directly — they must be wrapped in a `cosmos.group.v1.MsgSubmitProposal`. See the per-module references ([manifest](docs/modules/manifest.md), [billing](docs/modules/billing.md#worked-example--tenant-lifecycle), [POA](docs/modules/poa.md#worked-example--admitting-a-pending-validator-via-group)) for the group-proposal flow.
 
@@ -102,15 +101,14 @@ For Node scripts and tests, build a signer with `@cosmjs/proto-signing` (proto/D
 
 ```ts
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { getSigningLiftedinitClient } from '@manifest-network/manifestjs';
-import { cosmos } from '@manifest-network/manifestjs';
+import { getSigningCosmosClient, cosmos } from '@manifest-network/manifestjs';
 
 const signer = await DirectSecp256k1HdWallet.fromMnemonic(MNEMONIC, {
   prefix: 'manifest',
 });
 const [{ address }] = await signer.getAccounts();
 
-const client = await getSigningLiftedinitClient({
+const client = await getSigningCosmosClient({
   rpcEndpoint: RPC_ENDPOINT,
   signer,
 });
