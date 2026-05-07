@@ -4,4 +4,4 @@ setup:
 
 .PHONY: build
 build:
-	docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/manifest-network/manifest-ledger:1.0.8 .
+	docker buildx build --platform linux/amd64,linux/arm64 -t ghcr.io/manifest-network/manifest-ledger:2.1.0 .
