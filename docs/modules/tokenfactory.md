@@ -39,23 +39,23 @@ Response: `{ newTokenDenom }` — e.g., `factory/manifest1.../mytoken`.
 
 ### `MsgMint` — `mint`
 
-Mints to `mintToAddress` (defaults to sender if empty). Sender must be the denom's admin.
+Mints to the sender's account. Sender must be the denom's admin. The proto field `mintToAddress` exists but the chain's keeper currently only supports minting to the sender (per the proto comment "for now, we only support minting to the sender account"); set it to the sender address or leave it empty.
 
-| Field            | Type     | Notes                                                     |
-| ---------------- | -------- | --------------------------------------------------------- |
-| `sender`         | `string` | Denom admin.                                              |
-| `amount`         | `Coin`   | Denom must be a `factory/.../...` token.                  |
-| `mintToAddress`  | `string` | Optional. Empty string ⇒ mint to sender.                  |
+| Field            | Type     | Notes                                                                          |
+| ---------------- | -------- | ------------------------------------------------------------------------------ |
+| `sender`         | `string` | Denom admin. Receives the minted coins.                                        |
+| `amount`         | `Coin`   | Denom must be a `factory/.../...` token.                                       |
+| `mintToAddress`  | `string` | Must equal `sender` (or be empty). Third-party minting is not supported today. |
 
 ### `MsgBurn` — `burn`
 
-Burns from `burnFromAddress` (defaults to sender). Sender must be admin.
+Burns from the sender's account. Sender must be admin. As with `MsgMint`, the `burnFromAddress` field exists but the chain's keeper currently only supports burning from the sender (per the proto comment "for now, we only support burning from the sender account"); set it to the sender address or leave it empty.
 
-| Field             | Type     | Notes                                              |
-| ----------------- | -------- | -------------------------------------------------- |
-| `sender`          | `string` |                                                    |
-| `amount`          | `Coin`   |                                                    |
-| `burnFromAddress` | `string` | Optional.                                          |
+| Field             | Type     | Notes                                                                              |
+| ----------------- | -------- | ---------------------------------------------------------------------------------- |
+| `sender`          | `string` | Denom admin. Coins are deducted from this account.                                 |
+| `amount`          | `Coin`   |                                                                                    |
+| `burnFromAddress` | `string` | Must equal `sender` (or be empty). Third-party burns are not supported today.      |
 
 ### `MsgChangeAdmin` — `changeAdmin`
 
@@ -128,14 +128,16 @@ const createRes = await client.signAndBroadcast(adminAddress, [
 const denom = MsgCreateDenomResponse.decode(createRes.msgResponses[0].value).newTokenDenom;
 // e.g. "factory/manifest1.../mytoken"
 
-// 2. Mint 1,000,000 to a recipient
+// 2. Mint 1,000,000 into the admin account, then send to the recipient
 await client.signAndBroadcast(adminAddress, [
   tx.mint({
     sender: adminAddress,
     amount: { denom, amount: '1000000' },
-    mintToAddress: recipientAddress,
+    mintToAddress: adminAddress, // chain only supports sender == mintToAddress today
   }),
 ], fee);
+
+// (Use cosmos.bank.MsgSend afterwards if the coins should land in another account.)
 
 // 3. Hand admin off
 await client.signAndBroadcast(adminAddress, [

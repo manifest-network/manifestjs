@@ -42,7 +42,7 @@ Compatibility:
 
 ## What's in the box
 
-Top-level namespaces exported by the package:
+Primary chain-module namespaces:
 
 | Namespace                     | Modules                                                            | Notes                                                                |
 | ----------------------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------- |
@@ -53,6 +53,8 @@ Top-level namespaces exported by the package:
 | `strangelove_ventures`        | poa (v1)                                                           | Proof-of-Authority validator module.                                 |
 | `liftedinit`                  | manifest (v1), billing (v1), sku (v1)                              | Manifest-specific modules. **The chain's distinctive features live here.** |
 | `tendermint`, `google`        | —                                                                  | Supporting types.                                                    |
+
+The package also exports proto-plumbing namespaces — `amino`, `ics23`, `cosmos_proto`, `gogoproto` — which application code rarely needs to import directly.
 
 For each namespace the package generates:
 
