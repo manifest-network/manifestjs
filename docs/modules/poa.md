@@ -120,6 +120,8 @@ await client.signAndBroadcast(memberAddress, [submit], fee);
 //    the candidate moves from `pendingValidators` into the active set.
 ```
 
+> **Signer-type caveat.** The example wraps `MsgSetPower` in `cosmos.group.v1.MsgSubmitProposal`. Under a **Direct/proto** signer, `getSigningStrangeloveVenturesClient` works — the manifest fork's `defaultRegistryTypes` includes `groupTypes`, and the inner `MsgSetPower` rides as opaque `Any` bytes. Under an **Amino** signer (Ledger, Keplr's amino mode), the same client will fail at `aminoTypes.toAmino()` because `strangeloveVenturesAminoConverters` doesn't include cosmos.group converters, and the inner-message amino conversion would also need the POA amino converters that aren't loaded by sibling `getSigning*Client` factories. For Amino + group flows, build a multi-namespace `SigningStargateClient` per the README's [Advanced section](../../README.md#advanced--building-a-multi-namespace-signer).
+
 The full submit-vote-exec cycle is implemented in `starship/src/test_helper.ts:submitVoteExecGroupProposal`; see `starship/__tests__/poa.group.test.ts` for working POA scenarios.
 
 ## Reference

@@ -1,6 +1,6 @@
 # Manifest module — `liftedinit.manifest.v1`
 
-The `manifest` module is Manifest Network's authority-driven token-management module. It ships two messages: an `MsgPayout` for distributing coins to addresses and an `MsgBurnHeldBalance` for destroying coins held by the authority.
+The `manifest` module is Manifest Network's authority-driven token-management module. It ships two messages: a `MsgPayout` for distributing coins to addresses and a `MsgBurnHeldBalance` for destroying coins held by the authority.
 
 Both messages are signed by the module **authority** (typically a `cosmos.group` policy address). Sending them from a regular account will fail.
 
@@ -93,6 +93,8 @@ const submitProposal = cosmos.group.v1.MessageComposer.fromPartial.submitProposa
 
 await client.signAndBroadcast(proposerAddress, [submitProposal], fee);
 ```
+
+> **Signer-type caveat.** The example above broadcasts `MsgSubmitProposal` (cosmos.group.v1) wrapping a `MsgPayout`. Under a **Direct/proto** signer, `getSigningLiftedinitClient` works as-is — the manifest fork's `defaultRegistryTypes` includes `groupTypes`, and the inner `MsgPayout` rides as opaque `Any` bytes. Under an **Amino** signer (Ledger, Keplr's amino mode), the same client will fail at `aminoTypes.toAmino()` because `liftedinitAminoConverters` doesn't include cosmos.group, and the inner-message amino conversion would also need the manifest amino converters that aren't loaded by sibling `getSigning*Client` factories. For Amino + group flows, build a multi-namespace `SigningStargateClient` per the README's [Advanced section](../../README.md#advanced--building-a-multi-namespace-signer) (or use `getSigningCosmosClient` if you only need cosmos.* + the `Any`-wrapped payload).
 
 See `starship/__tests__/manifest.group.test.ts` for an end-to-end example of submitting, voting, and executing a `payout` proposal.
 
