@@ -365,6 +365,13 @@ export interface MsgWithdraw {
    * Ignored when lease_uuids is specified.
    */
   limit: bigint;
+  /**
+   * key is an opaque pagination cursor for provider-wide mode. Echo back the
+   * next_key returned by the previous MsgWithdrawResponse to continue paging;
+   * empty starts from the beginning. Must not be set when lease_uuids is
+   * specified (rejected by ValidateBasic).
+   */
+  key: Uint8Array;
 }
 export interface MsgWithdrawProtoMsg {
   typeUrl: "/liftedinit.billing.v1.MsgWithdraw";
@@ -397,6 +404,13 @@ export interface MsgWithdrawAmino {
    * Ignored when lease_uuids is specified.
    */
   limit?: string;
+  /**
+   * key is an opaque pagination cursor for provider-wide mode. Echo back the
+   * next_key returned by the previous MsgWithdrawResponse to continue paging;
+   * empty starts from the beginning. Must not be set when lease_uuids is
+   * specified (rejected by ValidateBasic).
+   */
+  key?: string;
 }
 export interface MsgWithdrawAminoMsg {
   type: "lifted/billing/MsgWithdraw";
@@ -414,6 +428,7 @@ export interface MsgWithdrawSDKType {
   lease_uuids: string[];
   provider_uuid: string;
   limit: bigint;
+  key: Uint8Array;
 }
 /** MsgWithdrawResponse is the response type for MsgWithdraw. */
 export interface MsgWithdrawResponse {
@@ -428,6 +443,13 @@ export interface MsgWithdrawResponse {
    * Always false when using lease_uuids mode.
    */
   hasMore: boolean;
+  /**
+   * next_key is the opaque cursor to pass as MsgWithdraw.key to fetch the next
+   * page in provider-wide mode. It is non-empty if and only if has_more is
+   * true; an empty next_key means there are no more leases. Always empty in
+   * lease_uuids mode.
+   */
+  nextKey: Uint8Array;
 }
 export interface MsgWithdrawResponseProtoMsg {
   typeUrl: "/liftedinit.billing.v1.MsgWithdrawResponse";
@@ -446,6 +468,13 @@ export interface MsgWithdrawResponseAmino {
    * Always false when using lease_uuids mode.
    */
   has_more?: boolean;
+  /**
+   * next_key is the opaque cursor to pass as MsgWithdraw.key to fetch the next
+   * page in provider-wide mode. It is non-empty if and only if has_more is
+   * true; an empty next_key means there are no more leases. Always empty in
+   * lease_uuids mode.
+   */
+  next_key?: string;
 }
 export interface MsgWithdrawResponseAminoMsg {
   type: "/liftedinit.billing.v1.MsgWithdrawResponse";
@@ -457,6 +486,7 @@ export interface MsgWithdrawResponseSDKType {
   payout_address: string;
   withdrawal_count: bigint;
   has_more: boolean;
+  next_key: Uint8Array;
 }
 /** MsgUpdateParams updates the module parameters. */
 export interface MsgUpdateParams {
@@ -1823,20 +1853,21 @@ function createBaseMsgWithdraw(): MsgWithdraw {
     sender: "",
     leaseUuids: [],
     providerUuid: "",
-    limit: BigInt(0)
+    limit: BigInt(0),
+    key: new Uint8Array()
   };
 }
 export const MsgWithdraw = {
   typeUrl: "/liftedinit.billing.v1.MsgWithdraw",
   aminoType: "lifted/billing/MsgWithdraw",
   is(o: any): o is MsgWithdraw {
-    return o && (o.$typeUrl === MsgWithdraw.typeUrl || typeof o.sender === "string" && Array.isArray(o.leaseUuids) && (!o.leaseUuids.length || typeof o.leaseUuids[0] === "string") && typeof o.providerUuid === "string" && typeof o.limit === "bigint");
+    return o && (o.$typeUrl === MsgWithdraw.typeUrl || typeof o.sender === "string" && Array.isArray(o.leaseUuids) && (!o.leaseUuids.length || typeof o.leaseUuids[0] === "string") && typeof o.providerUuid === "string" && typeof o.limit === "bigint" && (o.key instanceof Uint8Array || typeof o.key === "string"));
   },
   isSDK(o: any): o is MsgWithdrawSDKType {
-    return o && (o.$typeUrl === MsgWithdraw.typeUrl || typeof o.sender === "string" && Array.isArray(o.lease_uuids) && (!o.lease_uuids.length || typeof o.lease_uuids[0] === "string") && typeof o.provider_uuid === "string" && typeof o.limit === "bigint");
+    return o && (o.$typeUrl === MsgWithdraw.typeUrl || typeof o.sender === "string" && Array.isArray(o.lease_uuids) && (!o.lease_uuids.length || typeof o.lease_uuids[0] === "string") && typeof o.provider_uuid === "string" && typeof o.limit === "bigint" && (o.key instanceof Uint8Array || typeof o.key === "string"));
   },
   isAmino(o: any): o is MsgWithdrawAmino {
-    return o && (o.$typeUrl === MsgWithdraw.typeUrl || typeof o.sender === "string" && Array.isArray(o.lease_uuids) && (!o.lease_uuids.length || typeof o.lease_uuids[0] === "string") && typeof o.provider_uuid === "string" && typeof o.limit === "bigint");
+    return o && (o.$typeUrl === MsgWithdraw.typeUrl || typeof o.sender === "string" && Array.isArray(o.lease_uuids) && (!o.lease_uuids.length || typeof o.lease_uuids[0] === "string") && typeof o.provider_uuid === "string" && typeof o.limit === "bigint" && (o.key instanceof Uint8Array || typeof o.key === "string"));
   },
   encode(message: MsgWithdraw, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.sender !== "") {
@@ -1850,6 +1881,9 @@ export const MsgWithdraw = {
     }
     if (message.limit !== BigInt(0)) {
       writer.uint32(32).uint64(message.limit);
+    }
+    if (message.key.length !== 0) {
+      writer.uint32(42).bytes(message.key);
     }
     return writer;
   },
@@ -1872,6 +1906,9 @@ export const MsgWithdraw = {
         case 4:
           message.limit = reader.uint64();
           break;
+        case 5:
+          message.key = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -1884,7 +1921,8 @@ export const MsgWithdraw = {
       sender: isSet(object.sender) ? String(object.sender) : "",
       leaseUuids: Array.isArray(object?.leaseUuids) ? object.leaseUuids.map((e: any) => String(e)) : [],
       providerUuid: isSet(object.providerUuid) ? String(object.providerUuid) : "",
-      limit: isSet(object.limit) ? BigInt(object.limit.toString()) : BigInt(0)
+      limit: isSet(object.limit) ? BigInt(object.limit.toString()) : BigInt(0),
+      key: isSet(object.key) ? bytesFromBase64(object.key) : new Uint8Array()
     };
   },
   toJSON(message: MsgWithdraw): JsonSafe<MsgWithdraw> {
@@ -1897,6 +1935,7 @@ export const MsgWithdraw = {
     }
     message.providerUuid !== undefined && (obj.providerUuid = message.providerUuid);
     message.limit !== undefined && (obj.limit = (message.limit || BigInt(0)).toString());
+    message.key !== undefined && (obj.key = base64FromBytes(message.key !== undefined ? message.key : new Uint8Array()));
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgWithdraw>, I>>(object: I): MsgWithdraw {
@@ -1905,6 +1944,7 @@ export const MsgWithdraw = {
     message.leaseUuids = object.leaseUuids?.map(e => e) || [];
     message.providerUuid = object.providerUuid ?? "";
     message.limit = object.limit !== undefined && object.limit !== null ? BigInt(object.limit.toString()) : BigInt(0);
+    message.key = object.key ?? new Uint8Array();
     return message;
   },
   fromAmino(object: MsgWithdrawAmino): MsgWithdraw {
@@ -1919,6 +1959,9 @@ export const MsgWithdraw = {
     if (object.limit !== undefined && object.limit !== null) {
       message.limit = BigInt(object.limit);
     }
+    if (object.key !== undefined && object.key !== null) {
+      message.key = bytesFromBase64(object.key);
+    }
     return message;
   },
   toAmino(message: MsgWithdraw): MsgWithdrawAmino {
@@ -1931,6 +1974,7 @@ export const MsgWithdraw = {
     }
     obj.provider_uuid = message.providerUuid === "" ? undefined : message.providerUuid;
     obj.limit = message.limit !== BigInt(0) ? message.limit?.toString() : undefined;
+    obj.key = message.key ? base64FromBytes(message.key) : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgWithdrawAminoMsg): MsgWithdraw {
@@ -1962,19 +2006,20 @@ function createBaseMsgWithdrawResponse(): MsgWithdrawResponse {
     totalAmounts: [],
     payoutAddress: "",
     withdrawalCount: BigInt(0),
-    hasMore: false
+    hasMore: false,
+    nextKey: new Uint8Array()
   };
 }
 export const MsgWithdrawResponse = {
   typeUrl: "/liftedinit.billing.v1.MsgWithdrawResponse",
   is(o: any): o is MsgWithdrawResponse {
-    return o && (o.$typeUrl === MsgWithdrawResponse.typeUrl || Array.isArray(o.totalAmounts) && (!o.totalAmounts.length || Coin.is(o.totalAmounts[0])) && typeof o.payoutAddress === "string" && typeof o.withdrawalCount === "bigint" && typeof o.hasMore === "boolean");
+    return o && (o.$typeUrl === MsgWithdrawResponse.typeUrl || Array.isArray(o.totalAmounts) && (!o.totalAmounts.length || Coin.is(o.totalAmounts[0])) && typeof o.payoutAddress === "string" && typeof o.withdrawalCount === "bigint" && typeof o.hasMore === "boolean" && (o.nextKey instanceof Uint8Array || typeof o.nextKey === "string"));
   },
   isSDK(o: any): o is MsgWithdrawResponseSDKType {
-    return o && (o.$typeUrl === MsgWithdrawResponse.typeUrl || Array.isArray(o.total_amounts) && (!o.total_amounts.length || Coin.isSDK(o.total_amounts[0])) && typeof o.payout_address === "string" && typeof o.withdrawal_count === "bigint" && typeof o.has_more === "boolean");
+    return o && (o.$typeUrl === MsgWithdrawResponse.typeUrl || Array.isArray(o.total_amounts) && (!o.total_amounts.length || Coin.isSDK(o.total_amounts[0])) && typeof o.payout_address === "string" && typeof o.withdrawal_count === "bigint" && typeof o.has_more === "boolean" && (o.next_key instanceof Uint8Array || typeof o.next_key === "string"));
   },
   isAmino(o: any): o is MsgWithdrawResponseAmino {
-    return o && (o.$typeUrl === MsgWithdrawResponse.typeUrl || Array.isArray(o.total_amounts) && (!o.total_amounts.length || Coin.isAmino(o.total_amounts[0])) && typeof o.payout_address === "string" && typeof o.withdrawal_count === "bigint" && typeof o.has_more === "boolean");
+    return o && (o.$typeUrl === MsgWithdrawResponse.typeUrl || Array.isArray(o.total_amounts) && (!o.total_amounts.length || Coin.isAmino(o.total_amounts[0])) && typeof o.payout_address === "string" && typeof o.withdrawal_count === "bigint" && typeof o.has_more === "boolean" && (o.next_key instanceof Uint8Array || typeof o.next_key === "string"));
   },
   encode(message: MsgWithdrawResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.totalAmounts) {
@@ -1988,6 +2033,9 @@ export const MsgWithdrawResponse = {
     }
     if (message.hasMore === true) {
       writer.uint32(32).bool(message.hasMore);
+    }
+    if (message.nextKey.length !== 0) {
+      writer.uint32(42).bytes(message.nextKey);
     }
     return writer;
   },
@@ -2010,6 +2058,9 @@ export const MsgWithdrawResponse = {
         case 4:
           message.hasMore = reader.bool();
           break;
+        case 5:
+          message.nextKey = reader.bytes();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -2022,7 +2073,8 @@ export const MsgWithdrawResponse = {
       totalAmounts: Array.isArray(object?.totalAmounts) ? object.totalAmounts.map((e: any) => Coin.fromJSON(e)) : [],
       payoutAddress: isSet(object.payoutAddress) ? String(object.payoutAddress) : "",
       withdrawalCount: isSet(object.withdrawalCount) ? BigInt(object.withdrawalCount.toString()) : BigInt(0),
-      hasMore: isSet(object.hasMore) ? Boolean(object.hasMore) : false
+      hasMore: isSet(object.hasMore) ? Boolean(object.hasMore) : false,
+      nextKey: isSet(object.nextKey) ? bytesFromBase64(object.nextKey) : new Uint8Array()
     };
   },
   toJSON(message: MsgWithdrawResponse): JsonSafe<MsgWithdrawResponse> {
@@ -2035,6 +2087,7 @@ export const MsgWithdrawResponse = {
     message.payoutAddress !== undefined && (obj.payoutAddress = message.payoutAddress);
     message.withdrawalCount !== undefined && (obj.withdrawalCount = (message.withdrawalCount || BigInt(0)).toString());
     message.hasMore !== undefined && (obj.hasMore = message.hasMore);
+    message.nextKey !== undefined && (obj.nextKey = base64FromBytes(message.nextKey !== undefined ? message.nextKey : new Uint8Array()));
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<MsgWithdrawResponse>, I>>(object: I): MsgWithdrawResponse {
@@ -2043,6 +2096,7 @@ export const MsgWithdrawResponse = {
     message.payoutAddress = object.payoutAddress ?? "";
     message.withdrawalCount = object.withdrawalCount !== undefined && object.withdrawalCount !== null ? BigInt(object.withdrawalCount.toString()) : BigInt(0);
     message.hasMore = object.hasMore ?? false;
+    message.nextKey = object.nextKey ?? new Uint8Array();
     return message;
   },
   fromAmino(object: MsgWithdrawResponseAmino): MsgWithdrawResponse {
@@ -2057,6 +2111,9 @@ export const MsgWithdrawResponse = {
     if (object.has_more !== undefined && object.has_more !== null) {
       message.hasMore = object.has_more;
     }
+    if (object.next_key !== undefined && object.next_key !== null) {
+      message.nextKey = bytesFromBase64(object.next_key);
+    }
     return message;
   },
   toAmino(message: MsgWithdrawResponse): MsgWithdrawResponseAmino {
@@ -2069,6 +2126,7 @@ export const MsgWithdrawResponse = {
     obj.payout_address = message.payoutAddress === "" ? undefined : message.payoutAddress;
     obj.withdrawal_count = message.withdrawalCount !== BigInt(0) ? message.withdrawalCount?.toString() : undefined;
     obj.has_more = message.hasMore === false ? undefined : message.hasMore;
+    obj.next_key = message.nextKey ? base64FromBytes(message.nextKey) : undefined;
     return obj;
   },
   fromAminoMsg(object: MsgWithdrawResponseAminoMsg): MsgWithdrawResponse {

@@ -113,14 +113,17 @@ Closes one or more `ACTIVE` leases. Sender must be the tenant, the provider, or 
 Provider claims accrued earnings. Two **mutually exclusive** modes:
 
 - **Specific leases:** populate `leaseUuids` (1–100). Withdraws each lease's withdrawable balance.
-- **Provider-wide:** populate `providerUuid`. Sweeps all of that provider's active leases. Optional `limit` (default 50, max 100). The response's `hasMore: true` means call again to continue.
+- **Provider-wide:** populate `providerUuid`. Sweeps that provider's active leases, up to `limit` per call (default 50, max 100). To page through them all, echo each response's opaque `nextKey` back as the next request's `key`, looping until `nextKey` is empty (equivalently, until `hasMore` is `false`).
 
-| Field           | Type       | Notes                                                       |
-| --------------- | ---------- | ----------------------------------------------------------- |
-| `sender`        | `string`   | Provider address or authority.                              |
-| `leaseUuids`    | `string[]` | Mutually exclusive with `providerUuid`.                     |
-| `providerUuid`  | `string`   | Mutually exclusive with `leaseUuids`.                       |
-| `limit`         | `bigint`   | Cap on leases processed in provider-wide mode.              |
+| Field           | Type         | Notes                                                                                                                          |
+| --------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| `sender`        | `string`     | Provider address or authority.                                                                                                 |
+| `leaseUuids`    | `string[]`   | Mutually exclusive with `providerUuid`.                                                                                        |
+| `providerUuid`  | `string`     | Mutually exclusive with `leaseUuids`.                                                                                          |
+| `limit`         | `bigint`     | Cap on leases processed per call in provider-wide mode.                                                                        |
+| `key`           | `Uint8Array` | Opaque pagination cursor for provider-wide mode — echo the previous response's `nextKey`; empty starts from the beginning. Must be unset in `leaseUuids` mode. |
+
+Response (`MsgWithdrawResponse`): `totalAmounts`, `payoutAddress`, `withdrawalCount`, `hasMore`, and `nextKey` — the opaque cursor to pass as the next request's `key`. `nextKey` is non-empty **iff** `hasMore` is `true`.
 
 ### `MsgUpdateParams` — `updateParams`
 
@@ -170,7 +173,7 @@ const billing = client.liftedinit.billing.v1;
 | `creditAccount({ tenant })` |                                                  | `{ creditAccount, balances, availableBalances }`                 |
 | `creditAddress({ tenant })` |                                                  | `{ creditAddress }` — derived bech32 address holding the credit. |
 | `withdrawableAmount({ leaseUuid })` |                                          | `{ amounts }`                                                    |
-| `providerWithdrawable({ providerUuid, limit })` |                              | `{ amounts, leaseCount, hasMore }`                               |
+| `providerWithdrawable({ providerUuid, pagination })` |                         | `{ amounts, leaseCount, pagination }` — loop until `pagination.nextKey` is empty, summing `amounts`. |
 | `creditAccounts({ pagination })` |                                             | `{ creditAccounts, pagination }`                                 |
 | `leasesBySKU({ skuUuid, pagination, stateFilter })` |                          | `{ leases, pagination }`                                         |
 | `creditEstimate({ tenant })` |                                                 | `{ currentBalance, totalRatePerSecond, estimatedDurationSeconds, activeLeaseCount }` |
