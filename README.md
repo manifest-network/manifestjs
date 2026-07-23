@@ -18,7 +18,7 @@ yarn add @manifest-network/manifestjs
 
 Compatibility:
 
-- This release (`2.4.x`) targets [`manifest-ledger` v2.1.0](https://github.com/manifest-network/manifest-ledger).
+- This release (`3.0.x`) targets [`manifest-ledger` v2.3.1](https://github.com/manifest-network/manifest-ledger/releases/tag/v2.3.1).
 - CI builds and tests on Node 20.
 
 ## Table of contents

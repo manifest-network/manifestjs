@@ -503,10 +503,12 @@ export interface QueryProviderWithdrawableRequest {
   /** provider_uuid is the UUID of the provider. */
   providerUuid: string;
   /**
-   * limit is the maximum number of leases to process (default: 100, max: 1000).
-   * Use this to prevent query timeouts for providers with many leases.
+   * pagination defines optional pagination. Only ACTIVE leases are iterated
+   * (the only ones that can contribute a withdrawable amount). Page size
+   * defaults to 100 and is capped at 1000. Loop until pagination.next_key is
+   * empty and sum the response amounts for the provider's full withdrawable total.
    */
-  limit: bigint;
+  pagination?: PageRequest;
 }
 export interface QueryProviderWithdrawableRequestProtoMsg {
   typeUrl: "/liftedinit.billing.v1.QueryProviderWithdrawableRequest";
@@ -520,10 +522,12 @@ export interface QueryProviderWithdrawableRequestAmino {
   /** provider_uuid is the UUID of the provider. */
   provider_uuid?: string;
   /**
-   * limit is the maximum number of leases to process (default: 100, max: 1000).
-   * Use this to prevent query timeouts for providers with many leases.
+   * pagination defines optional pagination. Only ACTIVE leases are iterated
+   * (the only ones that can contribute a withdrawable amount). Page size
+   * defaults to 100 and is capped at 1000. Loop until pagination.next_key is
+   * empty and sum the response amounts for the provider's full withdrawable total.
    */
-  limit?: string;
+  pagination?: PageRequestAmino;
 }
 export interface QueryProviderWithdrawableRequestAminoMsg {
   type: "/liftedinit.billing.v1.QueryProviderWithdrawableRequest";
@@ -535,7 +539,7 @@ export interface QueryProviderWithdrawableRequestAminoMsg {
  */
 export interface QueryProviderWithdrawableRequestSDKType {
   provider_uuid: string;
-  limit: bigint;
+  pagination?: PageRequestSDKType;
 }
 /**
  * QueryProviderWithdrawableResponse is the response type for the
@@ -544,13 +548,13 @@ export interface QueryProviderWithdrawableRequestSDKType {
 export interface QueryProviderWithdrawableResponse {
   /** amounts is the total amounts available for withdrawal across all leases (one per denom). */
   amounts: Coin[];
-  /** lease_count is the number of leases included in the withdrawable amount. */
+  /** lease_count is the number of leases with a non-zero withdrawable amount in this page. */
   leaseCount: bigint;
   /**
-   * has_more indicates whether there are more leases beyond the limit.
-   * If true, the amounts represent a partial total and there are more leases to query.
+   * pagination defines the pagination in the response. A non-empty next_key
+   * means more leases remain; pass it as the next request's pagination.key.
    */
-  hasMore: boolean;
+  pagination?: PageResponse;
 }
 export interface QueryProviderWithdrawableResponseProtoMsg {
   typeUrl: "/liftedinit.billing.v1.QueryProviderWithdrawableResponse";
@@ -563,13 +567,13 @@ export interface QueryProviderWithdrawableResponseProtoMsg {
 export interface QueryProviderWithdrawableResponseAmino {
   /** amounts is the total amounts available for withdrawal across all leases (one per denom). */
   amounts: CoinAmino[];
-  /** lease_count is the number of leases included in the withdrawable amount. */
+  /** lease_count is the number of leases with a non-zero withdrawable amount in this page. */
   lease_count?: string;
   /**
-   * has_more indicates whether there are more leases beyond the limit.
-   * If true, the amounts represent a partial total and there are more leases to query.
+   * pagination defines the pagination in the response. A non-empty next_key
+   * means more leases remain; pass it as the next request's pagination.key.
    */
-  has_more?: boolean;
+  pagination?: PageResponseAmino;
 }
 export interface QueryProviderWithdrawableResponseAminoMsg {
   type: "/liftedinit.billing.v1.QueryProviderWithdrawableResponse";
@@ -582,7 +586,7 @@ export interface QueryProviderWithdrawableResponseAminoMsg {
 export interface QueryProviderWithdrawableResponseSDKType {
   amounts: CoinSDKType[];
   lease_count: bigint;
-  has_more: boolean;
+  pagination?: PageResponseSDKType;
 }
 /**
  * QueryCreditAccountsRequest is the request type for the Query/CreditAccounts
@@ -2377,26 +2381,26 @@ GlobalDecoderRegistry.register(QueryWithdrawableAmountResponse.typeUrl, QueryWit
 function createBaseQueryProviderWithdrawableRequest(): QueryProviderWithdrawableRequest {
   return {
     providerUuid: "",
-    limit: BigInt(0)
+    pagination: undefined
   };
 }
 export const QueryProviderWithdrawableRequest = {
   typeUrl: "/liftedinit.billing.v1.QueryProviderWithdrawableRequest",
   is(o: any): o is QueryProviderWithdrawableRequest {
-    return o && (o.$typeUrl === QueryProviderWithdrawableRequest.typeUrl || typeof o.providerUuid === "string" && typeof o.limit === "bigint");
+    return o && (o.$typeUrl === QueryProviderWithdrawableRequest.typeUrl || typeof o.providerUuid === "string");
   },
   isSDK(o: any): o is QueryProviderWithdrawableRequestSDKType {
-    return o && (o.$typeUrl === QueryProviderWithdrawableRequest.typeUrl || typeof o.provider_uuid === "string" && typeof o.limit === "bigint");
+    return o && (o.$typeUrl === QueryProviderWithdrawableRequest.typeUrl || typeof o.provider_uuid === "string");
   },
   isAmino(o: any): o is QueryProviderWithdrawableRequestAmino {
-    return o && (o.$typeUrl === QueryProviderWithdrawableRequest.typeUrl || typeof o.provider_uuid === "string" && typeof o.limit === "bigint");
+    return o && (o.$typeUrl === QueryProviderWithdrawableRequest.typeUrl || typeof o.provider_uuid === "string");
   },
   encode(message: QueryProviderWithdrawableRequest, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     if (message.providerUuid !== "") {
       writer.uint32(10).string(message.providerUuid);
     }
-    if (message.limit !== BigInt(0)) {
-      writer.uint32(16).uint64(message.limit);
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -2410,8 +2414,8 @@ export const QueryProviderWithdrawableRequest = {
         case 1:
           message.providerUuid = reader.string();
           break;
-        case 2:
-          message.limit = reader.uint64();
+        case 3:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -2423,19 +2427,19 @@ export const QueryProviderWithdrawableRequest = {
   fromJSON(object: any): QueryProviderWithdrawableRequest {
     return {
       providerUuid: isSet(object.providerUuid) ? String(object.providerUuid) : "",
-      limit: isSet(object.limit) ? BigInt(object.limit.toString()) : BigInt(0)
+      pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined
     };
   },
   toJSON(message: QueryProviderWithdrawableRequest): JsonSafe<QueryProviderWithdrawableRequest> {
     const obj: any = {};
     message.providerUuid !== undefined && (obj.providerUuid = message.providerUuid);
-    message.limit !== undefined && (obj.limit = (message.limit || BigInt(0)).toString());
+    message.pagination !== undefined && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<QueryProviderWithdrawableRequest>, I>>(object: I): QueryProviderWithdrawableRequest {
     const message = createBaseQueryProviderWithdrawableRequest();
     message.providerUuid = object.providerUuid ?? "";
-    message.limit = object.limit !== undefined && object.limit !== null ? BigInt(object.limit.toString()) : BigInt(0);
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageRequest.fromPartial(object.pagination) : undefined;
     return message;
   },
   fromAmino(object: QueryProviderWithdrawableRequestAmino): QueryProviderWithdrawableRequest {
@@ -2443,15 +2447,15 @@ export const QueryProviderWithdrawableRequest = {
     if (object.provider_uuid !== undefined && object.provider_uuid !== null) {
       message.providerUuid = object.provider_uuid;
     }
-    if (object.limit !== undefined && object.limit !== null) {
-      message.limit = BigInt(object.limit);
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageRequest.fromAmino(object.pagination);
     }
     return message;
   },
   toAmino(message: QueryProviderWithdrawableRequest): QueryProviderWithdrawableRequestAmino {
     const obj: any = {};
     obj.provider_uuid = message.providerUuid === "" ? undefined : message.providerUuid;
-    obj.limit = message.limit !== BigInt(0) ? message.limit?.toString() : undefined;
+    obj.pagination = message.pagination ? PageRequest.toAmino(message.pagination) : undefined;
     return obj;
   },
   fromAminoMsg(object: QueryProviderWithdrawableRequestAminoMsg): QueryProviderWithdrawableRequest {
@@ -2475,19 +2479,19 @@ function createBaseQueryProviderWithdrawableResponse(): QueryProviderWithdrawabl
   return {
     amounts: [],
     leaseCount: BigInt(0),
-    hasMore: false
+    pagination: undefined
   };
 }
 export const QueryProviderWithdrawableResponse = {
   typeUrl: "/liftedinit.billing.v1.QueryProviderWithdrawableResponse",
   is(o: any): o is QueryProviderWithdrawableResponse {
-    return o && (o.$typeUrl === QueryProviderWithdrawableResponse.typeUrl || Array.isArray(o.amounts) && (!o.amounts.length || Coin.is(o.amounts[0])) && typeof o.leaseCount === "bigint" && typeof o.hasMore === "boolean");
+    return o && (o.$typeUrl === QueryProviderWithdrawableResponse.typeUrl || Array.isArray(o.amounts) && (!o.amounts.length || Coin.is(o.amounts[0])) && typeof o.leaseCount === "bigint");
   },
   isSDK(o: any): o is QueryProviderWithdrawableResponseSDKType {
-    return o && (o.$typeUrl === QueryProviderWithdrawableResponse.typeUrl || Array.isArray(o.amounts) && (!o.amounts.length || Coin.isSDK(o.amounts[0])) && typeof o.lease_count === "bigint" && typeof o.has_more === "boolean");
+    return o && (o.$typeUrl === QueryProviderWithdrawableResponse.typeUrl || Array.isArray(o.amounts) && (!o.amounts.length || Coin.isSDK(o.amounts[0])) && typeof o.lease_count === "bigint");
   },
   isAmino(o: any): o is QueryProviderWithdrawableResponseAmino {
-    return o && (o.$typeUrl === QueryProviderWithdrawableResponse.typeUrl || Array.isArray(o.amounts) && (!o.amounts.length || Coin.isAmino(o.amounts[0])) && typeof o.lease_count === "bigint" && typeof o.has_more === "boolean");
+    return o && (o.$typeUrl === QueryProviderWithdrawableResponse.typeUrl || Array.isArray(o.amounts) && (!o.amounts.length || Coin.isAmino(o.amounts[0])) && typeof o.lease_count === "bigint");
   },
   encode(message: QueryProviderWithdrawableResponse, writer: BinaryWriter = BinaryWriter.create()): BinaryWriter {
     for (const v of message.amounts) {
@@ -2496,8 +2500,8 @@ export const QueryProviderWithdrawableResponse = {
     if (message.leaseCount !== BigInt(0)) {
       writer.uint32(16).uint64(message.leaseCount);
     }
-    if (message.hasMore === true) {
-      writer.uint32(24).bool(message.hasMore);
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -2514,8 +2518,8 @@ export const QueryProviderWithdrawableResponse = {
         case 2:
           message.leaseCount = reader.uint64();
           break;
-        case 3:
-          message.hasMore = reader.bool();
+        case 4:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -2528,7 +2532,7 @@ export const QueryProviderWithdrawableResponse = {
     return {
       amounts: Array.isArray(object?.amounts) ? object.amounts.map((e: any) => Coin.fromJSON(e)) : [],
       leaseCount: isSet(object.leaseCount) ? BigInt(object.leaseCount.toString()) : BigInt(0),
-      hasMore: isSet(object.hasMore) ? Boolean(object.hasMore) : false
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined
     };
   },
   toJSON(message: QueryProviderWithdrawableResponse): JsonSafe<QueryProviderWithdrawableResponse> {
@@ -2539,14 +2543,14 @@ export const QueryProviderWithdrawableResponse = {
       obj.amounts = [];
     }
     message.leaseCount !== undefined && (obj.leaseCount = (message.leaseCount || BigInt(0)).toString());
-    message.hasMore !== undefined && (obj.hasMore = message.hasMore);
+    message.pagination !== undefined && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
     return obj;
   },
   fromPartial<I extends Exact<DeepPartial<QueryProviderWithdrawableResponse>, I>>(object: I): QueryProviderWithdrawableResponse {
     const message = createBaseQueryProviderWithdrawableResponse();
     message.amounts = object.amounts?.map(e => Coin.fromPartial(e)) || [];
     message.leaseCount = object.leaseCount !== undefined && object.leaseCount !== null ? BigInt(object.leaseCount.toString()) : BigInt(0);
-    message.hasMore = object.hasMore ?? false;
+    message.pagination = object.pagination !== undefined && object.pagination !== null ? PageResponse.fromPartial(object.pagination) : undefined;
     return message;
   },
   fromAmino(object: QueryProviderWithdrawableResponseAmino): QueryProviderWithdrawableResponse {
@@ -2555,8 +2559,8 @@ export const QueryProviderWithdrawableResponse = {
     if (object.lease_count !== undefined && object.lease_count !== null) {
       message.leaseCount = BigInt(object.lease_count);
     }
-    if (object.has_more !== undefined && object.has_more !== null) {
-      message.hasMore = object.has_more;
+    if (object.pagination !== undefined && object.pagination !== null) {
+      message.pagination = PageResponse.fromAmino(object.pagination);
     }
     return message;
   },
@@ -2568,7 +2572,7 @@ export const QueryProviderWithdrawableResponse = {
       obj.amounts = message.amounts;
     }
     obj.lease_count = message.leaseCount !== BigInt(0) ? message.leaseCount?.toString() : undefined;
-    obj.has_more = message.hasMore === false ? undefined : message.hasMore;
+    obj.pagination = message.pagination ? PageResponse.toAmino(message.pagination) : undefined;
     return obj;
   },
   fromAminoMsg(object: QueryProviderWithdrawableResponseAminoMsg): QueryProviderWithdrawableResponse {

@@ -82,8 +82,8 @@ export class LCDQueryClient {
     const options: any = {
       params: {}
     };
-    if (typeof params?.limit !== "undefined") {
-      options.params.limit = params.limit;
+    if (typeof params?.pagination !== "undefined") {
+      setPaginationParams(options, params.pagination);
     }
     const endpoint = `liftedinit/billing/v1/provider/${params.providerUuid}/withdrawable`;
     return await this.req.get<QueryProviderWithdrawableResponseSDKType>(endpoint, options);
