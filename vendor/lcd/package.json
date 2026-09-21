@@ -1,0 +1,50 @@
+{
+  "name": "@manifest-network/lcd",
+  "version": "0.14.6",
+  "description": "Manifest-maintained Telescope LCD client with patched Axios dependencies",
+  "author": "Dan Lynch <pyramation@gmail.com>",
+  "homepage": "https://github.com/manifest-network/manifestjs/tree/main/vendor/lcd",
+  "license": "(MIT OR Apache-2.0)",
+  "main": "main/index.js",
+  "module": "module/index.js",
+  "typings": "types/index.d.ts",
+  "directories": {
+    "lib": "src",
+    "test": "__tests__"
+  },
+  "files": [
+    "types",
+    "src",
+    "!src/**/*.spec.ts",
+    "module",
+    "main",
+    "LICENSE-MIT",
+    "LICENSE-Apache",
+    "UPSTREAM.md"
+  ],
+  "scripts": {
+    "build:main": "tsc -p tsconfig.json --outDir main --module commonjs",
+    "build:module": "tsc -p tsconfig.json --outDir module --module es2022",
+    "build": "npm run build:module && npm run build:main",
+    "test": "node --test test/*.test.cjs",
+    "prepack": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manifest-network/manifestjs.git",
+    "directory": "vendor/lcd"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/manifest-network/manifestjs/issues"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "axios": "^1.19.0"
+  }
+}

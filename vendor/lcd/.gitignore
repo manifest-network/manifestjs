@@ -8,9 +8,7 @@ pids
 *.pid
 *.seed
 
-# out
-dist
-mjs
+# dist
 main
 module
 
@@ -43,8 +41,7 @@ jspm_packages
 lib
 
 # npm package lock
-package-lock.json
-!vendor/lcd/package-lock.json
+yarn.lock
 
 # others
 .DS_Store

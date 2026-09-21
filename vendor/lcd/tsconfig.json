@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "declaration": true,
+    "declarationDir": "./types",
+    "isolatedModules": true,
+    "allowJs": true,
+
+    "baseUrl": ".",
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "emitDeclarationOnly": false,
+    "target": "es2022",
+    "lib": ["es2022", "DOM"],
+    "downlevelIteration": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "src/**/*.spec.ts", "src/__fixtures__/**/*"]
+}
