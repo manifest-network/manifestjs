@@ -66,7 +66,9 @@ selects one package, exact version, and full commit SHA.
 
 1. Merge the reviewed source and workflow changes, then prepare reviewed leaf
    version bumps: LCD 0.14.7 in this repository and ICS23 0.6.10 in the CosmJS fork.
-2. Dispatch each leaf package at its reviewed main SHA. The read-only build job
+2. Dispatch each leaf package at its reviewed source-branch SHA: LCD from this
+   repository's `main`, ICS23 from the CosmJS fork's `manifest/0.32` maintenance
+   branch. The read-only build job
    installs locked build dependencies with lifecycle scripts disabled, explicitly
    builds/tests, packs, and checks a fresh consumer audit. The separate protected
    publish job rechecks the artifact hash and manifest and publishes those exact
@@ -79,7 +81,9 @@ selects one package, exact version, and full commit SHA.
    attestation URL alone cannot pass. Preserve the `npm-publication-evidence`
    Actions artifact and public run URL.
 4. After the leaves are verified, prepare/review Stargate ll.5 and its lockfile,
-   then publish and verify it from the CosmJS repository. Prepare the ManifestJS
+   then publish and verify it from the CosmJS repository's protected
+   `manifest/0.32` branch. That branch is the fork's default and release branch;
+   its `main` remains an upstream reference. Prepare the ManifestJS
    compatibility correction and major upgrade as separate reviewed changes; do
    not make locks resolve nonexistent successor versions.
 5. Test old SDK 0.22.0 against the proposed 3.0.2 registry candidate and new SDK/CLI
