@@ -1,6 +1,6 @@
 {
   "name": "@manifest-network/lcd",
-  "version": "0.14.6",
+  "version": "0.14.7",
   "description": "Manifest-maintained Telescope LCD client with patched Axios dependencies",
   "author": "Dan Lynch <pyramation@gmail.com>",
   "homepage": "https://github.com/manifest-network/manifestjs/tree/main/vendor/lcd",
