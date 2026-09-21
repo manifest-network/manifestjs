@@ -62,6 +62,19 @@ the current Sigstore verification fixes. The release no longer runs automaticall
 on version tags or creates a GitHub Release. Its explicit main-branch dispatch
 selects one package, exact version, and full commit SHA.
 
+The dispatch also selects the reviewed npm channel: `latest`, `next`, or
+`legacy`. `latest` accepts stable versions and cannot move below the registry's
+current `latest`. Use `next` for prereleases or candidate releases. `legacy`
+accepts stable versions below an existing `latest`. These checks run before the
+build and again immediately before publication.
+
+For the planned ManifestJS lines, publish 3.0.2 under `latest` if it precedes
+4.0.0, then publish 4.0.0 under `latest`. If 4.0.0 is already `latest`, publish
+3.0.2 under `legacy`. Do not publish 3.0.2 only under `legacy` while 3.0.1 is
+still `latest`: npm can prefer the matching `latest` for an old SDK's `^3.0.0`
+range. This channel policy does not waive the legacy line's audit or provenance
+requirements.
+
 ## Release order and evidence
 
 1. Merge the reviewed source and workflow changes, then prepare reviewed leaf
@@ -75,6 +88,9 @@ selects one package, exact version, and full commit SHA.
    bytes with OIDC/provenance. Existing versions are rejected.
 3. The verifier installs the public package without lifecycle scripts and runs
    `npm audit signatures --json --include-attestations` with the pinned npm CLI.
+   Installation and verification retry together for up to 12 attempts with
+   10-second pauses, requesting fresh registry metadata. Publication is never
+   retried, and exhausted or permanent verification failures still fail the job.
    It applies policy to those **cryptographically verified bundles**, checking the
    artifact SHA-512, package/version, GitHub certificate workflow/source/ref/SHA,
    and SLSA source/workflow/builder. Unsigned decoded JSON or the presence of an
@@ -87,7 +103,7 @@ selects one package, exact version, and full commit SHA.
    compatibility correction and major upgrade as separate reviewed changes; do
    not make locks resolve nonexistent successor versions.
 5. Test old SDK 0.22.0 against the proposed 3.0.2 registry candidate and new SDK/CLI
-   tarballs against 4.0.0 before publication (which uses the `latest` dist-tag). The legacy correction
+   tarballs against 4.0.0 before publication using the reviewed channel policy above. The legacy correction
    intentionally has audit/provenance limitations described above. The new SDK
    graph must pass identity, smoke, vulnerability, and provenance gates.
 6. Only after all public successor artifacts are verified may the monorepo adopt

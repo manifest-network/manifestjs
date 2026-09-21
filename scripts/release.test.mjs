@@ -1,10 +1,24 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
+import {
+  chmodSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import {
   assertPackedManifest,
   assertReleaseContext,
   repository,
+  verifyPublishedArtifact,
   workflow,
 } from "./release.mjs";
 
@@ -261,5 +275,261 @@ test("provenance policy rejects wrong artifact, source, workflow, and builder", 
     const value = statement();
     mutate(value);
     assert.throws(() => assertProvenanceStatement(value, expected));
+  }
+});
+
+test("post-publication verification recovers from unavailable versions and delayed attestations", async (t) => {
+  const fixture = JSON.parse(
+    readFileSync(
+      new URL("./fixtures/sdk-0.22.0-provenance.json", import.meta.url)
+    )
+  );
+  const consumer = mkdtempSync(join(tmpdir(), "manifest-verification-retry-"));
+  t.after(() => rmSync(consumer, { recursive: true, force: true }));
+  const calls = [];
+  let installs = 0;
+  let audits = 0;
+  let waits = 0;
+  const verifiedAudit = {
+    invalid: [],
+    missing: [],
+    verified: [fixture.verified],
+  };
+  const audit = await verifyPublishedArtifact(fixture.expected, consumer, {
+    attempts: 3,
+    wait: async () => {
+      waits++;
+    },
+    execute(command, args, directory, capture) {
+      assert.equal(command, "npm");
+      assert.equal(directory, consumer);
+      calls.push(args[0]);
+      if (args[0] === "install") {
+        assert.ok(args.includes("--ignore-scripts"));
+        assert.ok(args.includes("--prefer-online"));
+        assert.ok(
+          args.includes(`${fixture.expected.name}@${fixture.expected.version}`)
+        );
+        if (++installs === 1)
+          throw new Error("E404: new version not visible yet");
+        writeFileSync(
+          join(consumer, "package-lock.json"),
+          JSON.stringify({
+            packages: {
+              [`node_modules/${fixture.expected.name}`]: {
+                integrity: fixture.expected.integrity,
+              },
+            },
+          })
+        );
+        return;
+      }
+      assert.deepEqual(args, [
+        "audit",
+        "signatures",
+        "--json",
+        "--include-attestations",
+        "--prefer-online",
+        "--registry=https://registry.npmjs.org/",
+      ]);
+      assert.equal(capture, true);
+      if (++audits === 1)
+        return JSON.stringify({
+          ...verifiedAudit,
+          verified: [{ ...fixture.verified, attestationBundles: [] }],
+        });
+      return JSON.stringify(verifiedAudit);
+    },
+  });
+  assert.deepEqual(audit, verifiedAudit);
+  assert.deepEqual(calls, ["install", "install", "audit", "install", "audit"]);
+  assert.equal(waits, 2);
+});
+
+test("post-publication verification exhausts installation retries without publishing", async () => {
+  let installs = 0;
+  let waits = 0;
+  const failure = new Error("E404: version remains unavailable");
+  await assert.rejects(
+    verifyPublishedArtifact(expected, "/unused", {
+      attempts: 3,
+      wait: async () => {
+        waits++;
+      },
+      execute(command, args) {
+        assert.equal(command, "npm");
+        assert.equal(args[0], "install");
+        installs++;
+        throw failure;
+      },
+    }),
+    (error) => error === failure
+  );
+  assert.equal(installs, 3);
+  assert.equal(waits, 2);
+});
+
+test("retrying publication verification never accepts a wrong artifact or source identity", async (t) => {
+  const fixture = JSON.parse(
+    readFileSync(
+      new URL("./fixtures/sdk-0.22.0-provenance.json", import.meta.url)
+    )
+  );
+  const consumer = mkdtempSync(join(tmpdir(), "manifest-verification-policy-"));
+  t.after(() => rmSync(consumer, { recursive: true, force: true }));
+  for (const [integrity, identity, message] of [
+    [expected.integrity, fixture.expected, /differs from the tested tarball/],
+    [
+      fixture.expected.integrity,
+      { ...fixture.expected, sha: "b".repeat(40) },
+      /Fulcio identity extension/,
+    ],
+  ]) {
+    let installs = 0;
+    let waits = 0;
+    await assert.rejects(
+      verifyPublishedArtifact(identity, consumer, {
+        attempts: 2,
+        wait: async () => {
+          waits++;
+        },
+        execute(command, args) {
+          assert.equal(command, "npm");
+          if (args[0] === "install") {
+            installs++;
+            writeFileSync(
+              join(consumer, "package-lock.json"),
+              JSON.stringify({
+                packages: { [`node_modules/${identity.name}`]: { integrity } },
+              })
+            );
+            return;
+          }
+          assert.equal(args[0], "audit");
+          return JSON.stringify({
+            invalid: [],
+            missing: [],
+            verified: [fixture.verified],
+          });
+        },
+      }),
+      message
+    );
+    assert.equal(installs, 2);
+    assert.equal(waits, 1);
+  }
+});
+
+test("publication CLI rejects a latest rollback and passes the approved legacy tag to npm", (t) => {
+  const checkout = fileURLToPath(new URL("../", import.meta.url));
+  const head = spawnSync("git", ["rev-parse", "HEAD"], {
+    cwd: checkout,
+    encoding: "utf8",
+  }).stdout.trim();
+  const directory = mkdtempSync(join(tmpdir(), "manifest-publish-policy-"));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const stage = join(directory, "stage");
+  const output = join(directory, "release");
+  const bin = join(directory, "bin");
+  mkdirSync(join(stage, "package"), { recursive: true });
+  mkdirSync(output);
+  mkdirSync(bin);
+  writeFileSync(join(stage, "package/package.json"), JSON.stringify(manifest));
+  const filename = "fixture.tgz";
+  const artifact = join(output, filename);
+  const packed = spawnSync("tar", ["-czf", artifact, "-C", stage, "package"], {
+    encoding: "utf8",
+  });
+  assert.equal(packed.status, 0, packed.stderr);
+  writeFileSync(
+    join(output, "release.json"),
+    JSON.stringify({
+      target: "lcd",
+      filename,
+      sha: head,
+      integrity: `sha512-${createHash("sha512")
+        .update(readFileSync(artifact))
+        .digest("base64")}`,
+    })
+  );
+  const npmLog = join(directory, "npm-publish.json");
+  const npm = join(bin, "npm");
+  writeFileSync(
+    npm,
+    `#!${process.execPath}
+const { writeFileSync } = require("node:fs");
+const args = process.argv.slice(2);
+if (args[0] === "--version") console.log("11.19.1");
+else if (args[0] === "publish") writeFileSync(process.env.MANIFEST_TEST_NPM_LOG, JSON.stringify(args));
+else process.exit(1);
+`
+  );
+  chmodSync(npm, 0o755);
+  const preload = join(directory, "registry.mjs");
+  writeFileSync(
+    preload,
+    `const endpoint = "https://registry.npmjs.org/" + encodeURIComponent(process.env.MANIFEST_TEST_PACKAGE);
+globalThis.fetch = async (url) => {
+  if (url === endpoint + "/latest") return {
+    status: 200,
+    json: async () => ({ name: process.env.MANIFEST_TEST_PACKAGE, version: process.env.MANIFEST_TEST_LATEST }),
+  };
+  if (url === endpoint + "/" + process.env.RELEASE_VERSION) return { status: 404 };
+  throw new Error("Unexpected registry request: " + url);
+};
+`
+  );
+  const env = {
+    ...process.env,
+    PATH: `${bin}:${process.env.PATH}`,
+    GITHUB_EVENT_NAME: "workflow_dispatch",
+    GITHUB_REF: "refs/heads/main",
+    GITHUB_REPOSITORY: repository,
+    GITHUB_SHA: head,
+    RELEASE_SHA: head,
+    RELEASE_TARGET: "lcd",
+    RELEASE_VERSION: manifest.version,
+    ACTIONS_ID_TOKEN_REQUEST_URL: "https://example.invalid/oidc",
+    ACTIONS_ID_TOKEN_REQUEST_TOKEN: "fixture-only",
+    NODE_AUTH_TOKEN: "",
+    NPM_TOKEN: "",
+    NPM_AUTH_TOKEN: "",
+    MANIFEST_TEST_PACKAGE: manifest.name,
+    MANIFEST_TEST_LATEST: `${Number(manifest.version.split(".")[0]) + 1}.0.0`,
+    MANIFEST_TEST_NPM_LOG: npmLog,
+  };
+  for (const tag of ["latest", "legacy"]) {
+    const result = spawnSync(
+      process.execPath,
+      [
+        "--import",
+        preload,
+        "scripts/release.mjs",
+        "publish",
+        "lcd",
+        output,
+        manifest.version,
+        head,
+      ],
+      {
+        cwd: checkout,
+        env: { ...env, RELEASE_TAG: tag },
+        encoding: "utf8",
+        timeout: 10_000,
+      }
+    );
+    if (tag === "latest") {
+      assert.notEqual(result.status, 0);
+      assert.match(result.stderr, /Cannot move latest backward/);
+      assert.equal(existsSync(npmLog), false);
+    } else {
+      assert.equal(result.status, 0, result.stderr);
+      const args = JSON.parse(readFileSync(npmLog, "utf8"));
+      assert.equal(args[0], "publish");
+      assert.equal(args[1], artifact);
+      assert.ok(args.includes("--tag=legacy"));
+      assert.ok(args.includes("--provenance"));
+      assert.ok(args.includes("--ignore-scripts"));
+    }
   }
 });

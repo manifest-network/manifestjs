@@ -12,6 +12,12 @@ on:
         description: Exact version already committed on main
         type: string
         required: true
+      tag:
+        description: Reviewed npm channel (latest, next, or legacy)
+        type: choice
+        options: [latest, next, legacy]
+        default: latest
+        required: true
       sha:
         description: Full reviewed main commit SHA (must match the dispatch SHA)
         type: string
@@ -27,6 +33,7 @@ concurrency:
 env:
   RELEASE_TARGET: ${{ inputs.package }}
   RELEASE_VERSION: ${{ inputs.version }}
+  RELEASE_TAG: ${{ inputs.tag }}
   RELEASE_SHA: ${{ inputs.sha }}
   npm_config_registry: https://registry.npmjs.org
 
@@ -48,7 +55,7 @@ jobs:
       - name: Install the pinned package managers
         run: npm install --global npm@11.19.1 yarn@1.22.22 --ignore-scripts
       - name: Test publication guards
-        run: node --test scripts/release.test.mjs
+        run: node --test scripts/release.test.mjs scripts/release-tag.test.mjs
       - name: Build and validate the exact release artifact
         run: |
           node scripts/build-release.mjs "$RELEASE_TARGET" "$RUNNER_TEMP/release"

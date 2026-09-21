@@ -26,7 +26,7 @@ jobs:
       - name: Install the pinned package managers
         run: npm install --global npm@11.19.1 yarn@1.22.22 --ignore-scripts
       - name: Check publication guard negative controls
-        run: node --test scripts/release.test.mjs
+        run: node --test scripts/release.test.mjs scripts/release-tag.test.mjs
       - name: Build, test, and pack the selected package
         env:
           PACKAGE: ${{ matrix.package }}
