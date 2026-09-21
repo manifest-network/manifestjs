@@ -1,6 +1,6 @@
 {
   "name": "@manifest-network/manifestjs",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Javascript library for interacting with Manifest",
   "author": "Manifest Network <hello@manifest.network>",
   "homepage": "https://github.com/manifest-network/manifestjs#readme",
@@ -16,8 +16,8 @@
     "!CHANGELOG.md"
   ],
   "scripts": {
-    "build:cjs": "yarn tsc -p tsconfig.json --outDir dist --module commonjs || true",
-    "build:mjs": "yarn tsc -p tsconfig.json --outDir mjs --module es2022 --declaration false || true",
+    "build:cjs": "yarn tsc -p tsconfig.json --outDir dist --module commonjs",
+    "build:mjs": "yarn tsc -p tsconfig.json --outDir mjs --module es2022 --declaration false",
     "clean:mjs": "rimraf mjs",
     "clean:dist": "rimraf dist",
     "clean": "npm run clean:mjs && npm run clean:dist",
@@ -34,11 +34,14 @@
     "starship:watch": "jest --watch --config ./jest.starship.config.js"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org",
+    "provenance": true
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/manifest-network/manifestjs"
+    "url": "git+https://github.com/manifest-network/manifestjs.git",
+    "directory": "."
   },
   "keywords": [],
   "bugs": {
@@ -70,8 +73,8 @@
     "@cosmjs/amino": "^0.32.4",
     "@cosmjs/encoding": "^0.32.4",
     "@cosmjs/proto-signing": "^0.32.4",
-    "@cosmjs/stargate": "npm:@manifest-network/stargate@0.32.4-ll.3",
+    "@cosmjs/stargate": "npm:@manifest-network/stargate@0.32.4-ll.4",
     "@cosmjs/tendermint-rpc": "^0.32.4",
-    "@cosmology/lcd": "^0.14.0"
+    "@cosmology/lcd": "npm:@manifest-network/lcd@^0.14.6"
   }
 }

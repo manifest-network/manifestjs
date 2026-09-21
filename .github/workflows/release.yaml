@@ -1,99 +1,102 @@
 name: Release
 
 on:
-  push:
-    tags: ['v[0-9]*.[0-9]*.[0-9]*']
+  workflow_dispatch:
+    inputs:
+      package:
+        description: Reviewed package to publish
+        type: choice
+        options: [lcd, manifestjs]
+        required: true
+      version:
+        description: Exact version already committed on main
+        type: string
+        required: true
+      tag:
+        description: Reviewed npm channel (latest, next, or legacy)
+        type: choice
+        options: [latest, next, legacy]
+        default: latest
+        required: true
+      sha:
+        description: Full reviewed main commit SHA (must match the dispatch SHA)
+        type: string
+        required: true
 
 permissions:
-  contents: write
-  id-token: write # required for npm provenance (OIDC signing)
+  contents: read
+
+concurrency:
+  group: npm-release-${{ inputs.package }}
+  cancel-in-progress: false
+
+env:
+  RELEASE_TARGET: ${{ inputs.package }}
+  RELEASE_VERSION: ${{ inputs.version }}
+  RELEASE_TAG: ${{ inputs.tag }}
+  RELEASE_SHA: ${{ inputs.sha }}
+  npm_config_registry: https://registry.npmjs.org
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 20
-          cache: yarn
-          registry-url: https://registry.npmjs.org
-
-      - name: Upgrade npm for OIDC trusted publishing
-        run: npm install -g npm@11.5.1
-
-      - name: Validate tag format and matches package version
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.15.0
+          package-manager-cache: false
+      - name: Isolate npm configuration
+        run: printf 'npm_config_userconfig=%s/no-token-npmrc\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - name: Require the reviewed main commit and package version
+        run: node scripts/release.mjs guard
+      - name: Install the pinned package managers
+        run: npm install --global npm@11.19.1 yarn@1.22.22 --ignore-scripts
+      - name: Test publication guards
+        run: node --test scripts/release.test.mjs scripts/release-tag.test.mjs
+      - name: Build and validate the exact release artifact
         run: |
-          if [[ ! "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
-            echo "::error::tag $GITHUB_REF_NAME is not a valid semver release tag (expected vMAJOR.MINOR.PATCH[-PRERELEASE][+BUILD])"
-            exit 1
-          fi
-          TAG_VERSION="${GITHUB_REF_NAME#v}"
-          PKG_VERSION=$(node -p "require('./package.json').version")
-          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
-            echo "::error::package.json version ($PKG_VERSION) does not match tag ($TAG_VERSION)"
-            exit 1
-          fi
+          node scripts/build-release.mjs "$RELEASE_TARGET" "$RUNNER_TEMP/release"
+          node scripts/release.mjs validate "$RELEASE_TARGET" "$RUNNER_TEMP/release" "$RELEASE_VERSION" "$GITHUB_SHA"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: npm-release
+          path: ${{ runner.temp }}/release
+          if-no-files-found: error
+          retention-days: 30
 
-      - run: yarn install --frozen-lockfile
-
-      - name: Typecheck
-        run: yarn tsc -p tsconfig.json --noEmit
-
-      - run: yarn build
-
-      - name: Verify build outputs
-        run: |
-          MISSING=0
-          for f in dist/index.js dist/index.mjs dist/index.d.ts; do
-            if [ ! -s "$f" ]; then
-              echo "::error::expected build output missing or empty: $f"
-              MISSING=1
-            fi
-          done
-          if [ "$MISSING" -eq 1 ]; then
-            exit 1
-          fi
-
-      - run: yarn test
-
-      - name: Publish to npm
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          PKG_NAME=$(node -p "require('./package.json').name")
-          if npm view "${PKG_NAME}@${VERSION}" version >/dev/null 2>&1; then
-            echo "::warning::${PKG_NAME}@${VERSION} already published, skipping"
-            exit 0
-          fi
-          # Pre-release versions go to a non-'latest' dist-tag so
-          # `npm install` does not pick them up by default.
-          if [[ "$VERSION" == *-* ]]; then
-            PRERELEASE="${VERSION#*-}"
-            PRERELEASE="${PRERELEASE%%.*}"
-            PRERELEASE="${PRERELEASE%%[0-9]*}"
-            NPM_TAG="${PRERELEASE:-next}"
-          else
-            NPM_TAG="latest"
-          fi
-          echo "Publishing ${PKG_NAME}@${VERSION} with dist-tag '${NPM_TAG}'"
-          npm publish --ignore-scripts --provenance --access public --tag "$NPM_TAG"
-
-      - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
-            echo "Release $GITHUB_REF_NAME already exists, skipping"
-            exit 0
-          fi
-          VERSION="${GITHUB_REF_NAME#v}"
-          PRERELEASE_FLAG=""
-          if [[ "$VERSION" == *-* ]]; then
-            PRERELEASE_FLAG="--prerelease"
-          fi
-          if ! gh release create "$GITHUB_REF_NAME" --generate-notes $PRERELEASE_FLAG; then
-            echo "::error::Package was published to npm, but GitHub Release creation failed."
-            echo "::error::Create it manually: gh release create $GITHUB_REF_NAME --generate-notes $PRERELEASE_FLAG"
-            exit 1
-          fi
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: npm-release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.15.0
+          package-manager-cache: false
+      - name: Isolate npm configuration
+        run: printf 'npm_config_userconfig=%s/no-token-npmrc\n' "$RUNNER_TEMP" >> "$GITHUB_ENV"
+      - name: Install the pinned npm CLI
+        run: npm install --global npm@11.19.1 --ignore-scripts
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: npm-release
+          path: ${{ runner.temp }}/release
+      - name: Publish the tested artifact using npm trusted publishing
+        run: node scripts/release.mjs publish "$RELEASE_TARGET" "$RUNNER_TEMP/release" "$RELEASE_VERSION" "$GITHUB_SHA"
+      - name: Verify npm signatures, provenance, source commit, and artifact integrity
+        run: node scripts/release.mjs verify "$RELEASE_TARGET" "$RUNNER_TEMP/release" "$RELEASE_VERSION" "$GITHUB_SHA"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: npm-publication-evidence
+          path: ${{ runner.temp }}/release/verified-publication.json
+          if-no-files-found: error
+          retention-days: 90
