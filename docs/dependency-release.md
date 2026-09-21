@@ -1,34 +1,95 @@
-# LCD and ManifestJS dependency patch
+# Reviewed dependency releases
 
-The patch preserves generated client source and the current CosmJS family.
-ManifestJS 3.0.1 requires:
+The manually published LCD 0.14.6, ICS23 0.6.9, Stargate 0.32.4-ll.4, and
+ManifestJS 3.0.1 have no npm provenance. Their recorded source comparisons are
+useful historical evidence, but are **not an exception permitting an SDK release**.
+Already published versions cannot gain a new provenance attestation; successors
+must be built and published from reviewed source in GitHub Actions.
 
-- `@cosmology/lcd: npm:@manifest-network/lcd@^0.14.6`, which requires Axios
-  `^1.19.0` in its published dependencies.
-- `@cosmjs/stargate: npm:@manifest-network/stargate@0.32.4-ll.4`, which requires
-  the maintained ICS23/protobufjs dependency patch.
+This PR prepares that release path. The current package versions remain unchanged
+and cannot be republished. Generated client source and the CosmJS crypto family
+remain unchanged; the broader crypto migration is deferred.
 
-The new minimum versions prevent a fresh consumer from resolving the older
-vulnerable dependency declarations. Existing public import paths remain valid.
-Repository `resolutions`, consumer overrides, and install-time patch scripts are
-not needed for this runtime repair.
+## Compatibility and coordinated versions
 
-## Publication order
+ManifestJS 3.0.1 changed its exact Stargate alias from 0.32.4-ll.3 to ll.4.
+Published SDK/core 0.22.0 still pins ll.3 while accepting ManifestJS `^3.0.0`.
+A fresh SDK install can therefore contain two Stargate implementations. Passing
+`npm ls` or an import smoke test alone does not prove compatible class identities.
 
-1. Build and test `vendor/lcd` with `npm ci --ignore-scripts`, `npm run build`,
-   and `npm test`. Run `npm audit --omit=dev --audit-level=high` and pack it with
-   `npm pack --ignore-scripts`. Publish the reviewed `@manifest-network/lcd@0.14.6`
-   tarball with `npm publish TAR_FILE --access public --tag latest`.
-2. Publish the companion `@manifest-network/ics23@0.6.9` and
-   `@manifest-network/stargate@0.32.4-ll.4` patches from the CosmJS fork.
-3. Verify the ManifestJS lockfile against public npm, then run
-   `yarn install --frozen-lockfile`, `yarn tsc -p tsconfig.json --noEmit`,
-   `yarn build`, and `yarn test --runInBand`. The generated-LCD tests use a local
-   HTTP server and preserve query parameters, large amounts, and error metadata.
-4. Publish ManifestJS 3.0.1 through the existing release process or the reviewed
-   tarball. The MCP monorepo must then adopt 3.0.1 and pass its independent packed
-   SDK/CLI consumer audits before its release.
+Use two explicitly different release lines:
 
-Candidate-registry tests before publication prove the staged package graph;
-they do not prove that public npm has these releases. Keep that distinction in
-release evidence. The separate CosmJS crypto migration remains deferred.
+| Package    | Planned version | Purpose                                                                  |
+| ---------- | --------------- | ------------------------------------------------------------------------ |
+| LCD        | 0.14.7          | Attested successor, patched Axios declaration                            |
+| ICS23      | 0.6.10          | Attested successor, patched protobufjs declaration                       |
+| Stargate   | 0.32.4-ll.5     | Attested successor requiring ICS23 0.6.10                                |
+| ManifestJS | 3.0.2           | Compatibility correction retaining exact Stargate ll.3, using LCD 0.14.7 |
+| ManifestJS | 4.0.0           | Repaired line requiring exact Stargate ll.5 and LCD 0.14.7               |
+
+The 3.0.2 correction restores one Stargate identity for old SDK consumers. It
+**retains the old ICS23/protobufjs chain and old Stargate's provenance gap**; it
+cannot be called a complete security repair. It needs a separate reviewed release
+policy for that legacy line: this workflow's production audit currently fails on
+that graph. Do not weaken the gate globally or suppress its audit failures.
+Existing lockfiles require an explicit update, and the complete repair requires
+a new coordinated SDK/core/CLI release using ManifestJS 4.0.0 and Stargate ll.5.
+
+An alternative using a required Stargate peer was tested with real npm resolution.
+The published SDK/core topology still produced two copies; it is not an accepted
+solution. Monorepo consumer tests cover both the published 0.22.0 entry points
+and candidates, including dependency identity, import smoke tests, and audits.
+
+## One-time maintainer configuration
+
+1. Review and merge the source PRs. ManifestJS main requires an approving review;
+   release dispatch must run at the exact reviewed main SHA. Configure the
+   `npm-release` GitHub environment with required reviewers and main-only
+   deployment branches before any dispatch. Naming an environment in YAML alone
+   does not create these protections.
+2. On **both** npm package settings pages, configure a GitHub Actions trusted
+   publisher: owner `manifest-network`, repository `manifestjs`, workflow filename
+   `release.yaml`, environment `npm-release`. Use GitHub-hosted runners. This
+   workflow intentionally provides no npm token fallback.
+3. Configure the trusted publisher to allow **direct publication**. New npm trust
+   relationships default to staging; this reviewed workflow uses `npm publish`
+   and must fail if the trust policy only permits staging. Do not replace a
+   staged-approval policy without maintainer review.
+
+See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/) for the
+account configuration. Node 24.15.0 and npm 11.19.1 are pinned; the latter includes
+the current Sigstore verification fixes. The release no longer runs automatically
+on version tags or creates a GitHub Release. Its explicit main-branch dispatch
+selects one package, exact version, and full commit SHA.
+
+## Release order and evidence
+
+1. Merge the reviewed source and workflow changes, then prepare reviewed leaf
+   version bumps: LCD 0.14.7 in this repository and ICS23 0.6.10 in the CosmJS fork.
+2. Dispatch each leaf package at its reviewed main SHA. The read-only build job
+   installs locked build dependencies with lifecycle scripts disabled, explicitly
+   builds/tests, packs, and checks a fresh consumer audit. The separate protected
+   publish job rechecks the artifact hash and manifest and publishes those exact
+   bytes with OIDC/provenance. Existing versions are rejected.
+3. The verifier installs the public package without lifecycle scripts and runs
+   `npm audit signatures --json --include-attestations` with the pinned npm CLI.
+   It applies policy to those **cryptographically verified bundles**, checking the
+   artifact SHA-512, package/version, GitHub certificate workflow/source/ref/SHA,
+   and SLSA source/workflow/builder. Unsigned decoded JSON or the presence of an
+   attestation URL alone cannot pass. Preserve the `npm-publication-evidence`
+   Actions artifact and public run URL.
+4. After the leaves are verified, prepare/review Stargate ll.5 and its lockfile,
+   then publish and verify it from the CosmJS repository. Prepare the ManifestJS
+   compatibility correction and major upgrade as separate reviewed changes; do
+   not make locks resolve nonexistent successor versions.
+5. Test old SDK 0.22.0 against the proposed 3.0.2 registry candidate and new SDK/CLI
+   tarballs against 4.0.0 before publication (which uses the `latest` dist-tag). The legacy correction
+   intentionally has audit/provenance limitations described above. The new SDK
+   graph must pass identity, smoke, vulnerability, and provenance gates.
+6. Only after all public successor artifacts are verified may the monorepo adopt
+   them, refresh its lockfile/evidence and release the SDK. Current unattested
+   versions must fail the monorepo release provenance gate.
+
+If publication succeeds but verification fails, stop the sequence and investigate
+that published version. Never use an existing-version skip to claim success, and
+never adopt an artifact whose source identity or integrity failed verification.

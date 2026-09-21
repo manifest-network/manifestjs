@@ -12,6 +12,7 @@
     "emitDeclarationOnly": false,
     "target": "es2022",
     "lib": ["es2022", "DOM"],
+    "types": [],
     "downlevelIteration": true,
     "moduleResolution": "node",
     "resolveJsonModule": true
