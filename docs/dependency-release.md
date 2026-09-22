@@ -6,9 +6,25 @@ useful historical evidence, but are **not an exception permitting an SDK release
 Already published versions cannot gain a new provenance attestation; successors
 must be built and published from reviewed source in GitHub Actions.
 
-This PR prepares that release path. The current package versions remain unchanged
-and cannot be republished. Generated client source and the CosmJS crypto family
-remain unchanged; the broader crypto migration is deferred.
+ManifestJS 4.0.0 adopts the verified LCD 0.14.7 and exact Stargate 0.32.4-ll.5
+releases. Stargate requires the verified ICS23 0.6.10 release. The major version
+keeps this new Stargate identity outside existing SDK/core consumers' `^3.0.0`
+range; those consumers must adopt the new versions together. Generated client
+source and the CosmJS crypto family remain unchanged; the broader crypto
+migration is deferred.
+
+The dependency publications passed artifact integrity and cryptographic npm
+provenance verification against these reviewed commits:
+
+| Package  | Version     | Reviewed source                            | Successful release run                                                                        |
+| -------- | ----------- | ------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| LCD      | 0.14.7      | `c69387ceefcb23165c58c92aee123c97dce3e9e9` | [ManifestJS release](https://github.com/manifest-network/manifestjs/actions/runs/35650499591) |
+| ICS23    | 0.6.10      | `e464b5c21ae097e06e5505b7a8d3834359199840` | [ICS23 release](https://github.com/manifest-network/cosmjs/actions/runs/35650590941)          |
+| Stargate | 0.32.4-ll.5 | `f700b2f6268b1ee0fb41a133b1719a889f632754` | [Stargate release](https://github.com/manifest-network/cosmjs/actions/runs/35653654841)       |
+
+ManifestJS 4.0.0 still requires review, publication, and verification through the
+protected workflow before the monorepo can adopt its public artifact. The
+optional 3.0.2 legacy correction remains a separate release-policy decision.
 
 ## Compatibility and coordinated versions
 
@@ -19,13 +35,13 @@ A fresh SDK install can therefore contain two Stargate implementations. Passing
 
 Use two explicitly different release lines:
 
-| Package    | Planned version | Purpose                                                                  |
-| ---------- | --------------- | ------------------------------------------------------------------------ |
-| LCD        | 0.14.7          | Attested successor, patched Axios declaration                            |
-| ICS23      | 0.6.10          | Attested successor, patched protobufjs declaration                       |
-| Stargate   | 0.32.4-ll.5     | Attested successor requiring ICS23 0.6.10                                |
-| ManifestJS | 3.0.2           | Compatibility correction retaining exact Stargate ll.3, using LCD 0.14.7 |
-| ManifestJS | 4.0.0           | Repaired line requiring exact Stargate ll.5 and LCD 0.14.7               |
+| Package    | Version     | Purpose                                                                  |
+| ---------- | ----------- | ------------------------------------------------------------------------ |
+| LCD        | 0.14.7      | Attested successor, patched Axios declaration                            |
+| ICS23      | 0.6.10      | Attested successor, patched protobufjs declaration                       |
+| Stargate   | 0.32.4-ll.5 | Attested successor requiring ICS23 0.6.10                                |
+| ManifestJS | 3.0.2       | Compatibility correction retaining exact Stargate ll.3, using LCD 0.14.7 |
+| ManifestJS | 4.0.0       | Repaired line requiring exact Stargate ll.5 and LCD 0.14.7               |
 
 The 3.0.2 correction restores one Stargate identity for old SDK consumers. It
 **retains the old ICS23/protobufjs chain and old Stargate's provenance gap**; it
