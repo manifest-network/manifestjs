@@ -1,6 +1,6 @@
 {
   "name": "@manifest-network/manifestjs",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "description": "Javascript library for interacting with Manifest",
   "author": "Manifest Network <hello@manifest.network>",
   "homepage": "https://github.com/manifest-network/manifestjs#readme",
@@ -73,8 +73,8 @@
     "@cosmjs/amino": "^0.32.4",
     "@cosmjs/encoding": "^0.32.4",
     "@cosmjs/proto-signing": "^0.32.4",
-    "@cosmjs/stargate": "npm:@manifest-network/stargate@0.32.4-ll.4",
+    "@cosmjs/stargate": "npm:@manifest-network/stargate@0.32.4-ll.5",
     "@cosmjs/tendermint-rpc": "^0.32.4",
-    "@cosmology/lcd": "npm:@manifest-network/lcd@^0.14.6"
+    "@cosmology/lcd": "npm:@manifest-network/lcd@^0.14.7"
   }
 }
